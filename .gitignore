@@ -1,0 +1,48 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
+
+# cloudflare
+.dev.vars
+.wrangler/
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+CLAUDE.md
+CLAUDE.md.scaffold
+SKILL.md
+.10x-cli-manifest.json
+prd-schema.md
+copilot-instructions.md
+bootstrapper-config.yaml
+handoff-consumer.md
+post-scaffold-verification.md
+pre-scaffold-verification.md
+refusal-protocol.md
+scaffold-merge.md
+verification-log-schema.md
+health-check-schema.md
+agent-friendly-criteria.md
+decision-flow.md
+eval-cases.md
+handoff-schema.md
+residual-interview.md
+starter-registry.yaml
