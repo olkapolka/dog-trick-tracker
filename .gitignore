@@ -47,7 +47,6 @@ handoff-schema.md
 residual-interview.md
 starter-registry.yaml
 
-node_modules
 .github/*
 .claude/*
 .agents/*
