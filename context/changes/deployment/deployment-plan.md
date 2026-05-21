@@ -1,3 +1,13 @@
+---
+project: dog-trick-tracker
+created_at: 2026-05-21
+plan_type: deployment
+status: draft
+deployment_target: Cloudflare Pages
+deployment_method: GitHub Integration
+context_type: change
+---
+
 # Deployment Plan: Cloudflare Pages Integration & First Deployment
 
 This plan deploys Dog Trick Tracker to Cloudflare Pages with Supabase authentication. The project is 95% ready — all code is edge-compatible, auth flows are correct, and the Cloudflare adapter is configured. The main work is renaming inherited template names, configuring secrets, and executing the first deploy. After manual verification, we'll add automated deployments via Cloudflare's native GitHub integration.
@@ -9,9 +19,183 @@ This plan deploys Dog Trick Tracker to Cloudflare Pages with Supabase authentica
 - Edge runtime compatibility is ✅ verified (no Node.js filesystem APIs, uses `@supabase/ssr`, server-only env vars)
 - Known constraints documented in `context/foundation/infrastructure.md`: dashboard-only logs, 500 builds/month cap, D1 not Postgres-compatible
 
+## Phase Overview
+
+**Required Phases (0-7):**
+- **Phase 0**: Prerequisites & Environment Setup — Supabase project, local `.env`/`.dev.vars`, verify local dev works
+- **Phase 1**: Pre-Flight Configuration — Fix project naming, verify production build
+- **Phase 2**: Cloudflare Authentication — Wrangler CLI login
+- **Phase 3**: First Manual Deployment — Deploy to Cloudflare Pages via CLI
+- **Phase 4**: Configure Production Secrets — Add Supabase credentials to Cloudflare
+- **Phase 5**: Production Verification — Test deployed app auth flow
+- **Phase 6**: Deployment Hardening — Lock down preview deploys, configure quota limits
+- **Phase 7**: Automated CI/CD — Connect GitHub for auto-deploy on push to `master`
+
+**Optional Phase:**
+- **Phase 8**: Operational Readiness — Rollback procedures, monitoring, log drains
+
+**Estimated Time:**
+- Phases 0-7 (first-time): ~2-3 hours (includes account creation, waiting for builds)
+- Phases 0-7 (if accounts exist): ~45-60 minutes
+- Phase 8: ~30-60 minutes (depends on monitoring service chosen)
+
+---
+
+## Phase 0: Prerequisites & Environment Setup
+
+**Goal:** Set up Supabase project and local development environment before deployment
+
+### Part A: Supabase Project Setup
+
+Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) for development-only.
+
+#### Option 1: Supabase Cloud Project (Recommended for Production)
+
+- [ ] **0.1** Create Supabase cloud project:
+  - Visit https://supabase.com/dashboard
+  - Sign in or create free account
+  - Click **"New Project"**
+  - Fill in:
+    - **Organization**: Select or create
+    - **Project Name**: `dog-trick-tracker` (or your choice)
+    - **Database Password**: Generate strong password (save this securely)
+    - **Region**: Choose closest to your users (e.g., `us-east-1`, `eu-central-1`)
+  - Click **"Create new project"**
+  - Wait 2-3 minutes for provisioning
+
+- [ ] **0.2** Get Supabase credentials:
+  - In Supabase dashboard, go to **Project Settings** (gear icon)
+  - Navigate to **API** section
+  - Copy the following:
+    - **Project URL** (e.g., `https://abcdefgh.supabase.co`)
+    - **anon public** key (long JWT token starting with `eyJ...`)
+  - **Important**: Use the **anon** key, NOT the service_role key (service_role bypasses Row Level Security)
+
+- [ ] **0.3** Configure authentication settings:
+  - Project Settings → **Authentication** → **Email Auth**
+  - Enable **"Enable email confirmations"** for production (disable for quick testing)
+  - Enable **"Enable email signup"**
+  - Configure email templates (optional, can use defaults)
+  - For testing without email: disable confirmations, or use Supabase dashboard → Authentication → Users to manually verify users
+
+#### Option 2: Supabase Local Development (Docker Required)
+
+- [ ] **0.1** Verify Docker is running:
+  ```bash
+  docker --version
+  # Should output: Docker version 20.x or higher
+  docker ps
+  # Should connect without errors
+  ```
+  - If Docker not installed: Download from https://www.docker.com/products/docker-desktop
+
+- [ ] **0.2** Start local Supabase:
+  ```bash
+  npx supabase start
+  ```
+  - First run downloads Docker images (~2-3 minutes)
+  - Outputs local credentials to terminal:
+    - **API URL**: `http://127.0.0.1:54321`
+    - **anon key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (long token)
+    - **service_role key**: (don't use for client code)
+  - **Copy these credentials** for next step
+
+- [ ] **0.3** Access local Supabase Studio:
+  - Open browser to `http://127.0.0.1:54323`
+  - Local dashboard for managing users, tables, auth settings
+  - **Note**: Local Supabase resets on `npx supabase stop` — use `npx supabase db dump` to preserve data
+
+### Part B: Local Environment Configuration
+
+- [ ] **0.4** Create `.env` file for local development:
+  ```bash
+  cp .env.example .env
+  ```
+  - Open `.env` in editor
+  - Fill in Supabase credentials from 0.2 or 0.2 (local):
+    ```bash
+    SUPABASE_URL=https://your-project.supabase.co  # or http://127.0.0.1:54321 for local
+    SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...  # anon key
+    ```
+  - Save file
+  - **Verify `.env` is in `.gitignore`** (should already be gitignored)
+
+- [ ] **0.5** Create `.dev.vars` file for Cloudflare local testing:
+  ```bash
+  cp .env.example .dev.vars
+  ```
+  - Open `.dev.vars` in editor
+  - Fill in same Supabase credentials:
+    ```bash
+    SUPABASE_URL=https://your-project.supabase.co
+    SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    ```
+  - **Why separate files?** Astro reads `.env`, Wrangler reads `.dev.vars`
+  - **Verify `.dev.vars` is in `.gitignore`** (should already be gitignored)
+
+### Part C: Dependencies & Cloudflare CLI Setup
+
+- [ ] **0.6** Install project dependencies:
+  ```bash
+  npm install
+  ```
+  - Installs Astro, Supabase client, Cloudflare adapter, and Wrangler CLI
+  - Expected output: `added XXX packages` with no errors
+  - This includes `wrangler` as devDependency
+
+- [ ] **0.7** Verify Wrangler CLI is available:
+  ```bash
+  npx wrangler --version
+  ```
+  - Should output: `⛅️ wrangler 4.90.0` (or similar)
+  - If not available: run `npm install` again
+
+- [ ] **0.8** (Optional) Install Wrangler globally for convenience:
+  ```bash
+  npm install -g wrangler
+  ```
+  - Allows running `wrangler` instead of `npx wrangler`
+  - Not required, but makes commands shorter
+
+### Part D: Verify Local Development Works
+
+- [ ] **0.9** Test Astro dev server:
+  ```bash
+  npm run dev
+  ```
+  - Expected output: `🚀 astro  v6.0.0-beta.11 started in XXXms`
+  - Open browser to `http://localhost:4321`
+  - Homepage should load without "Config Error" banner
+  - If config error shows: re-check `.env` file has correct credentials
+  - Stop server: `Ctrl+C`
+
+- [ ] **0.10** Test authentication flow locally:
+  - Start dev server: `npm run dev`
+  - Navigate to `http://localhost:4321/auth/signup`
+  - Create test account with email + password
+  - For **cloud Supabase**: check email for confirmation link (or disable confirmations in settings)
+  - For **local Supabase**: user auto-confirmed, open `http://127.0.0.1:54323` → Authentication → Users to verify
+  - Sign in at `http://localhost:4321/auth/signin`
+  - Verify redirect to `/dashboard` succeeds
+  - If this works, Supabase integration is correctly configured ✅
+
+### Edge Case Support
+
+- **If `npx supabase start` fails with "Docker daemon not running"**: Start Docker Desktop application, wait for it to fully load, then retry
+- **If port 54321 already in use**: Another Supabase instance is running. Run `npx supabase stop` then `npx supabase start` again
+- **If `.env` exists but `npm run dev` shows config error**: Check for typos in variable names (must be exactly `SUPABASE_URL` and `SUPABASE_KEY`), ensure no quotes around values, ensure file is saved
+- **If signup succeeds but user can't sign in**: Check Supabase dashboard → Authentication → Users → verify user exists and `email_confirmed_at` is set (if confirmations enabled, user must click email link first)
+- **If sign-in redirects to `/auth/signin` in a loop**: Cookie issue. Clear browser cookies for localhost, ensure `SUPABASE_KEY` is the **anon** key (not service_role)
+- **If you need to switch from local to cloud Supabase later**: Just update `.env` and `.dev.vars` with cloud credentials, restart dev server. Database schema changes require migration (see `supabase/` folder)
+- **If Cloudflare deploy will use different Supabase than local dev**: Acceptable pattern — use local Supabase for dev, cloud Supabase for production. Set cloud credentials in Cloudflare Pages environment variables (Phase 4)
+
+---
+
 ## Phase 1: Pre-Flight Configuration
 
 **Goal:** Fix naming and verify local build before touching Cloudflare
+
+**Prerequisites:** Phase 0 complete (Supabase configured, `.env` and `.dev.vars` exist, `npm install` run)
 
 - [ ] **1.1** Update project name in `wrangler.jsonc` line 3 from `"10x-astro-starter"` to `"dog-trick-tracker"`
 - [ ] **1.2** Update project name in `package.json` line 2 to `"dog-trick-tracker"` for consistency
@@ -76,6 +260,8 @@ This plan deploys Dog Trick Tracker to Cloudflare Pages with Supabase authentica
 **Goal:** Add Supabase credentials to Cloudflare Pages environment variables
 
 **⚠️ Critical:** The deployment from Phase 3 will be live but non-functional until these secrets are set. Auth will fail because the app can't connect to Supabase.
+
+**⚠️ Production Note:** If you used local Supabase (Phase 0 Option 2) for development, you MUST create a cloud Supabase project for production deployment. Local Supabase (`http://127.0.0.1:54321`) is not accessible from Cloudflare's edge network. Use Phase 0 Option 1 to create a cloud project and get production credentials.
 
 ### Option A (Dashboard — recommended for first-time)
 
@@ -288,9 +474,10 @@ These are post-MVP improvements. Deploy works without them, but they reduce mean
 
 ## Verification Checklist
 
-After completing all phases:
+After completing all phases (0-7 minimum, 8 optional):
 
-- [ ] Project deployed to Cloudflare Pages at `https://dog-trick-tracker.pages.dev`
+- [ ] **Phase 0**: Supabase project configured (cloud for production), `.env` and `.dev.vars` files created, local dev server works with auth
+- [ ] **Phases 1-7**: Project deployed to Cloudflare Pages at `https://dog-trick-tracker.pages.dev`
 - [ ] Auth flow works end-to-end (signup → email confirm → signin → dashboard access)
 - [ ] Protected routes redirect unauthenticated users to `/auth/signin`
 - [ ] Secrets configured in Cloudflare Pages (production + preview environments)
