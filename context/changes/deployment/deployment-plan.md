@@ -51,7 +51,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 #### Option 1: Supabase Cloud Project (Recommended for Production)
 
-- [ ] **0.1** Create Supabase cloud project:
+- [x] **0.1** Create Supabase cloud project:
   - Visit https://supabase.com/dashboard
   - Sign in or create free account
   - Click **"New Project"**
@@ -63,7 +63,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
   - Click **"Create new project"**
   - Wait 2-3 minutes for provisioning
 
-- [ ] **0.2** Get Supabase credentials:
+- [x] **0.2** Get Supabase credentials:
   - In Supabase dashboard, go to **Project Settings** (gear icon)
   - Navigate to **API** section
   - Copy the following:
@@ -71,7 +71,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
     - **anon public** key (long JWT token starting with `eyJ...`)
   - **Important**: Use the **anon** key, NOT the service_role key (service_role bypasses Row Level Security)
 
-- [ ] **0.3** Configure authentication settings:
+- [x] **0.3** Configure authentication settings:
   - Project Settings → **Authentication** → **Email Auth**
   - Enable **"Enable email confirmations"** for production (disable for quick testing)
   - Enable **"Enable email signup"**
@@ -135,15 +135,15 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 ### Part C: Dependencies & Cloudflare CLI Setup
 
-- [ ] **0.6** Install project dependencies:
-  ```bash
+- [x] **0.6** Install project dependencies:
+  - ```bash
   npm install
   ```
   - Installs Astro, Supabase client, Cloudflare adapter, and Wrangler CLI
   - Expected output: `added XXX packages` with no errors
   - This includes `wrangler` as devDependency
 
-- [ ] **0.7** Verify Wrangler CLI is available:
+- [x] **0.7** Verify Wrangler CLI is available:
   ```bash
   npx wrangler --version
   ```
