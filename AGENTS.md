@@ -10,6 +10,8 @@ Dog Trick Tracker is a web app for tracking dog trick training progress, built w
 
 **React in JSX scope.** This project uses `jsxImportSource: "react"` — do not add `import React from "react"` to component files; it's automatic.
 
+**Node.js version.** This project requires Node.js v22+ for Wrangler CLI compatibility. Before running any `npm` or `npx` commands, ensure the correct Node version is active: `nvm use 22` (or `nvm use` if `.nvmrc` exists). Verify current version with `node --version`.
+
 ## Project Structure
 
 ```
