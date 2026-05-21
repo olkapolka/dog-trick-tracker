@@ -18,6 +18,7 @@ This plan deploys Dog Trick Tracker to Cloudflare Pages with Supabase authentica
 - Secrets (`SUPABASE_URL`, `SUPABASE_KEY`) are GitHub Actions secrets for CI but not yet configured in Cloudflare Pages
 - Edge runtime compatibility is ✅ verified (no Node.js filesystem APIs, uses `@supabase/ssr`, server-only env vars)
 - Known constraints documented in `context/foundation/infrastructure.md`: dashboard-only logs, 500 builds/month cap, D1 not Postgres-compatible
+- **Node.js v22+ required** for Wrangler CLI compatibility — run `nvm use 22` (or `nvm use` if `.nvmrc` exists) before any `npm`/`npx` command
 
 ## Phase Overview
 
@@ -107,7 +108,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 ### Part B: Local Environment Configuration
 
-- [ ] **0.4** Create `.env` file for local development:
+- [x] **0.4** Create `.env` file for local development:
   ```bash
   cp .env.example .env
   ```
@@ -120,7 +121,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
   - Save file
   - **Verify `.env` is in `.gitignore`** (should already be gitignored)
 
-- [ ] **0.5** Create `.dev.vars` file for Cloudflare local testing:
+- [x] **0.5** Create `.dev.vars` file for Cloudflare local testing:
   ```bash
   cp .env.example .dev.vars
   ```
@@ -134,6 +135,15 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
   - **Verify `.dev.vars` is in `.gitignore`** (should already be gitignored)
 
 ### Part C: Dependencies & Cloudflare CLI Setup
+
+**⚠️ Node.js Requirement:** This project requires Node.js v22+ for Wrangler CLI compatibility. Before running any `npm` or `npx` commands below, ensure the correct Node version is active:
+```bash
+nvm use 22
+# or if .nvmrc exists:
+nvm use
+# Verify version:
+node --version  # Should show v22.x.x or higher
+```
 
 - [x] **0.6** Install project dependencies:
   - ```bash
@@ -159,7 +169,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 ### Part D: Verify Local Development Works
 
-- [ ] **0.9** Test Astro dev server:
+- [x] **0.9** Test Astro dev server:
   ```bash
   npm run dev
   ```
@@ -169,7 +179,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
   - If config error shows: re-check `.env` file has correct credentials
   - Stop server: `Ctrl+C`
 
-- [ ] **0.10** Test authentication flow locally:
+- [x] **0.10** Test authentication flow locally:
   - Start dev server: `npm run dev`
   - Navigate to `http://localhost:4321/auth/signup`
   - Create test account with email + password
@@ -181,6 +191,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 ### Edge Case Support
 
+- **If any `npm` or `npx` command fails with module errors**: Ensure Node.js v22+ is active by running `nvm use 22` first, then retry the command
 - **If `npx supabase start` fails with "Docker daemon not running"**: Start Docker Desktop application, wait for it to fully load, then retry
 - **If port 54321 already in use**: Another Supabase instance is running. Run `npx supabase stop` then `npx supabase start` again
 - **If `.env` exists but `npm run dev` shows config error**: Check for typos in variable names (must be exactly `SUPABASE_URL` and `SUPABASE_KEY`), ensure no quotes around values, ensure file is saved
@@ -197,9 +208,9 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 **Prerequisites:** Phase 0 complete (Supabase configured, `.env` and `.dev.vars` exist, `npm install` run)
 
-- [ ] **1.1** Update project name in `wrangler.jsonc` line 3 from `"10x-astro-starter"` to `"dog-trick-tracker"`
-- [ ] **1.2** Update project name in `package.json` line 2 to `"dog-trick-tracker"` for consistency
-- [ ] **1.3** Run `npm run build` locally to verify build succeeds with current configuration
+- [x] **1.1** Update project name in `wrangler.jsonc` line 3 from `"10x-astro-starter"` to `"dog-trick-tracker"`
+- [x] **1.2** Update project name in `package.json` line 2 to `"dog-trick-tracker"` for consistency
+- [x] **1.3** Run `npm run build` locally to verify build succeeds with current configuration
   - Expected output: `dist/` directory with static assets + SSR functions
   - If build fails on missing env vars, verify `.env` exists with Supabase credentials (copy from `.env.example`)
 - [ ] **1.4** (Optional) Test local Cloudflare Pages environment: `npx wrangler pages dev ./dist`
@@ -220,10 +231,10 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 - [ ] **2.1** Install Wrangler globally (if not already): `npm install -g wrangler`
   - Wrangler is already in `devDependencies`, but global install allows `wrangler` command outside npm scripts
-- [ ] **2.2** Authenticate with Cloudflare: `wrangler login`
+- [x] **2.2** Authenticate with Cloudflare: `wrangler login`
   - Opens browser for OAuth flow
   - Grants access to Cloudflare account
-- [ ] **2.3** Verify authentication: `wrangler whoami`
+- [x] **2.3** Verify authentication: `wrangler whoami`
   - Expected output: `"You are logged in with an OAuth Token..."` + email + account ID
   - **Copy the Account ID** — needed for reference later
 
@@ -239,13 +250,14 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 **Goal:** Create Cloudflare Pages project and deploy initial version
 
-- [ ] **3.1** Build production bundle: `npm run build`
+- [x] **3.1** Build production bundle: `npm run build`
   - Outputs to `./dist` (verified in Phase 1)
-- [ ] **3.2** Deploy to Cloudflare Pages: `npx wrangler pages deploy ./dist --project-name dog-trick-tracker`
+- [x] **3.2** Deploy to Cloudflare Pages: `npx wrangler pages deploy ./dist --project-name dog-trick-tracker`
   - First deploy creates the Pages project automatically
   - Prompts for confirmation: production branch = `main` or `master` (choose `master` per `.github/workflows/ci.yml`)
   - Outputs deployment URL: `https://dog-trick-tracker.pages.dev` (or auto-generated subdomain if name taken)
-- [ ] **3.3** **Copy the deployment URL** from terminal output for testing in Phase 4
+- [x] **3.3** **Copy the deployment URL** from terminal output for testing in Phase 4
+  - **Deployed at**: https://b862f1e6.dog-trick-tracker.pages.dev
 
 ### Edge Case Support
 
@@ -276,7 +288,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 
 ### Option B (CLI — faster for subsequent updates)
 
-- [ ] **4.1** Set production secrets via Wrangler:
+- [x] **4.1** Set production secrets via Wrangler:
   ```bash
   npx wrangler pages secret put SUPABASE_URL --project-name dog-trick-tracker
   # Paste Supabase URL when prompted, press Enter
@@ -284,7 +296,8 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
   # Paste Supabase anon key when prompted, press Enter
   ```
 - [ ] **4.2** Repeat for preview environment if needed: add `--env preview` flag to each command
-- [ ] **4.3** Redeploy: `npx wrangler pages deploy ./dist --project-name dog-trick-tracker`
+- [x] **4.3** Redeploy: `npx wrangler pages deploy ./dist --project-name dog-trick-tracker`
+  - **New deployment URL**: https://f49d57ff.dog-trick-tracker.pages.dev
 
 ### Edge Case Support
 
