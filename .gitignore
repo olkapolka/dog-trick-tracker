@@ -48,6 +48,7 @@ residual-interview.md
 starter-registry.yaml
 
 .github/*
+!.github/workflows/
 .claude/*
 .agents/*
 CLAUDE.md
