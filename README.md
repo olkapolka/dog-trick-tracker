@@ -1,8 +1,11 @@
-# 10x Astro Starter
+# Dog Trick Tracker
 
-![](./public/template.png)
+[![CI](https://github.com/olkapolka/dog-trick-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/olkapolka/dog-trick-tracker/actions/workflows/ci.yml)
+[![Deploy](https://github.com/olkapolka/dog-trick-tracker/actions/workflows/deploy.yml/badge.svg)](https://github.com/olkapolka/dog-trick-tracker/actions/workflows/deploy.yml)
 
-A modern, opinionated starter template for building fast, accessible web applications.
+A web application for tracking dog trick training progress.
+
+**Production:** https://dog-trick-tracker.oliwia-achyna.workers.dev
 
 ## Tech Stack
 
@@ -150,7 +153,22 @@ Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_
 
 ## Deployment
 
-This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/).
+This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/) with automated CI/CD.
+
+### Automated Deployment (Recommended)
+
+Every push to `main` branch automatically:
+1. Runs lint and build checks (CI workflow)
+2. Deploys to production (Deploy workflow)
+3. Updates https://dog-trick-tracker.oliwia-achyna.workers.dev
+
+**Required GitHub Secrets:**
+- `SUPABASE_URL` - Supabase project URL
+- `SUPABASE_KEY` - Supabase anon key
+- `CLOUDFLARE_API_TOKEN` - Cloudflare API token with Workers write access
+- `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare account ID
+
+### Manual Deployment
 
 1. Build the project:
 
@@ -164,11 +182,51 @@ npm run build
 npx wrangler deploy
 ```
 
-Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets in your Cloudflare dashboard or via `npx wrangler secret put`.
+3. Set secrets (first-time only):
+
+```bash
+npx wrangler secret put SUPABASE_URL
+npx wrangler secret put SUPABASE_KEY
+```
+
+### Rollback Procedure
+
+If a deployment introduces issues:
+
+1. List recent deployments:
+
+```bash
+npx wrangler deployments list
+```
+
+2. Find the last known-good deployment ID from the list
+
+3. Rollback to that version:
+
+```bash
+npx wrangler rollback --message "Rollback to stable version"
+```
+
+4. Verify rollback at https://dog-trick-tracker.oliwia-achyna.workers.dev (takes ~10 seconds)
+
+5. If the bad deployment included database changes, check Supabase dashboard for schema state
+
+**Alternative:** Revert the Git commit and push to `main` - automated deployment will restore the previous version.
+
+## Known Constraints
+
+**Cloudflare Workers limitations:**
+- Runtime logs accessible only via Cloudflare dashboard (no `wrangler tail` for deployed Workers)
+- No in-memory session stores - use Supabase cookies or KV
+- Cold starts can take 1-2 seconds on first request
+
+**Supabase:**
+- Must use external Supabase (cloud or self-hosted) - Cloudflare D1 is SQLite, not Postgres-compatible
+- Email confirmations disabled for development - enable in production via Supabase dashboard
 
 ## CI
 
-GitHub Actions runs lint + build on every push and PR to `master`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
+GitHub Actions runs lint + build on every push and PR to `main`. Successful builds on `main` trigger automatic deployment to production.
 
 ## License
 
