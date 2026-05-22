@@ -372,14 +372,14 @@ These are security + operational best practices from `infrastructure.md` Risk Re
 
 **Prerequisites:** Phases 1-5 complete, manual deploy verified working
 
-- [ ] **7.1** Connect GitHub repository to Cloudflare Pages:
+- [x] **7.1** Connect GitHub repository to Cloudflare Pages:
   - Cloudflare dashboard → Pages → `dog-trick-tracker` project
   - Settings → Builds & deployments → **"Connect to Git"** (or if project was created manually, delete and recreate via "Create application" → "Connect to Git")
   - Alternative path if project doesn't exist yet: Pages → Create application → Connect to Git
   - Authorize Cloudflare to access your GitHub account (one-time OAuth)
   - Select repository: `oliwia.achyna/dog-trick-tracker` (or your GitHub username/org)
   
-- [ ] **7.2** Configure build settings:
+- [x] **7.2** Configure build settings:
   - **Production branch**: `master` (must match your default branch)
   - **Framework preset**: Astro (auto-detected)
   - **Build command**: `npm run build` (auto-populated)
@@ -387,7 +387,7 @@ These are security + operational best practices from `infrastructure.md` Risk Re
   - **Root directory**: `/` (leave default unless monorepo)
   - Click **"Save and Deploy"**
 
-- [ ] **7.3** Set environment variables for Cloudflare builds:
+- [x] **7.3** Set environment variables for Cloudflare builds:
   - During setup wizard OR later via Settings → Environment variables
   - Add **Production** environment variables:
     - `SUPABASE_URL` = your Supabase project URL

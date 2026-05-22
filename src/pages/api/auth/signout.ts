@@ -8,3 +8,11 @@ export const POST: APIRoute = async (context) => {
   }
   return context.redirect("/");
 };
+
+export const GET: APIRoute = async (context) => {
+  const supabase = createClient(context.request.headers, context.cookies);
+  if (supabase) {
+    await supabase.auth.signOut();
+  }
+  return context.redirect("/");
+};
