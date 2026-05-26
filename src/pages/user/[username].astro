@@ -1,28 +1,26 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import Topbar from "@/components/Topbar.astro";
 import { createClient } from "@/lib/supabase";
-import { PhotoUpload } from "@/components/profile/PhotoUpload";
 import { calculateProgressScore } from "@/lib/calculate-score";
 
-const user = Astro.locals.user;
-if (!user) {
-  return Astro.redirect("/auth/signin");
+// Extract username from URL
+const username = Astro.params.username;
+
+if (!username) {
+  return Astro.redirect("/404", 404);
 }
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-if (!supabase) {
-  return Astro.redirect("/auth/signin");
-}
 
+// Fetch profile by username
 const { data: profile } = await supabase
   .from("profiles")
   .select("*")
-  .eq("user_id", user.id)
+  .eq("login_name", username)
   .single();
 
 if (!profile) {
-  return Astro.redirect("/profile/create");
+  return Astro.redirect("/404", 404);
 }
 
 // Calculate age
@@ -35,13 +33,13 @@ if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
 }
 
 // Calculate progress score
-const score = await calculateProgressScore(supabase, user.id);
+const score = await calculateProgressScore(supabase, profile.user_id);
 
 // Fetch user's trick progress
 const { data: userTricks } = await supabase
   .from("user_tricks")
   .select("trick_id, status, tricks(*)")
-  .eq("user_id", user.id);
+  .eq("user_id", profile.user_id);
 
 // Group tricks by status
 const favorites = userTricks?.filter((ut) => ut.status === "favorite") || [];
@@ -49,20 +47,31 @@ const inProgress = userTricks?.filter((ut) => ut.status === "in-progress") || []
 const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
 ---
 
-<Layout title="My Profile">
+<Layout title={`${profile.dog_name}'s Profile`}>
   <div class="bg-cosmic min-h-screen p-4 pt-20">
     <div class="mx-auto max-w-2xl">
-      <Topbar />
       <h1
         class="mb-8 bg-gradient-to-r from-purple-300 via-blue-200 to-purple-300 bg-clip-text text-4xl font-bold text-transparent"
       >
-        My Profile
+        {profile.dog_name}'s Profile
       </h1>
 
       <div class="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
         <div class="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           <div class="flex-shrink-0">
-            <PhotoUpload value={profile.photo_url} client:load />
+            {
+              profile.photo_url ? (
+                <img
+                  src={profile.photo_url}
+                  alt={profile.dog_name}
+                  class="size-32 rounded-full border-2 border-white/20 object-cover"
+                />
+              ) : (
+                <div class="flex size-32 items-center justify-center rounded-full border-2 border-white/20 bg-white/10 text-4xl">
+                  🐕
+                </div>
+              )
+            }
           </div>
 
           <div class="flex-grow text-center sm:text-left">
@@ -90,7 +99,6 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
           <div class="text-center">
             <div class="text-5xl font-bold text-purple-300">{score}</div>
             <div class="text-sm text-blue-100/80">training points</div>
-            <p class="mt-2 text-xs text-blue-100/50">Mark tricks as finished to earn points!</p>
           </div>
         </div>
 
@@ -166,41 +174,20 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
             favorites.length === 0 && inProgress.length === 0 && finished.length === 0 && (
               <div class="py-8 text-center">
                 <p class="text-blue-100/60">No tricks tracked yet</p>
-                <a
-                  href="/dashboard"
-                  class="mt-2 inline-block text-sm text-purple-300 hover:text-purple-200"
-                >
-                  Browse the catalog →
-                </a>
               </div>
             )
           }
         </div>
 
         <div class="mt-6">
-          <button
-            id="copy-link-btn"
-            class="w-full rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 font-medium text-white transition-all hover:from-purple-600 hover:to-blue-600 focus:ring-2 focus:ring-purple-400/50 focus:outline-none"
+          <a
+            href="/dashboard"
+            class="block w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-center text-sm text-blue-100 transition-colors hover:bg-white/20"
           >
-            Copy profile link
-          </button>
+            ← Back to Dashboard
+          </a>
         </div>
       </div>
     </div>
   </div>
-
-  <script define:vars={{ loginName: profile.login_name }}>
-    const btn = document.getElementById("copy-link-btn");
-    if (btn) {
-      btn.addEventListener("click", () => {
-        const url = `${window.location.origin}/user/${loginName}`;
-        navigator.clipboard.writeText(url).then(() => {
-          btn.textContent = "✓ Link copied!";
-          setTimeout(() => {
-            btn.textContent = "Copy profile link";
-          }, 2000);
-        });
-      });
-    }
-  </script>
 </Layout>

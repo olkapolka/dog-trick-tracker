@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implement the north star feature enabling users to create a profile with dog info (unique username, dog name, breed, date of birth, sex, optional photo uploaded to Supabase Storage), browse a public trick catalog grouped by difficulty, view trick detail pages with step-by-step teaching instructions, mark trick status (favorite/in-progress/finished) with optimistic UI updates, and see their weighted progress score (finished tricks × difficulty weight) on their profile. Users can share their profile via `/@username` URLs, and profiles are publicly viewable.
+Implement the north star feature enabling users to create a profile with dog info (unique username, dog name, breed, date of birth, sex, optional photo uploaded to Supabase Storage), browse a public trick catalog grouped by difficulty, view trick detail pages with step-by-step teaching instructions, mark trick status (favorite/in-progress/finished) with optimistic UI updates, and see their weighted progress score (finished tricks × difficulty weight) on their profile. Users can share their profile via `/user/username` URLs, and profiles are publicly viewable.
 
 This plan is self-contained. Phase 0 creates the database schema (profiles, tricks, user_tricks tables) with difficulty weights (beginner=1, intermediate=2, advanced=3) and seeds 12 starter tricks.
 
@@ -59,7 +59,7 @@ This plan is self-contained. Phase 0 creates the database schema (profiles, tric
 - [ ] Clicking trick name navigates to `/tricks/{slug}` detail page
 - [ ] Status toggle on catalog and detail page updates UI within 500ms (optimistic update)
 - [ ] Progress score on profile page recalculates immediately when status changes to/from finished
-- [ ] Public profile at `/@username` displays correct user data; visiting `/@nonexistent` shows 404
+- [ ] Public profile at `/user/username` displays correct user data; visiting `/user/nonexistent` shows 404
 - [ ] Toast appears on mutation errors (network failure, permission denied, etc.)
 - [ ] All pages responsive on mobile (touch targets ≥44px, readable text, no horizontal scroll)
 
@@ -1119,24 +1119,24 @@ Render score display:
 
 ### Overview
 
-Create dynamic route for public profile URLs (`/@username` via `[username].astro`), fetch profile and trick progress by username, display dog info and tricks grouped by status, add copy link button to user's own profile, and handle 404 for missing usernames.
+Create dynamic route for public profile URLs (`/user/username` via `user/[username].astro`), fetch profile and trick progress by username, display dog info and tricks grouped by status, add copy link button to user's own profile, and handle 404 for missing usernames.
 
 ### Changes Required:
 
 #### 1. Public profile page route
 
-**File**: `src/pages/[username].astro` (new file)
+**File**: `src/pages/user/[username].astro` (new file)
 
-**Intent**: Dynamic route matching `/@username` or `/username` URLs to display public profile.
+**Intent**: Dynamic route matching `/user/username` URLs to display public profile.
 
-**Contract**: Extract username from `Astro.params.username`. Strip leading `@` if present. Fetch profile:
+**Contract**: Extract username from `Astro.params.username`. Fetch profile:
 ```typescript
-const cleanUsername = Astro.params.username?.replace(/^@/, "");
+const username = Astro.params.username;
 
 const { data: profile } = await supabase
   .from("profiles")
   .select("*")
-  .eq("login_name", cleanUsername)
+  .eq("login_name", username)
   .single();
 
 if (!profile) return Astro.redirect("/404", 404);
@@ -1164,12 +1164,12 @@ Render:
 
 **File**: `src/pages/profile.astro`
 
-**Intent**: Add button to copy profile URL (`/@{login_name}`) to clipboard.
+**Intent**: Add button to copy profile URL (`/user/{login_name}`) to clipboard.
 
 **Contract**: Client-side button component:
 ```tsx
 <button onclick={() => {
-  navigator.clipboard.writeText(`${window.location.origin}/@${profile.login_name}`);
+  navigator.clipboard.writeText(`${window.location.origin}/user/${profile.login_name}`);
   toast.success("Profile link copied!");
 }}>
   Copy profile link
@@ -1180,7 +1180,7 @@ Requires sonner toast already set up in Phase 6.
 
 #### 3. Handle 404 for missing usernames
 
-**File**: `src/pages/[username].astro`
+**File**: `src/pages/user/[username].astro`
 
 **Intent**: Redirect to 404 page if username doesn't exist (already implemented in contract above).
 
@@ -1195,11 +1195,10 @@ Requires sonner toast already set up in Phase 6.
 
 #### Manual Verification:
 
-- Create profile with username "alice-dog", navigate to `/@alice-dog` → see public profile
-- Visit `/alice-dog` (without @) → same profile loads
+- Create profile with username "alice-dog", navigate to `/user/alice-dog` → see public profile
 - From `/profile`, click "Copy profile link" → clipboard contains full URL, toast confirms "Profile link copied!"
 - Open link in incognito window (or share with friend) → profile visible without login
-- Navigate to `/@nonexistent-user` → see 404 page
+- Navigate to `/user/nonexistent-user` → see 404 page
 - Verify public profile shows tricks grouped by status (Favorites, In Progress, Finished)
 - Verify public profile is read-only (no status toggle buttons)
 
@@ -1246,7 +1245,7 @@ Note: `/catalog` may not be needed if dashboard IS the catalog (per Phase 4 impl
 **Contract**: Verify the following empty states are implemented:
 - `/dashboard` — If user has no profile, redirect to `/profile/create` (already implemented in Phase 4 step 2)
 - `/dashboard` — If tricks array is empty, show inline message "No tricks in catalog yet. Check back soon!" (already implemented in Phase 4 step 2)
-- `/profile` and `/@username` — If `photo_url` is null, show placeholder avatar `/placeholder-dog.png` (already implemented in Phase 3)
+- `/profile` and `/user/username` — If `photo_url` is null, show placeholder avatar `/placeholder-dog.png` (already implemented in Phase 3)
 
 Note: Reusable `EmptyState` component is deferred until a third distinct empty state pattern emerges. Current empty states are context-specific and benefit from inline implementation.
 
@@ -1297,7 +1296,7 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 - Profile creation flow end-to-end (form submit → API insert → redirect → profile page displays data)
 - Status mutation flow (click Star → optimistic update → API call → revalidation → score recalc)
-- Public profile access (visit `/@username` → see profile, visit `/@nonexistent` → 404)
+- Public profile access (visit `/user/username` → see profile, visit `/user/nonexistent` → 404)
 
 ### Manual Testing Steps:
 
@@ -1477,28 +1476,28 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 7.1 TypeScript compilation passes
-- [x] 7.2 Unit test for calculateProgressScore passes
+- [x] 7.1 TypeScript compilation passes — 2133f5b
+- [x] 7.2 Unit test for calculateProgressScore passes — 2133f5b
 
 #### Manual
 
-- [x] 7.3 Profile shows correct score for finished tricks
-- [x] 7.4 Score updates when trick marked finished
-- [x] 7.5 New account shows "0 training points"
+- [x] 7.3 Profile shows correct score for finished tricks — 2133f5b
+- [x] 7.4 Score updates when trick marked finished — 2133f5b
+- [x] 7.5 New account shows "0 training points" — 2133f5b
 
 ### Phase 8: Public Profiles & Sharing
 
 #### Automated
 
-- [ ] 8.1 TypeScript compilation passes
-- [ ] 8.2 Build succeeds (`npm run build`)
+- [x] 8.1 TypeScript compilation passes
+- [x] 8.2 Build succeeds (`npm run build`)
 
 #### Manual
 
-- [ ] 8.3 Public profile accessible via /@username
-- [ ] 8.4 Copy link button works and copies full URL
-- [ ] 8.5 Public profile shows tricks grouped by status
-- [ ] 8.6 Missing username shows 404
+- [x] 8.3 Public profile accessible via /user/username
+- [x] 8.4 Copy link button works and copies full URL
+- [x] 8.5 Public profile shows tricks grouped by status
+- [x] 8.6 Missing username shows 404
 
 ### Phase 9: Navigation & Polish
 

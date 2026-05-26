@@ -14,7 +14,7 @@ Auth infrastructure is complete (Supabase signup/signin/signout, middleware-base
 
 ## Desired End State
 
-User registers → completes profile creation wizard (unique username, dog info, photo upload to Supabase Storage) → lands on dashboard showing trick catalog grouped by difficulty → clicks trick card to see detail page with step-by-step teaching description → marks status (favorite/in-progress/finished) with instant optimistic UI update → sees weighted progress score on profile → copies profile link → another user visits `/@username` and sees public read-only profile with trick progress.
+User registers → completes profile creation wizard (unique username, dog info, photo upload to Supabase Storage) → lands on dashboard showing trick catalog grouped by difficulty → clicks trick card to see detail page with step-by-step teaching description → marks status (favorite/in-progress/finished) with instant optimistic UI update → sees weighted progress score on profile → copies profile link → another user visits `/user/username` and sees public read-only profile with trick progress.
 
 ## Key Decisions Made
 
@@ -35,7 +35,7 @@ User registers → completes profile creation wizard (unique username, dog info,
 | Performance target | Optimize for 10-15 tricks | Meets <2s catalog load guardrail; simple implementation; scales to hundreds without refactor needed | Plan |
 | Error handling | Toast notifications + rollback + field errors | Matches existing auth pattern; non-blocking UX; clear user recovery path | Plan |
 | Dashboard route | Shows catalog directly | Users land on core feature immediately; no extra navigation layer | Plan |
-| Profile URLs | `/@username` for public, `/profile` for own | Clean shareable URLs (Twitter/Instagram pattern); separates public view from editing | Plan |
+| Profile URLs | `/user/username` for public, `/profile` for own | Clean shareable URLs; separates public view from editing | Plan |
 | Navigation | Top bar (Catalog, Profile, Sign out) | Consistent with existing Topbar; mobile-friendly; authenticated-only links | Plan |
 | Client-side mutations | Add SWR (4KB) + sonner for toasts | Enables optimistic UX and error feedback without reinventing; minimal bundle increase | Plan |
 | Trick catalog visibility | Public catalog + details, protected mutations | SEO-friendly, content marketing, users preview before signup; status toggles require auth | Plan |
@@ -48,7 +48,7 @@ User registers → completes profile creation wizard (unique username, dog info,
 - Trick detail pages (step-by-step teaching descriptions)
 - Status tracking (favorite/in-progress/finished) with icon buttons + optimistic updates
 - Weighted progress score (sum of finished tricks × difficulty weight)
-- Public profile sharing (`/@username` URLs, read-only view)
+- Public profile sharing (`/user/username` URLs, read-only view)
 - Copy profile link functionality
 - Empty states (no profile, no photo, no tricks)
 - Mobile-first responsive design
@@ -68,18 +68,18 @@ User registers → completes profile creation wizard (unique username, dog info,
 ## Architecture / Approach
 
 **Data flow:**
-1. Profile creation: Client form (validates reserved usernames) → `POST /api/profile/create` (validates reserved list + uniqueness) → Supabase `profiles` insert (photo_url = null) → redirect to dashboard
-2. Photo upload (optional, after profile exists): Client file picker → `POST /api/profile/upload-photo` → verify profile exists → Supabase Storage bucket `dog-photos` → UPDATE `profiles.photo_url` (with cleanup on failure)
+1. Profile creation: Client form → `POST /api/profile/create` → Supabase `profiles` insert (photo_url = null) → redirect to dashboard
+2. Photo upload (optional, after profile exists): Client file picker → `POST /api/profile/upload-photo` → verify profile exists → Supabase Storage bucket `dog-photos` → UPDATE `profiles.photo_url`
 3. Catalog display: Server-side fetch all tricks in `.astro` frontmatter → render grouped by difficulty
 4. Status mutation: Client click → SWR optimistic update → `POST /api/tricks/status` → Supabase `user_tricks` upsert → revalidate on error (rollback + toast)
 5. Progress score: On-demand query `SUM(tricks.difficulty_weight)` for finished tricks
 
 **Key components:**
-- `CreateProfileForm.tsx` — React form with validation (username uniqueness check, reserved username blocklist, breed dropdown, DOB, sex)
+- `CreateProfileForm.tsx` — React form with validation (username uniqueness check, breed dropdown, DOB, sex, photo upload)
 - `PhotoUpload.tsx` — File input with preview and 2MB validation
 - `TrickCard.astro` — Catalog card (title, difficulty badge, description preview, link to detail)
 - `StatusToggle.tsx` — Three icon buttons (Star/Clock/Check) with SWR mutation + optimistic state
-- `[username].astro` — Dynamic route for public profiles
+- `user/[username].astro` — Dynamic route for public profiles
 - `tricks/[slug].astro` — Dynamic route for trick details
 
 **Libraries added:**
@@ -97,13 +97,13 @@ User registers → completes profile creation wizard (unique username, dog info,
 |-------|------------------|----------|
 | 0. Database Schema | Tables (profiles, tricks, user_tricks), RLS policies, seed 12 tricks, generate TypeScript types | Schema design errors cascade to all phases; SQL syntax errors block progress |
 | 1. Foundation Setup | SWR + sonner installed, breeds constant created | Minimal risk; straightforward npm install and constant file |
-| 2. Profile Creation | Profile form, API route, username uniqueness + reserved name validation, wizard redirect from signup, signin profile checks | Username uniqueness race condition if two users submit simultaneously (mitigated by schema constraint); reserved names prevent route conflicts |
-| 3. Photo Upload | Supabase Storage bucket migration, RLS policies, upload component that updates existing profile | RLS policy syntax tricky; Storage API structure must be verified before implementation; cleanup on failure prevents orphaned files |
+| 2. Profile Creation | Profile form, API route, username uniqueness check, wizard redirect from signup, signin profile checks | Username uniqueness race condition if two users submit simultaneously (mitigated by schema constraint) |
+| 3. Photo Upload | Supabase Storage bucket migration, RLS policies, upload component that updates existing profile | RLS policy syntax tricky; photo upload requires profile to exist first (new flow prevents orphans) |
 | 4. Catalog on Dashboard | Dashboard shows tricks grouped by difficulty, trick cards, empty state, profile existence check | Phase 0 seed data must exist; implementer sees empty dashboard until this phase completes |
 | 5. Trick Detail Pages | Dynamic `/tricks/[slug]` route, step-by-step description, 404 handling | Slug collisions if two tricks have same name (mitigated by Phase 0 seed data design) |
 | 6. Status Tracking | Icon buttons, optimistic updates, API mutation, toast errors, rollback | SWR mutation complexity; optimistic rollback logic must handle all error cases |
 | 7. Progress Score | Score calculation utility, display on profile, auto-update on status change | Score query performance (acceptable for 12 tricks, may need denormalization at scale) |
-| 8. Public Profiles | `/@username` dynamic route, public view, copy link button, 404 for missing users | Dynamic route with `@` prefix may require Astro config tweaks (`[username].astro` matches both `/username` and `/@username`) |
+| 8. Public Profiles | `/user/username` dynamic route, public view, copy link button, 404 for missing users | Simple nested dynamic route (`user/[username].astro`) with straightforward username extraction |
 | 9. Navigation & Polish | Topbar links, protected routes, mobile responsiveness | Mobile testing requires real devices or thorough emulator testing; edge cases may slip through |
 
 **Prerequisites:**
@@ -115,20 +115,19 @@ User registers → completes profile creation wizard (unique username, dog info,
 
 ## Open Risks & Assumptions
 
-- **Supabase Storage API shape unverified** — Phase 3 uses `getPublicUrl()` destructuring based on docs but codebase has never used Storage API. **Pre-implementation verification step added** requiring manual API test before Phase 3 step 3 implementation.
-- **Username route collision** — **Mitigated:** Reserved username blocklist prevents users from registering "dashboard", "profile", "api", "auth", "tricks", "admin". Client and server validation both enforce this.
-- **Photo upload orphaned files** — **Mitigated:** Upload-photo API route now includes cleanup logic (storage.remove()) if profile update fails, preventing orphaned files in Storage bucket.
-- **Signin data destructuring** — **Fixed:** Signin route now captures `{ data, error }` from signInWithPassword() so profile existence check can access `data.user.id`.
+- **Supabase Storage API shape unverified** — Phase 3 uses `getPublicUrl()` destructuring based on docs but codebase has never used Storage API. Manual verification step added to confirm return structure.
 - **Username uniqueness race condition** — Application-level check + schema constraint mitigates, but two simultaneous submits could both pass check and hit constraint. Acceptable for MVP scale.
 - **SWR optimistic rollback complexity** — If mutation fails mid-flight and user navigates away, state may be stale. SWR revalidation should fix on next visit, but edge case exists.
 - **Mobile testing coverage** — Manual testing required; no automated mobile responsiveness tests. Touch targets and scroll behavior must be verified on real devices.
+- **Photo upload file size enforcement** — Client validation (2MB) enforced; Supabase Storage bucket migration includes file_size_limit and allowed_mime_types for server-side enforcement.
 - **Score calculation performance** — On-demand query is fast for 12 tricks but may slow down at 100+ tricks per user. Denormalization (store score in `profiles` table) deferred to post-MVP.
-- **Public profile privacy** — Any user with a `/@username` link can view profile and progress. No privacy controls in MVP. If user wants private profile, feature doesn't exist yet.
+- **Public profile privacy** — Any user with a `/user/username` link can view profile and progress. No privacy controls in MVP. If user wants private profile, feature doesn't exist yet.
+- **Signin bypass** — Users who signed up before this feature could bypass profile creation. Mitigated by profile existence checks in signin route and dashboard frontmatter.
 
 ## Success Criteria (Summary)
 
 - User can register → create profile → upload photo → browse catalog → mark trick status → see progress score → share profile link
-- Another user can visit shared `/@username` link and see public read-only profile with trick progress
+- Another user can visit shared `/user/username` link and see public read-only profile with trick progress
 - Status changes reflect instantly in UI (optimistic update) and persist after page reload
 - Progress score updates immediately when trick marked finished
 - All pages responsive on mobile (320px+ width, no horizontal scroll, touch targets ≥44px)
