@@ -3,169 +3,98 @@
 
 - **Plan**: context/changes/first-trick-tracking/plan.md
 - **Mode**: Deep
-- **Date**: 2026-05-25
-- **Verdict**: SOUND (after fixes)
-- **Findings**: 8 total (3 critical, 4 warnings, 1 observation) — all addressed
+- **Date**: 2026-05-26
+- **Verdict**: REVISE
+- **Findings**: 1 critical, 4 warnings, 0 observations
 
 ## Verdicts
 
-| Dimension | Initial | After Fixes |
-|-----------|---------|-------------|
-| End-State Alignment | WARNING | PASS |
-| Lean Execution | WARNING | PASS |
-| Architectural Fitness | PASS | PASS |
-| Blind Spots | FAIL | PASS |
-| Plan Completeness | WARNING | PASS |
+| Dimension | Verdict |
+|-----------|---------|
+| End-State Alignment | PASS |
+| Lean Execution | PASS |
+| Architectural Fitness | WARNING |
+| Blind Spots | WARNING |
+| Plan Completeness | WARNING |
 
 ## Grounding
 
-5/5 paths ✓, 3/3 symbols ✓, brief↔plan ✓
+Grounding: 5/5 paths ✓, 3/3 symbols ✓, brief↔plan ✓
 
 ## Findings
 
-### F1 — Database schema (F-01/F-02) doesn't exist
+### F1 — Phase 2 step 6 signin code won't work as written
 
 - **Severity**: ❌ CRITICAL
 - **Impact**: 🔬 HIGH — architectural stakes; think carefully before deciding
-- **Dimension**: Blind Spots
-- **Location**: Overview, Current State Analysis
-- **Detail**: Plan assumed F-01 (database-schema) and F-02 (seed-trick-catalog) were already implemented, but codebase verification showed no SQL migrations exist. The supabase/ directory has no migrations/, schema_paths = [], and roadmap marks F-01 as "ready" aspirationally. Phases 2-9 would fail immediately when trying to query non-existent tables.
-- **Fix A ⭐ Recommended**: Add Phase 0 to create schema before current Phase 1
-  - Strength: Makes plan self-contained; implementer can run end-to-end without external dependencies
-  - Tradeoff: Expands scope beyond "first trick tracking" into foundation work (4 tables + RLS + seed)
-  - Confidence: HIGH — schema shape is well-defined in roadmap.md
-  - Blind spot: If F-01 is separate work by another team, creates coordination conflict
-- **Decision**: FIXED via Fix A — Added Phase 0 with complete schema creation (profiles, tricks, user_tricks tables + RLS policies + 12 seeded tricks with step-by-step descriptions)
+- **Dimension**: Architectural Fitness
+- **Location**: Phase 2 — Profile Creation Flow, step 6
+- **Detail**: Plan instructs adding a profile existence check to signin.ts after successful authentication. The code snippet assumes `data.user.id` is available, but the current signin.ts only destructures `{ error }` from signInWithPassword(), not `{ data, error }`. The plan's code will fail at runtime with "Cannot read property 'user' of undefined". Evidence from codebase (src/pages/api/auth/signin.ts:11): `const { error } = await supabase.auth.signInWithPassword(...)`. Plan code at line 506-517 requires: `data.user.id` but data is never captured.
+- **Fix A ⭐ Recommended**: Update plan to capture data destructuring before profile check
+  - Strength: Matches the actual Supabase auth API contract; minimal change to plan (one line edit). The session IS established by signInWithPassword(), just needs to be captured.
+  - Tradeoff: None significant — this is the correct implementation.
+  - Confidence: HIGH — sub-agent verified signInWithPassword() returns { data, error } in Supabase v2.99.1.
+  - Blind spot: None significant.
+- **Decision**: FIXED (Fix A applied — added data destructuring to signin.ts)
 
----
-
-### F2 — Signin flow bypasses profile creation requirement
-
-- **Severity**: ❌ CRITICAL
-- **Impact**: 🔎 MEDIUM — real tradeoff; pause to reason through it
-- **Dimension**: Blind Spots
-- **Location**: Phase 2 (Profile Creation Flow), Phase 6 (access control)
-- **Detail**: Phase 2 changes signup to redirect to /profile/create, ensuring new users complete profiles. However, src/pages/api/auth/signin.ts still redirects directly to /dashboard. Users who signed up before this feature, cleared cookies and signed in again, or use multiple devices would bypass profile creation and land on dashboard. If they have no profile, Phase 4-9 features fail.
-- **Fix**: Add profile existence check to signin flow and dashboard frontmatter
-  - Strength: Closes the bypass gap; users without profiles are redirected to /profile/create from any entry point
-  - Tradeoff: Adds a profile query to signin and dashboard page load (minimal perf cost with indexed user_id)
-  - Confidence: HIGH — plan already has similar logic for /profile page
-  - Blind spot: None significant
-- **Decision**: FIXED — Added profile check to signin route (Phase 2 step 6) and dashboard frontmatter (Phase 4 step 2), plus manual verification steps 2.8–2.9
-
----
-
-### F3 — Supabase Storage API return structure unverified
-
-- **Severity**: ❌ CRITICAL
-- **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
-- **Dimension**: Blind Spots
-- **Location**: Phase 3, step 3 — API route: Upload photo
-- **Detail**: Plan's photo upload code assumes getPublicUrl() returns `{ data: { publicUrl } }` with nested destructuring. Codebase has NEVER used Supabase Storage (only auth). The destructuring pattern is based on docs but Supabase v2 API shows nesting ambiguity. Current package has @supabase/supabase-js v2.99.1 but no local evidence confirms this works.
-- **Fix**: Add verification step in Phase 3 success criteria to log return structure
-  - Strength: Quick console.log during manual testing catches the issue before production
-  - Tradeoff: None—this should already be in manual testing
-  - Confidence: HIGH — standard debugging practice for new APIs
-  - Blind spot: None—logging reveals truth immediately
-- **Decision**: FIXED — Added manual verification step 3.8 to verify Storage API return structure
-
----
-
-### F4 — Bucket setup approach is vague ("manual OR migration")
+### F2 — Plan Overview contradicts Phase 0 implementation
 
 - **Severity**: ⚠️ WARNING
 - **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
 - **Dimension**: Plan Completeness
-- **Location**: Phase 3, step 1 — Supabase Storage bucket setup
-- **Detail**: Phase 3 step 1 said "Manual Supabase dashboard step OR supabase/migrations/..." with no guidance on which to use. Implementer must decide, breaking flow. Migration approach is better (version-controlled, repeatable, works in CI/CD) but plan didn't say so.
-- **Fix**: Specify migration approach as recommended; provide exact SQL
-  - Strength: Removes decision burden; SQL in plan is copy-paste ready
-  - Tradeoff: None—migrations are already being used for schema per Phase 0
-  - Confidence: HIGH — this is standard infrastructure-as-code practice
-  - Blind spot: None significant
-- **Decision**: FIXED — Changed Phase 3 step 1 to specify migration approach with complete SQL including file size limit, MIME type restrictions, and all four RLS policies
+- **Location**: Overview section (lines 5-8) vs Phase 0
+- **Detail**: Plan Overview states "This plan assumes F-01 (database-schema) and F-02 (seed-trick-catalog) are already implemented" but Phase 0 creates these schemas from scratch. The plan-brief correctly says "Database schema will be created in Phase 0 — this plan is self-contained". Implementers following Phase 0 will succeed, but the contradiction is confusing and could cause uncertainty.
+- **Fix**: Update Overview to match plan-brief: "This plan is self-contained. Phase 0 creates the database schema (profiles, tricks, user_tricks) and seeds the starter trick catalog."
+- **Decision**: FIXED (Overview updated to clarify Phase 0 creates schema)
 
----
-
-### F5 — Photo upload failure leaves orphaned Storage files
+### F3 — Orphaned Storage files on profile update failure
 
 - **Severity**: ⚠️ WARNING
 - **Impact**: 🔎 MEDIUM — real tradeoff; pause to reason through it
 - **Dimension**: Blind Spots
-- **Location**: Phase 3 (photo upload flow)
-- **Detail**: Current flow: PhotoUpload component → upload to Storage → return URL → user saves profile form → insert profile row with photo_url. If profile creation fails (username constraint violation, network error), the photo is already in Storage but not referenced. Orphaned files accumulate over time. No cleanup mentioned.
-- **Fix A ⭐ Recommended**: Reverse order—create profile first, upload photo after
-  - Strength: Profile insert validates all data before uploading expensive 2MB file; no orphaned files
-  - Tradeoff: Requires RLS policy to allow INSERT to {user_id}/* where user_id matches auth.uid(); UX flow changes—user sees profile partially created
-  - Confidence: HIGH — eliminates the orphan problem entirely
-  - Blind spot: UX flow changes; need loading state during upload
-- **Fix B**: Add PENDING state or cleanup job for orphaned files
-  - Strength: Keeps current flow; handles cleanup separately
-  - Tradeoff: More complexity (cron job, state transitions); adds scope beyond MVP
-  - Confidence: MEDIUM — cleanup jobs add operational overhead
-  - Blind spot: Cost of orphaned 2MB files over time
-- **Decision**: FIXED via Fix A — Restructured photo upload flow to create profile first (Phase 2), then upload photo as a profile UPDATE operation (Phase 3 step 3 now verifies profile exists, uploads photo, then updates profile row)
+- **Location**: Phase 3 — Photo Upload, step 3 (API route)
+- **Detail**: Phase 3 upload-photo API route uploads file to Storage, then updates the profiles table with photo_url. If the profile update fails, the file is already in Storage with no reference. Plan includes a TODO comment "Consider deleting uploaded file on profile update failure" but doesn't resolve it. Over time, orphaned files accumulate storage costs and clutter.
+- **Fix A ⭐ Recommended**: Add cleanup on profile update failure
+  - Strength: Prevents orphaned files; shows defensive programming. Simple try-catch or if-error block with supabase.storage.remove().
+  - Tradeoff: Adds 5 lines of error handling code. If Storage.remove() also fails, you're in a partial state (logged but not fatal).
+  - Confidence: HIGH — this is standard cleanup-on-failure pattern.
+  - Blind spot: What if the storage.remove() call itself fails? Plan should log the error but let the upload-photo request fail gracefully.
+- **Fix B**: Accept orphaned files as acceptable technical debt for MVP
+  - Strength: Simpler implementation; defers complexity to post-MVP cleanup. With 2MB photo limit and low early-user volume, cost is minimal.
+  - Tradeoff: Storage costs accumulate; no automated cleanup. Requires manual purge script later.
+  - Confidence: MEDIUM — depends on risk tolerance and cleanup commitment.
+  - Blind spot: No measurement of actual orphan frequency in prod.
+- **Decision**: FIXED (Fix A applied — added storage cleanup on profile update failure)
 
----
-
-### F6 — Dashboard shows empty state before catalog implemented
+### F4 — Username collision with existing routes not addressed
 
 - **Severity**: ⚠️ WARNING
-- **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
-- **Dimension**: End-State Alignment
-- **Location**: Phase sequencing (Phase 2 vs Phase 4)
-- **Detail**: Phase 2 redirects signup → /profile/create → /dashboard. But catalog implementation is Phase 4. If implementer runs phases sequentially and tests after each phase, users land on the current empty dashboard ("Welcome, email@example.com" placeholder) after creating profiles in Phase 2-3. Not a runtime bug, but creates awkward intermediate UX if deploying incrementally or testing early phases.
-- **Fix**: Note in Phase 2 that dashboard remains placeholder until Phase 4
-  - Strength: Sets expectations; implementer knows this is temporary
-  - Tradeoff: None—just documentation clarity
-  - Confidence: HIGH — simple note prevents confusion
-  - Blind spot: None
-- **Decision**: FIXED — Added note in Phase 2 overview explaining that dashboard will show empty placeholder until Phase 4 (catalog) is implemented
+- **Impact**: 🔎 MEDIUM — real tradeoff; pause to reason through it
+- **Dimension**: Blind Spots
+- **Location**: Phase 2 — Profile Creation (username validation), Phase 8 — Public Profiles
+- **Detail**: Plan creates public profiles at `/@username` via `[username].astro` dynamic route. No validation prevents users from registering usernames that conflict with existing routes like "dashboard", "profile", "api", "auth". Astro's file-based routing prioritizes static files over dynamic routes, so `/dashboard` beats `/[username].astro`. But a user named "dashboard" creates confusion — their profile link `/@dashboard` navigates to the catalog instead of their profile. Same for "tricks" (conflicts with `/tricks/[slug]`).
+- **Fix A ⭐ Recommended**: Add reserved username validation at profile creation
+  - Strength: Prevents routing confusion before it happens. Simple blocklist: ["dashboard", "profile", "api", "auth", "tricks", "admin"]. Shows "Username reserved by the system" error inline with other validation (same UX as "Username taken").
+  - Tradeoff: Slightly more validation logic in CreateProfileForm and API route. Must keep reserved list in sync with new top-level routes.
+  - Confidence: HIGH — common pattern in user-facing URL systems (GitHub, Twitter, etc. all reserve paths).
+  - Blind spot: What if a route is added later? Reserved list becomes stale. Consider a shared constant or doc comment linking routes.
+- **Fix B**: Accept collision risk and document expected behavior
+  - Strength: No code changes. Trust Astro's routing priority and assume users entering "dashboard" as a dog name is rare edge case.
+  - Tradeoff: Confusing UX if it happens; support burden. No programmatic prevention.
+  - Confidence: LOW — conflicts are likely (dashboard, tricks, admin are plausible dog nicknames or online handles).
+  - Blind spot: Frequency unknown without user testing.
+- **Decision**: FIXED (Fix A applied — added reserved username blocklist to client and server validation)
 
----
-
-### F7 — Type generation will fail without schema
+### F5 — Supabase Storage getPublicUrl() API structure unverified
 
 - **Severity**: ⚠️ WARNING
-- **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
-- **Dimension**: Plan Completeness
-- **Location**: Phase 1, step 2 — Generate TypeScript types
-- **Detail**: Phase 1 step 2 runs `npx supabase gen types typescript --local` and assumes "F-01 migrations are applied to local Supabase instance." But with Phase 0 now added (creating the schema), type generation should happen AFTER Phase 0, not in Phase 1. Currently Phase 1 happens before schema exists, so generated types would be empty/minimal and Phase 1 success criteria "Verify database types include profiles, tricks, user_tricks tables" would fail.
-- **Fix**: Move type generation to Phase 0 (after migrations) OR to start of Phase 1 with dependency note
-  - Strength: Types reflect actual schema; TypeScript compilation works
-  - Tradeoff: None—this is just sequencing
-  - Confidence: HIGH — obvious dependency order
-  - Blind spot: None
-- **Decision**: FIXED — Moved TypeScript type generation from Phase 1 to Phase 0 (new step 5) so it happens after schema creation. Updated progress tracking and Phase 1 overview accordingly.
-
----
-
-### F8 — EmptyState component might be premature abstraction
-
-- **Severity**: 💡 OBSERVATION
-- **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
-- **Dimension**: Lean Execution
-- **Location**: Phase 9, step 3 — Empty state component
-- **Detail**: Phase 9 creates reusable `EmptyState.astro` component (message + optional CTA). Plan shows it used once: dashboard "Complete your profile to start tracking tricks" message. The pattern "extract component when used 2-3 times" suggests this is premature—one usage doesn't justify abstraction. Phase 4 already has inline empty state for "No tricks in catalog yet."
-- **Fix**: Inline the dashboard empty state markup; defer component until 3rd usage
-  - Strength: Less code, fewer concepts; follows "add abstraction when needed" pattern seen elsewhere in codebase
-  - Tradeoff: If a third empty state appears soon, we refactor twice (minor duplication of 5-10 lines)
-  - Confidence: MEDIUM — low stakes either way; style preference
-  - Blind spot: Future roadmap items that might need empty states
-- **Decision**: FIXED — Removed premature `EmptyState.astro` component creation from Phase 9. Empty states are now handled inline in their respective pages, deferring abstraction until a third usage emerges.
-
----
-
-## Summary
-
-All 8 findings have been addressed through targeted plan edits:
-
-- **Phase 0 added** — Complete schema creation (profiles, tricks, user_tricks + RLS + seed data + type generation)
-- **Profile checks strengthened** — Signin and dashboard now verify profile exists before proceeding
-- **Photo upload flow reversed** — Profile created first, then photo uploaded and profile updated (prevents orphans)
-- **Migration approach clarified** — Storage bucket setup uses migration with complete SQL
-- **Type generation sequenced correctly** — Moved to Phase 0 after schema creation
-- **Documentation improved** — Added notes explaining intermediate states and verification steps
-- **Premature abstraction removed** — EmptyState component deferred until justified by usage
-
-The plan is now **SOUND** and ready for implementation.
+- **Impact**: 🔎 MEDIUM — real tradeoff; pause to reason through it
+- **Dimension**: Blind Spots
+- **Location**: Phase 3 — Photo Upload, step 3
+- **Detail**: Plan assumes Supabase Storage's getPublicUrl() returns a nested structure: `const { data: { publicUrl } } = supabase.storage.from(...).getPublicUrl(...)`. This codebase has never used Supabase Storage before (only auth). The installed @supabase/supabase-js is v2.99.1, but return structure hasn't been tested. API shape has changed across v1 → v2 major versions. If the actual structure is `{ publicUrl }` (flat) or `{ data: { url } }` (different key), Phase 3 step 3 breaks at runtime. Plan includes manual verification in Phase 3.8 "Verify Storage API return structure" but doesn't block earlier phases if this hasn't been tested yet.
+- **Fix**: Test getPublicUrl() structure BEFORE implementing Phase 3 step 3
+  - Strength: Catches API shape mismatch early (5 min test vs mid-phase debugging). Simple verification: create scratch file, call getPublicUrl(), console.log() the result, confirm nested data.publicUrl exists.
+  - Tradeoff: Requires manual pre-work before Phase 3. But Phase 3.8 already requires this, so just reorder the verification to happen first.
+  - Confidence: HIGH — sub-agent confirmed no existing Storage usage, so this is the first integration point. Must verify before relying on it.
+  - Blind spot: None significant.
+- **Decision**: FIXED (Added pre-implementation verification requirement to Phase 3 step 3)

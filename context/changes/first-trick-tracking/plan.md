@@ -4,7 +4,7 @@
 
 Implement the north star feature enabling users to create a profile with dog info (unique username, dog name, breed, date of birth, sex, optional photo uploaded to Supabase Storage), browse a public trick catalog grouped by difficulty, view trick detail pages with step-by-step teaching instructions, mark trick status (favorite/in-progress/finished) with optimistic UI updates, and see their weighted progress score (finished tricks × difficulty weight) on their profile. Users can share their profile via `/@username` URLs, and profiles are publicly viewable.
 
-This plan assumes F-01 (database-schema) and F-02 (seed-trick-catalog) are already implemented — the `users`, `profiles`, `tricks`, and `user_tricks` tables exist with difficulty weights (beginner=1, intermediate=2, advanced=3) and 10-15 starter tricks are seeded.
+This plan is self-contained. Phase 0 creates the database schema (profiles, tricks, user_tricks tables) with difficulty weights (beginner=1, intermediate=2, advanced=3) and seeds 12 starter tricks.
 
 ## Current State Analysis
 
@@ -430,15 +430,25 @@ Build the profile creation form (username, dog name, breed, DOB, sex), API route
 
 Form action: `POST /api/profile/create`. Use `FormField` component for inputs, `SubmitButton` for submission. Validation regex for `login_name`: `/^[a-z][a-z0-9-]{2,19}$/` (starts with letter, lowercase + numbers + hyphens, 3-20 chars).
 
-Client-side uniqueness check:
+Reserved username blocklist (prevents route conflicts):
+```typescript
+const RESERVED_USERNAMES = ["dashboard", "profile", "api", "auth", "tricks", "admin"];
+```
+
+Client-side validation:
 ```typescript
 async function checkUsernameAvailable(username: string): Promise<boolean> {
+  // Check reserved list first
+  if (RESERVED_USERNAMES.includes(username.toLowerCase())) {
+    return false;
+  }
+  
   const res = await fetch(`/api/profile/check-username?username=${encodeURIComponent(username)}`);
   return res.ok;
 }
 ```
 
-Show error "Username taken" if check returns false.
+Show error "Username reserved by the system" if in blocklist, "Username taken" if uniqueness check returns false.
 
 #### 2. API route: Check username uniqueness
 
@@ -464,11 +474,23 @@ return new Response(null, { status: 200 });
 
 **Intent**: Insert new profile row linked to authenticated user, enforce uniqueness constraint, handle conflicts.
 
-**Contract**: POST endpoint. Extract FormData fields. Get `user` from `Astro.locals` (set by middleware). Insert into `profiles` table:
+**Contract**: POST endpoint. Extract FormData fields. Get `user` from `Astro.locals` (set by middleware). 
+
+Server-side reserved username validation (prevent route conflicts):
+```typescript
+const RESERVED_USERNAMES = ["dashboard", "profile", "api", "auth", "tricks", "admin"];
+const loginName = formData.get("login_name") as string;
+
+if (RESERVED_USERNAMES.includes(loginName.toLowerCase())) {
+  return context.redirect(`/profile/create?error=${encodeURIComponent("Username reserved by the system")}`);
+}
+```
+
+Insert into `profiles` table:
 ```typescript
 const { error } = await supabase.from("profiles").insert({
   user_id: user.id,
-  login_name: formData.get("login_name"),
+  login_name: loginName,
   dog_name: formData.get("dog_name"),
   breed: formData.get("breed"),
   date_of_birth: formData.get("date_of_birth"),
@@ -501,7 +523,12 @@ If `error.code === "23505"` (unique violation), redirect to `/profile/create?err
 
 **Intent**: Prevent users without profiles from bypassing profile creation when signing in (e.g., users who signed up before this feature, cleared cookies, or use multiple devices).
 
-**Contract**: After successful signin, check if profile exists before redirecting. Add profile query before redirect:
+**Contract**: After successful signin, check if profile exists before redirecting. First, update the signInWithPassword() destructuring to capture `data`:
+```typescript
+const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+```
+
+Then add profile query before redirect:
 ```typescript
 const { data: profile } = await supabase
   .from("profiles")
@@ -636,6 +663,13 @@ if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
 
 **Intent**: Receive file upload, save to Supabase Storage, update user's existing profile row with photo URL. Ensures profile exists before uploading (prevents orphaned files).
 
+**⚠️ Pre-implementation requirement**: Before coding this step, verify Supabase Storage API structure. Create a scratch file and test:
+```typescript
+const result = supabase.storage.from("dog-photos").getPublicUrl("test.jpg");
+console.log(result); // Confirm structure matches { data: { publicUrl: string } }
+```
+The installed @supabase/supabase-js v2.99.1 has never been used for Storage in this codebase. If the actual structure differs (e.g., `{ publicUrl }` flat or `{ data: { url } }`), update the destructuring below accordingly.
+
 **Contract**: POST endpoint. Extract file from `FormData`. Get `user` from `Astro.locals`. Verify profile exists, upload to Storage, update profile:
 ```typescript
 const file = formData.get("photo") as File;
@@ -671,7 +705,15 @@ const { error: updateError } = await supabase
   .eq("user_id", user.id);
 
 if (updateError) {
-  // TODO: Consider deleting uploaded file on profile update failure
+  // Cleanup: delete uploaded file since profile update failed
+  const { error: deleteError } = await supabase.storage
+    .from("dog-photos")
+    .remove([fileName]);
+  
+  if (deleteError) {
+    console.error("Failed to cleanup orphaned file:", deleteError);
+  }
+  
   return new Response(JSON.stringify({ error: updateError.message }), { status: 500 });
 }
 
