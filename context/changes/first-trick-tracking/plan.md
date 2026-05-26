@@ -1372,18 +1372,18 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [ ] 0.1 Migrations run without errors (`npx supabase migration up`)
-- [ ] 0.2 TypeScript type generation succeeds
-- [ ] 0.3 All tables exist in schema (profiles, tricks, user_tricks)
-- [ ] 0.4 Seed data inserted (12 tricks total)
+- [x] 0.1 Migrations run without errors (`npx supabase migration up`)
+- [x] 0.2 TypeScript type generation succeeds
+- [x] 0.3 All tables exist in schema (profiles, tricks, user_tricks)
+- [x] 0.4 Seed data inserted (12 tricks total)
 
 #### Manual
 
-- [ ] 0.5 Profiles table structure verified (login_name unique, user_id FK)
-- [ ] 0.6 Tricks query shows correct difficulty_weight values (1/2/3)
-- [ ] 0.7 Difficulty distribution correct (4 beginner, 4 intermediate, 4 advanced)
-- [ ] 0.8 RLS policies block anonymous user_tricks insert
-- [ ] 0.9 TypeScript types generated and include all three tables
+- [x] 0.5 Profiles table structure verified (login_name unique, user_id FK)
+- [x] 0.6 Tricks query shows correct difficulty_weight values (1/2/3)
+- [x] 0.7 Difficulty distribution correct (4 beginner, 4 intermediate, 4 advanced)
+- [x] 0.8 RLS policies block anonymous user_tricks insert
+- [x] 0.9 TypeScript types generated and include all three tables
 
 ### Phase 1: Foundation Setup & Dependencies
 
