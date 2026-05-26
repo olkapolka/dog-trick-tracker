@@ -1389,13 +1389,13 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 1.1 Install SWR and sonner packages (`npm install` completes)
-- [x] 1.2 Create breeds constant (`src/lib/breeds.ts` exports DOG_BREEDS)
-- [x] 1.3 TypeScript compilation passes (`npm run typecheck`)
+- [x] 1.1 Install SWR and sonner packages (`npm install` completes) — d216815
+- [x] 1.2 Create breeds constant (`src/lib/breeds.ts` exports DOG_BREEDS) — d216815
+- [x] 1.3 TypeScript compilation passes (`npm run typecheck`) — d216815
 
 #### Manual
 
-- [x] 1.4 Verify database types from Phase 0 include profiles, tricks, user_tricks tables
+- [x] 1.4 Verify database types from Phase 0 include profiles, tricks, user_tricks tables — d216815
 
 ### Phase 2: Profile Creation Flow
 
