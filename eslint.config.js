@@ -65,6 +65,7 @@ const astroConfig = tseslint.config({
     "astro/no-set-html-directive": "error",
     "astro/no-unused-css-selector": "warn",
     "astro/prefer-class-list-directive": "warn",
+    "@typescript-eslint/no-misused-promises": "off", // Disable for .astro files due to parser issues with Astro.redirect()
   },
 });
 
@@ -76,4 +77,10 @@ export default tseslint.config(
   ...eslintPluginAstro.configs["flat/jsx-a11y-recommended"],
   astroConfig,
   eslintPluginPrettier,
+  {
+    files: ["src/lib/database.types.ts"],
+    rules: {
+      "@typescript-eslint/no-redundant-type-constituents": "off", // Auto-generated file
+    },
+  },
 );

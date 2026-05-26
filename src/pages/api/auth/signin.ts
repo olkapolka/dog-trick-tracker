@@ -10,10 +10,17 @@ export const POST: APIRoute = async (context) => {
   if (!supabase) {
     return context.redirect(`/auth/signin?error=${encodeURIComponent("Supabase is not configured")}`);
   }
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return context.redirect(`/auth/signin?error=${encodeURIComponent(error.message)}`);
+  }
+
+  // Check if profile exists before redirecting
+  const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", data.user.id).single();
+
+  if (!profile) {
+    return context.redirect("/profile/create");
   }
 
   return context.redirect("/dashboard");

@@ -1,0 +1,46 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import CreateProfileForm from "@/components/profile/CreateProfileForm";
+import { createClient } from "@/lib/supabase";
+
+const user = Astro.locals.user;
+if (!user) {
+  return Astro.redirect("/auth/signin");
+}
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+if (!supabase) {
+  return Astro.redirect("/auth/signin");
+}
+
+// Check if user already has profile
+const { data: existingProfile } = await supabase.from("profiles").select("id").eq("user_id", user.id).single();
+
+if (existingProfile) {
+  return Astro.redirect("/dashboard");
+}
+
+const url = new URL(Astro.request.url);
+const serverError = url.searchParams.get("error");
+---
+
+<Layout title="Create Your Profile">
+  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <div class="mb-8 text-center">
+        <h1
+          class="bg-gradient-to-r from-purple-300 via-blue-200 to-purple-300 bg-clip-text text-4xl font-bold text-transparent"
+        >
+          Create Your Profile
+        </h1>
+        <p class="mt-2 text-sm text-blue-100/70">Tell us about your furry friend to get started</p>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
+        <CreateProfileForm serverError={serverError} client:load />
+      </div>
+
+      <p class="mt-4 text-center text-xs text-blue-100/50">Note: Usernames cannot be changed after creation</p>
+    </div>
+  </div>
+</Layout>

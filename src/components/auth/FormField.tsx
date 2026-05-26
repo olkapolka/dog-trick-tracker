@@ -12,11 +12,13 @@ interface FormFieldProps {
   type?: string;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   placeholder?: string;
   error?: string;
   hint?: ReactNode;
   icon: ReactNode;
   endContent?: ReactNode;
+  max?: string;
 }
 
 export function FormField({
@@ -26,11 +28,13 @@ export function FormField({
   type = "text",
   value,
   onChange,
+  onBlur,
   placeholder,
   error,
   hint,
   icon,
   endContent,
+  max,
 }: FormFieldProps) {
   return (
     <div>
@@ -47,7 +51,9 @@ export function FormField({
           onChange={(e) => {
             onChange(e.target.value);
           }}
+          onBlur={onBlur}
           placeholder={placeholder}
+          max={max}
           className={cn(
             inputBase,
             error ? "border-red-400/60 focus:ring-red-400" : "border-white/20 focus:ring-purple-400",

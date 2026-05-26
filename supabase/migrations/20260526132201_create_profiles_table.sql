@@ -7,7 +7,7 @@ CREATE TABLE profiles (
   dog_name TEXT NOT NULL,
   breed TEXT NOT NULL,
   date_of_birth DATE NOT NULL,
-  sex TEXT NOT NULL CHECK (sex IN ('Male', 'Female', 'Other')),
+  sex TEXT NOT NULL CHECK (sex IN ('Male', 'Female')),
   photo_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

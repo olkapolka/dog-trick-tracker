@@ -1401,18 +1401,18 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [ ] 2.1 TypeScript compilation passes
-- [ ] 2.2 ESLint passes (`npm run lint`)
-- [ ] 2.3 Profile create route protected (401 for unauthenticated)
+- [x] 2.1 TypeScript compilation passes
+- [x] 2.2 ESLint passes (`npm run lint`)
+- [x] 2.3 Profile create route protected (401 for unauthenticated)
 
 #### Manual
 
-- [ ] 2.4 Signup redirects to profile creation wizard
-- [ ] 2.5 Profile creation with valid data succeeds
-- [ ] 2.6 Duplicate username shows error "Username taken"
-- [ ] 2.7 Profile page displays created profile data
-- [ ] 2.8 Signin with existing profile redirects to dashboard
-- [ ] 2.9 Signin without profile redirects to profile creation (bypass prevented)
+- [x] 2.4 Signup redirects to profile creation wizard
+- [x] 2.5 Profile creation with valid data succeeds
+- [x] 2.6 Duplicate username shows error "Username taken"
+- [x] 2.7 Profile page displays created profile data
+- [x] 2.8 Signin with existing profile redirects to dashboard
+- [x] 2.9 Signin without profile redirects to profile creation (bypass prevented)
 
 ### Phase 3: Photo Upload (Supabase Storage)
 
