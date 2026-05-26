@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Banner from "@/components/Banner.astro";
 import { missingConfigs } from "@/lib/config-status";
+import { Toaster } from "sonner";
 
 interface Props {
   title?: string;
@@ -35,6 +36,7 @@ const { title = "10x Astro Starter" } = Astro.props;
         </Banner>
       ))
     }
+    <Toaster position="bottom-right" client:load />
     <slot />
   </body>
 </html>

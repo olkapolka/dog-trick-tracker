@@ -1401,34 +1401,34 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 2.1 TypeScript compilation passes
-- [x] 2.2 ESLint passes (`npm run lint`)
-- [x] 2.3 Profile create route protected (401 for unauthenticated)
+- [x] 2.1 TypeScript compilation passes — b86031f
+- [x] 2.2 ESLint passes (`npm run lint`) — b86031f
+- [x] 2.3 Profile create route protected (401 for unauthenticated) — b86031f
 
 #### Manual
 
-- [x] 2.4 Signup redirects to profile creation wizard
-- [x] 2.5 Profile creation with valid data succeeds
-- [x] 2.6 Duplicate username shows error "Username taken"
-- [x] 2.7 Profile page displays created profile data
-- [x] 2.8 Signin with existing profile redirects to dashboard
-- [x] 2.9 Signin without profile redirects to profile creation (bypass prevented)
+- [x] 2.4 Signup redirects to profile creation wizard — b86031f
+- [x] 2.5 Profile creation with valid data succeeds — b86031f
+- [x] 2.6 Duplicate username shows error "Username taken" — b86031f
+- [x] 2.7 Profile page displays created profile data — b86031f
+- [x] 2.8 Signin with existing profile redirects to dashboard — b86031f
+- [x] 2.9 Signin without profile redirects to profile creation (bypass prevented) — b86031f
 
 ### Phase 3: Photo Upload (Supabase Storage)
 
 #### Automated
 
-- [ ] 3.1 Supabase Storage bucket `dog-photos` exists
-- [ ] 3.2 TypeScript compilation passes
-- [ ] 3.3 ESLint passes
+- [x] 3.1 Supabase Storage bucket `dog-photos` exists
+- [x] 3.2 TypeScript compilation passes
+- [x] 3.3 ESLint passes
 
 #### Manual
 
-- [ ] 3.4 Photo upload succeeds and appears on profile
-- [ ] 3.5 Photo placeholder shown when no upload
-- [ ] 3.6 2MB file size limit enforced (error shown for 3MB file)
-- [ ] 3.7 MIME type validation works (reject .gif)
-- [ ] 3.8 Verify Storage API return structure (console.log getPublicUrl() result shows correct nesting)
+- [x] 3.4 Photo upload succeeds and appears on profile
+- [x] 3.5 Photo placeholder shown when no upload
+- [x] 3.6 2MB file size limit enforced (error shown for 3MB file)
+- [x] 3.7 MIME type validation works (reject .gif)
+- [x] 3.8 Verify Storage API return structure (console.log getPublicUrl() result shows correct nesting)
 
 ### Phase 4: Catalog on Dashboard
 
