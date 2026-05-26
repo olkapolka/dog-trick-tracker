@@ -1418,17 +1418,17 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 3.1 Supabase Storage bucket `dog-photos` exists
-- [x] 3.2 TypeScript compilation passes
-- [x] 3.3 ESLint passes
+- [x] 3.1 Supabase Storage bucket `dog-photos` exists — f3e4292
+- [x] 3.2 TypeScript compilation passes — f3e4292
+- [x] 3.3 ESLint passes — f3e4292
 
 #### Manual
 
-- [x] 3.4 Photo upload succeeds and appears on profile
-- [x] 3.5 Photo placeholder shown when no upload
-- [x] 3.6 2MB file size limit enforced (error shown for 3MB file)
-- [x] 3.7 MIME type validation works (reject .gif)
-- [x] 3.8 Verify Storage API return structure (console.log getPublicUrl() result shows correct nesting)
+- [x] 3.4 Photo upload succeeds and appears on profile — f3e4292
+- [x] 3.5 Photo placeholder shown when no upload — f3e4292
+- [x] 3.6 2MB file size limit enforced (error shown for 3MB file) — f3e4292
+- [x] 3.7 MIME type validation works (reject .gif) — f3e4292
+- [x] 3.8 Verify Storage API return structure (console.log getPublicUrl() result shows correct nesting) — f3e4292
 
 ### Phase 4: Catalog on Dashboard
 
