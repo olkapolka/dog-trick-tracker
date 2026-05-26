@@ -1,11 +1,13 @@
 ---
-import type { Tables } from "@/lib/database.types";
+import type { Tables, Enums } from "@/lib/database.types";
+import StatusToggle from "@/components/catalog/StatusToggle";
 
 interface Props {
   trick: Tables<"tricks">;
+  userStatus?: Enums<"trick_status"> | null;
 }
 
-const { trick } = Astro.props;
+const { trick, userStatus = null } = Astro.props;
 
 // Generate difficulty badge based on difficulty level
 const difficultyBadges = {
@@ -21,19 +23,21 @@ const truncatedDescription =
   trick.description.length > 100 ? trick.description.substring(0, 100).trim() + "..." : trick.description;
 ---
 
-<a
-  href={`/tricks/${trick.slug}`}
-  class="group relative block rounded-xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/20"
->
-  <div class="mb-3 flex items-center justify-between">
-    <h3 class="text-xl font-semibold text-white group-hover:text-purple-200">
-      {trick.name}
-    </h3>
-    <span class="text-xl" aria-label={`Difficulty: ${trick.difficulty}`}>
-      {badge}
-    </span>
+<div class="relative block rounded-xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl">
+  <a href={`/tricks/${trick.slug}`} class="group">
+    <div class="mb-3 flex items-center justify-between">
+      <h3 class="text-xl font-semibold text-white group-hover:text-purple-200">
+        {trick.name}
+      </h3>
+      <span class="text-xl" aria-label={`Difficulty: ${trick.difficulty}`}>
+        {badge}
+      </span>
+    </div>
+    <p class="mb-4 text-sm text-blue-100/70">
+      {truncatedDescription}
+    </p>
+  </a>
+  <div class="relative">
+    <StatusToggle trickId={trick.id} initialStatus={userStatus} client:only="react" />
   </div>
-  <p class="text-sm text-blue-100/70">
-    {truncatedDescription}
-  </p>
-</a>
+</div>

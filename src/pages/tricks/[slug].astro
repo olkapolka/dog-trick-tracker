@@ -1,6 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { createClient } from "@/lib/supabase";
+import StatusToggle from "@/components/catalog/StatusToggle";
+import type { Tables, Enums } from "@/lib/database.types";
 
 const { slug } = Astro.params;
 
@@ -10,15 +12,36 @@ if (!supabase) {
   return Astro.redirect("/auth/signin");
 }
 
-const { data: trick, error } = await supabase
+const { user } = Astro.locals;
+
+type TrickWithStatus = Tables<"tricks"> & {
+  user_tricks?: { status: Enums<"trick_status"> }[];
+};
+
+// Fetch trick with user status if authenticated
+const query = supabase
   .from("tricks")
-  .select("*")
-  .eq("slug", slug)
-  .single();
+  .select(
+    `
+    *,
+    user_tricks!left(status)
+  `,
+  )
+  .eq("slug", slug);
+
+if (user) {
+  query.eq("user_tricks.user_id", user.id);
+}
+
+const { data: tricks, error } = await query;
+
+const trick = (tricks as TrickWithStatus[] | null)?.[0];
 
 if (error || !trick) {
   return Astro.redirect("/404", 404);
 }
+
+const userStatus = trick.user_tricks?.[0]?.status ?? null;
 
 // Generate difficulty badge based on difficulty level
 const difficultyBadges = {
@@ -31,7 +54,7 @@ const badge = difficultyBadges[trick.difficulty];
 
 // Format description with step-by-step structure preserved
 // Replace \n with <br> tags for proper line breaks
-const formattedDescription = trick.description.split("\n").filter((line) => line.trim());
+const formattedDescription = trick.description.split("\n").filter((line: string) => line.trim());
 ---
 
 <Layout title={`${trick.name} - Trick Detail`}>
@@ -39,21 +62,10 @@ const formattedDescription = trick.description.split("\n").filter((line) => line
     <div class="mx-auto max-w-4xl">
       {/* Breadcrumb */}
       <div class="mb-6">
-        <a
-          href="/dashboard"
-          class="inline-flex items-center text-blue-200 transition-colors hover:text-purple-200"
-        >
-          <svg
-            class="mr-2 h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        <a href="/dashboard" class="inline-flex items-center text-blue-200 transition-colors hover:text-purple-200">
+          <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            ></path>
           </svg>
           Back to Catalog
         </a>
@@ -73,7 +85,7 @@ const formattedDescription = trick.description.split("\n").filter((line) => line
 
         {/* Difficulty Label */}
         <div class="mb-6">
-          <span class="inline-block rounded-full bg-white/20 px-4 py-1 text-sm font-medium capitalize text-blue-100">
+          <span class="inline-block rounded-full bg-white/20 px-4 py-1 text-sm font-medium text-blue-100 capitalize">
             {trick.difficulty}
           </span>
         </div>
@@ -82,20 +94,19 @@ const formattedDescription = trick.description.split("\n").filter((line) => line
         <div class="space-y-3 text-white">
           <h2 class="mb-4 text-xl font-semibold text-blue-200">Teaching Instructions</h2>
           <div class="space-y-2 text-blue-100/90">
-            {
-              formattedDescription.map((line) => (
-                <p class="leading-relaxed">{line}</p>
-              ))
-            }
+            {formattedDescription.map((line) => <p class="leading-relaxed">{line}</p>)}
           </div>
         </div>
 
-        {/* Placeholder for Status Toggle (Phase 6) */}
-        <div class="mt-8 border-t border-white/10 pt-6">
-          <p class="text-sm text-blue-100/60">
-            Status tracking will be available in the next phase
-          </p>
-        </div>
+        {/* Status Toggle */}
+        {
+          user && (
+            <div class="mt-8 border-t border-white/10 pt-6">
+              <h3 class="mb-3 text-sm font-medium text-blue-200">Track Your Progress</h3>
+              <StatusToggle trickId={trick.id} initialStatus={userStatus} client:only="react" />
+            </div>
+          )
+        }
       </div>
     </div>
   </div>

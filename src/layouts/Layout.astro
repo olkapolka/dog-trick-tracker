@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import Banner from "@/components/Banner.astro";
 import { missingConfigs } from "@/lib/config-status";
-import { Toaster } from "sonner";
+import ToastProvider from "@/components/ui/ToastProvider";
 
 interface Props {
   title?: string;
@@ -36,7 +36,7 @@ const { title = "10x Astro Starter" } = Astro.props;
         </Banner>
       ))
     }
-    <Toaster position="bottom-right" client:load />
+    <ToastProvider client:only="react" />
     <slot />
   </body>
 </html>

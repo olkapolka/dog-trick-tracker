@@ -2,7 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import TrickCard from "@/components/catalog/TrickCard.astro";
 import { createClient } from "@/lib/supabase";
-import type { Tables } from "@/lib/database.types";
+import type { Tables, Enums } from "@/lib/database.types";
 
 const { user } = Astro.locals;
 
@@ -23,12 +23,31 @@ if (!profile) {
   return Astro.redirect("/profile/create");
 }
 
-// Fetch tricks for catalog
-const { data: tricks } = await supabase.from("tricks").select("*").order("name");
+// Fetch tricks for catalog with user status
+const { data: tricksData } = await supabase
+  .from("tricks")
+  .select(
+    `
+    *,
+    user_tricks!left(status)
+  `,
+  )
+  .eq("user_tricks.user_id", user.id)
+  .order("name");
 
-const beginner = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficulty === "beginner") ?? [];
-const intermediate = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficulty === "intermediate") ?? [];
-const advanced = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficulty === "advanced") ?? [];
+// Transform the data to include userStatus
+type TrickWithStatus = Tables<"tricks"> & {
+  user_tricks?: { status: Enums<"trick_status"> }[];
+};
+
+const tricks = (tricksData as TrickWithStatus[] | null)?.map((t) => ({
+  ...t,
+  userStatus: t.user_tricks?.[0]?.status ?? null,
+}));
+
+const beginner = tricks?.filter((t) => t.difficulty === "beginner") ?? [];
+const intermediate = tricks?.filter((t) => t.difficulty === "intermediate") ?? [];
+const advanced = tricks?.filter((t) => t.difficulty === "advanced") ?? [];
 ---
 
 <Layout title="Dashboard">
@@ -50,7 +69,7 @@ const advanced = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficul
                 <h2 class="mb-4 text-2xl font-semibold text-white">⭐ Beginner</h2>
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {beginner.map((trick) => (
-                    <TrickCard trick={trick} />
+                    <TrickCard trick={trick} userStatus={trick.userStatus} />
                   ))}
                 </div>
               </section>
@@ -62,7 +81,7 @@ const advanced = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficul
                 <h2 class="mb-4 text-2xl font-semibold text-white">⭐⭐ Intermediate</h2>
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {intermediate.map((trick) => (
-                    <TrickCard trick={trick} />
+                    <TrickCard trick={trick} userStatus={trick.userStatus} />
                   ))}
                 </div>
               </section>
@@ -74,7 +93,7 @@ const advanced = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficul
                 <h2 class="mb-4 text-2xl font-semibold text-white">⭐⭐⭐ Advanced</h2>
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {advanced.map((trick) => (
-                    <TrickCard trick={trick} />
+                    <TrickCard trick={trick} userStatus={trick.userStatus} />
                   ))}
                 </div>
               </section>

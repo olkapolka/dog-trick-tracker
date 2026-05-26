@@ -1448,30 +1448,30 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 5.1 TypeScript compilation passes
-- [x] 5.2 Build succeeds (`npm run build`)
+- [x] 5.1 TypeScript compilation passes — 415eea3
+- [x] 5.2 Build succeeds (`npm run build`) — 415eea3
 
 #### Manual
 
-- [x] 5.3 Trick detail page shows full description
-- [x] 5.4 Breadcrumb "Back to Catalog" navigates correctly
-- [x] 5.5 Missing trick slug shows 404 page
+- [x] 5.3 Trick detail page shows full description — 415eea3
+- [x] 5.4 Breadcrumb "Back to Catalog" navigates correctly — 415eea3
+- [x] 5.5 Missing trick slug shows 404 page — 415eea3
 
 ### Phase 6: Status Tracking (Optimistic Updates)
 
 #### Automated
 
-- [ ] 6.1 TypeScript compilation passes
-- [ ] 6.2 ESLint passes
-- [ ] 6.3 Build succeeds (`npm run build`)
+- [x] 6.1 TypeScript compilation passes
+- [x] 6.2 ESLint passes
+- [x] 6.3 Build succeeds (`npm run build`)
 
 #### Manual
 
-- [ ] 6.4 Status icon click updates UI instantly (optimistic)
-- [ ] 6.5 Status persists after page reload
-- [ ] 6.6 Network error shows toast and rolls back status
-- [ ] 6.7 Status consistent across catalog and detail pages
-- [ ] 6.8 Mobile touch targets ≥44px for icons
+- [x] 6.4 Status icon click updates UI instantly (optimistic)
+- [x] 6.5 Status persists after page reload
+- [x] 6.6 Network error shows toast and rolls back status
+- [x] 6.7 Status consistent across catalog and detail pages
+- [x] 6.8 Mobile touch targets ≥44px for icons
 
 ### Phase 7: Progress Score Calculation
 
