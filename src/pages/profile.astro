@@ -15,11 +15,7 @@ if (!supabase) {
   return Astro.redirect("/auth/signin");
 }
 
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("*")
-  .eq("user_id", user.id)
-  .single();
+const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
 
 if (!profile) {
   return Astro.redirect("/profile/create");
@@ -44,9 +40,9 @@ const { data: userTricks } = await supabase
   .eq("user_id", user.id);
 
 // Group tricks by status
-const favorites = userTricks?.filter((ut) => ut.status === "favorite") || [];
-const inProgress = userTricks?.filter((ut) => ut.status === "in-progress") || [];
-const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
+const favorites = userTricks?.filter((ut) => ut.status === "favorite") ?? [];
+const inProgress = userTricks?.filter((ut) => ut.status === "in-progress") ?? [];
+const finished = userTricks?.filter((ut) => ut.status === "finished") ?? [];
 ---
 
 <Layout title="My Profile">
@@ -107,10 +103,10 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
                 <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {favorites.map((ut) => (
                     <a
-                      href={`/tricks/${ut.tricks?.slug}`}
+                      href={`/tricks/${ut.tricks.slug}`}
                       class="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-blue-100 transition-colors hover:bg-white/10"
                     >
-                      {ut.tricks?.name}
+                      {ut.tricks.name}
                     </a>
                   ))}
                 </div>
@@ -129,10 +125,10 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
                 <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {inProgress.map((ut) => (
                     <a
-                      href={`/tricks/${ut.tricks?.slug}`}
+                      href={`/tricks/${ut.tricks.slug}`}
                       class="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-blue-100 transition-colors hover:bg-white/10"
                     >
-                      {ut.tricks?.name}
+                      {ut.tricks.name}
                     </a>
                   ))}
                 </div>
@@ -151,10 +147,10 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
                 <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {finished.map((ut) => (
                     <a
-                      href={`/tricks/${ut.tricks?.slug}`}
+                      href={`/tricks/${ut.tricks.slug}`}
                       class="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-blue-100 transition-colors hover:bg-white/10"
                     >
-                      {ut.tricks?.name}
+                      {ut.tricks.name}
                     </a>
                   ))}
                 </div>
@@ -166,10 +162,7 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
             favorites.length === 0 && inProgress.length === 0 && finished.length === 0 && (
               <div class="py-8 text-center">
                 <p class="text-blue-100/60">No tricks tracked yet</p>
-                <a
-                  href="/dashboard"
-                  class="mt-2 inline-block text-sm text-purple-300 hover:text-purple-200"
-                >
+                <a href="/dashboard" class="mt-2 inline-block text-sm text-purple-300 hover:text-purple-200">
                   Browse the catalog →
                 </a>
               </div>

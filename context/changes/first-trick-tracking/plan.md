@@ -1489,27 +1489,27 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 8.1 TypeScript compilation passes
-- [x] 8.2 Build succeeds (`npm run build`)
+- [x] 8.1 TypeScript compilation passes — 706ae9d
+- [x] 8.2 Build succeeds (`npm run build`) — 706ae9d
 
 #### Manual
 
-- [x] 8.3 Public profile accessible via /user/username
-- [x] 8.4 Copy link button works and copies full URL
-- [x] 8.5 Public profile shows tricks grouped by status
-- [x] 8.6 Missing username shows 404
+- [x] 8.3 Public profile accessible via /user/username — 706ae9d
+- [x] 8.4 Copy link button works and copies full URL — 706ae9d
+- [x] 8.5 Public profile shows tricks grouped by status — 706ae9d
+- [x] 8.6 Missing username shows 404 — 706ae9d
 
 ### Phase 9: Navigation & Polish
 
 #### Automated
 
-- [ ] 9.1 TypeScript compilation passes
-- [ ] 9.2 ESLint passes
-- [ ] 9.3 Build succeeds (`npm run build`)
+- [x] 9.1 TypeScript compilation passes
+- [x] 9.2 ESLint passes
+- [x] 9.3 Build succeeds (`npm run build`)
 
 #### Manual
 
-- [ ] 9.4 Topbar shows Catalog and Profile links
-- [ ] 9.5 Protected routes redirect when signed out
-- [ ] 9.6 Empty states display correctly
-- [ ] 9.7 All pages responsive on mobile (320px+ width, no horizontal scroll)
+- [x] 9.4 Topbar shows Catalog and Profile links
+- [x] 9.5 Protected routes redirect when signed out
+- [x] 9.6 Empty states display correctly
+- [x] 9.7 All pages responsive on mobile (320px+ width, no horizontal scroll)
