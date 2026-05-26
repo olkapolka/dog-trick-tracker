@@ -1372,30 +1372,30 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 0.1 Migrations run without errors (`npx supabase migration up`)
-- [x] 0.2 TypeScript type generation succeeds
-- [x] 0.3 All tables exist in schema (profiles, tricks, user_tricks)
-- [x] 0.4 Seed data inserted (12 tricks total)
+- [x] 0.1 Migrations run without errors (`npx supabase migration up`) — f7ac0ef
+- [x] 0.2 TypeScript type generation succeeds — f7ac0ef
+- [x] 0.3 All tables exist in schema (profiles, tricks, user_tricks) — f7ac0ef
+- [x] 0.4 Seed data inserted (12 tricks total) — f7ac0ef
 
 #### Manual
 
-- [x] 0.5 Profiles table structure verified (login_name unique, user_id FK)
-- [x] 0.6 Tricks query shows correct difficulty_weight values (1/2/3)
-- [x] 0.7 Difficulty distribution correct (4 beginner, 4 intermediate, 4 advanced)
-- [x] 0.8 RLS policies block anonymous user_tricks insert
-- [x] 0.9 TypeScript types generated and include all three tables
+- [x] 0.5 Profiles table structure verified (login_name unique, user_id FK) — f7ac0ef
+- [x] 0.6 Tricks query shows correct difficulty_weight values (1/2/3) — f7ac0ef
+- [x] 0.7 Difficulty distribution correct (4 beginner, 4 intermediate, 4 advanced) — f7ac0ef
+- [x] 0.8 RLS policies block anonymous user_tricks insert — f7ac0ef
+- [x] 0.9 TypeScript types generated and include all three tables — f7ac0ef
 
 ### Phase 1: Foundation Setup & Dependencies
 
 #### Automated
 
-- [ ] 1.1 Install SWR and sonner packages (`npm install` completes)
-- [ ] 1.2 Create breeds constant (`src/lib/breeds.ts` exports DOG_BREEDS)
-- [ ] 1.3 TypeScript compilation passes (`npm run typecheck`)
+- [x] 1.1 Install SWR and sonner packages (`npm install` completes)
+- [x] 1.2 Create breeds constant (`src/lib/breeds.ts` exports DOG_BREEDS)
+- [x] 1.3 TypeScript compilation passes (`npm run typecheck`)
 
 #### Manual
 
-- [ ] 1.4 Verify database types from Phase 0 include profiles, tricks, user_tricks tables
+- [x] 1.4 Verify database types from Phase 0 include profiles, tricks, user_tricks tables
 
 ### Phase 2: Profile Creation Flow
 
