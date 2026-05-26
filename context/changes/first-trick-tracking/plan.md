@@ -1503,13 +1503,13 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 9.1 TypeScript compilation passes
-- [x] 9.2 ESLint passes
-- [x] 9.3 Build succeeds (`npm run build`)
+- [x] 9.1 TypeScript compilation passes — a145b36
+- [x] 9.2 ESLint passes — a145b36
+- [x] 9.3 Build succeeds (`npm run build`) — a145b36
 
 #### Manual
 
-- [x] 9.4 Topbar shows Catalog and Profile links
-- [x] 9.5 Protected routes redirect when signed out
-- [x] 9.6 Empty states display correctly
-- [x] 9.7 All pages responsive on mobile (320px+ width, no horizontal scroll)
+- [x] 9.4 Topbar shows Catalog and Profile links — a145b36
+- [x] 9.5 Protected routes redirect when signed out — a145b36
+- [x] 9.6 Empty states display correctly — a145b36
+- [x] 9.7 All pages responsive on mobile (320px+ width, no horizontal scroll) — a145b36
