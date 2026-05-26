@@ -1434,28 +1434,28 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 4.1 TypeScript compilation passes
-- [x] 4.2 Build succeeds (`npm run build`)
+- [x] 4.1 TypeScript compilation passes — 9cecd36
+- [x] 4.2 Build succeeds (`npm run build`) — 9cecd36
 
 #### Manual
 
-- [x] 4.3 Dashboard shows tricks grouped by difficulty
-- [x] 4.4 Trick cards display with correct badges
-- [x] 4.5 Empty state shown if no tricks (test by deleting seed data)
-- [x] 4.6 Mobile responsive (cards stack vertically)
+- [x] 4.3 Dashboard shows tricks grouped by difficulty — 9cecd36
+- [x] 4.4 Trick cards display with correct badges — 9cecd36
+- [x] 4.5 Empty state shown if no tricks (test by deleting seed data) — 9cecd36
+- [x] 4.6 Mobile responsive (cards stack vertically) — 9cecd36
 
 ### Phase 5: Trick Detail Pages
 
 #### Automated
 
-- [ ] 5.1 TypeScript compilation passes
-- [ ] 5.2 Build succeeds (`npm run build`)
+- [x] 5.1 TypeScript compilation passes
+- [x] 5.2 Build succeeds (`npm run build`)
 
 #### Manual
 
-- [ ] 5.3 Trick detail page shows full description
-- [ ] 5.4 Breadcrumb "Back to Catalog" navigates correctly
-- [ ] 5.5 Missing trick slug shows 404 page
+- [x] 5.3 Trick detail page shows full description
+- [x] 5.4 Breadcrumb "Back to Catalog" navigates correctly
+- [x] 5.5 Missing trick slug shows 404 page
 
 ### Phase 6: Status Tracking (Optimistic Updates)
 
