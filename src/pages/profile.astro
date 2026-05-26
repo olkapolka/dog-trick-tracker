@@ -1,8 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { createClient } from "@/lib/supabase";
-import type { Database } from "@/lib/database.types";
 import { PhotoUpload } from "@/components/profile/PhotoUpload";
+import { calculateProgressScore } from "@/lib/calculate-score";
 
 const user = Astro.locals.user;
 if (!user) {
@@ -18,7 +18,7 @@ const { data: profile } = await supabase
   .from("profiles")
   .select("*")
   .eq("user_id", user.id)
-  .single<Database["public"]["Tables"]["profiles"]["Row"]>();
+  .single();
 
 if (!profile) {
   return Astro.redirect("/profile/create");
@@ -32,6 +32,9 @@ const monthDiff = today.getMonth() - dob.getMonth();
 if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
   age--;
 }
+
+// Calculate progress score
+const score = await calculateProgressScore(supabase, user.id);
 ---
 
 <Layout title="My Profile">
@@ -72,7 +75,7 @@ if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
 
         <div class="mt-8 border-t border-white/10 pt-6">
           <div class="text-center">
-            <div class="text-5xl font-bold text-purple-300">0</div>
+            <div class="text-5xl font-bold text-purple-300">{score}</div>
             <div class="text-sm text-blue-100/80">training points</div>
             <p class="mt-2 text-xs text-blue-100/50">Mark tricks as finished to earn points!</p>
           </div>

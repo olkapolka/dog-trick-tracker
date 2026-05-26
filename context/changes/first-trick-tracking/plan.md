@@ -1461,30 +1461,30 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [x] 6.1 TypeScript compilation passes
-- [x] 6.2 ESLint passes
-- [x] 6.3 Build succeeds (`npm run build`)
+- [x] 6.1 TypeScript compilation passes — 59e6531
+- [x] 6.2 ESLint passes — 59e6531
+- [x] 6.3 Build succeeds (`npm run build`) — 59e6531
 
 #### Manual
 
-- [x] 6.4 Status icon click updates UI instantly (optimistic)
-- [x] 6.5 Status persists after page reload
-- [x] 6.6 Network error shows toast and rolls back status
-- [x] 6.7 Status consistent across catalog and detail pages
-- [x] 6.8 Mobile touch targets ≥44px for icons
+- [x] 6.4 Status icon click updates UI instantly (optimistic) — 59e6531
+- [x] 6.5 Status persists after page reload — 59e6531
+- [x] 6.6 Network error shows toast and rolls back status — 59e6531
+- [x] 6.7 Status consistent across catalog and detail pages — 59e6531
+- [x] 6.8 Mobile touch targets ≥44px for icons — 59e6531
 
 ### Phase 7: Progress Score Calculation
 
 #### Automated
 
-- [ ] 7.1 TypeScript compilation passes
-- [ ] 7.2 Unit test for calculateProgressScore passes
+- [x] 7.1 TypeScript compilation passes
+- [x] 7.2 Unit test for calculateProgressScore passes
 
 #### Manual
 
-- [ ] 7.3 Profile shows correct score for finished tricks
-- [ ] 7.4 Score updates when trick marked finished
-- [ ] 7.5 New account shows "0 training points"
+- [x] 7.3 Profile shows correct score for finished tricks
+- [x] 7.4 Score updates when trick marked finished
+- [x] 7.5 New account shows "0 training points"
 
 ### Phase 8: Public Profiles & Sharing
 
