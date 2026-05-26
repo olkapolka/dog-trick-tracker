@@ -1434,15 +1434,15 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 
 #### Automated
 
-- [ ] 4.1 TypeScript compilation passes
-- [ ] 4.2 Build succeeds (`npm run build`)
+- [x] 4.1 TypeScript compilation passes
+- [x] 4.2 Build succeeds (`npm run build`)
 
 #### Manual
 
-- [ ] 4.3 Dashboard shows tricks grouped by difficulty
-- [ ] 4.4 Trick cards display with correct badges
-- [ ] 4.5 Empty state shown if no tricks (test by deleting seed data)
-- [ ] 4.6 Mobile responsive (cards stack vertically)
+- [x] 4.3 Dashboard shows tricks grouped by difficulty
+- [x] 4.4 Trick cards display with correct badges
+- [x] 4.5 Empty state shown if no tricks (test by deleting seed data)
+- [x] 4.6 Mobile responsive (cards stack vertically)
 
 ### Phase 5: Trick Detail Pages
 

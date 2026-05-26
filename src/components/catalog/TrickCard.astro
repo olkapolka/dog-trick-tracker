@@ -1,0 +1,39 @@
+---
+import type { Tables } from "@/lib/database.types";
+
+interface Props {
+  trick: Tables<"tricks">;
+}
+
+const { trick } = Astro.props;
+
+// Generate difficulty badge based on difficulty level
+const difficultyBadges = {
+  beginner: "⭐",
+  intermediate: "⭐⭐",
+  advanced: "⭐⭐⭐",
+} as const;
+
+const badge = difficultyBadges[trick.difficulty];
+
+// Truncate description to ~100 chars
+const truncatedDescription =
+  trick.description.length > 100 ? trick.description.substring(0, 100).trim() + "..." : trick.description;
+---
+
+<a
+  href={`/tricks/${trick.slug}`}
+  class="group relative block rounded-xl border border-white/10 bg-white/10 p-6 backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/20"
+>
+  <div class="mb-3 flex items-center justify-between">
+    <h3 class="text-xl font-semibold text-white group-hover:text-purple-200">
+      {trick.name}
+    </h3>
+    <span class="text-xl" aria-label={`Difficulty: ${trick.difficulty}`}>
+      {badge}
+    </span>
+  </div>
+  <p class="text-sm text-blue-100/70">
+    {truncatedDescription}
+  </p>
+</a>

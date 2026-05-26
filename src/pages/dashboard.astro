@@ -1,35 +1,91 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import TrickCard from "@/components/catalog/TrickCard.astro";
+import { createClient } from "@/lib/supabase";
+import type { Tables } from "@/lib/database.types";
 
 const { user } = Astro.locals;
+
+if (!user) {
+  return Astro.redirect("/auth/signin");
+}
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+
+if (!supabase) {
+  return Astro.redirect("/auth/signin");
+}
+
+// Check if user has profile
+const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", user.id).single();
+
+if (!profile) {
+  return Astro.redirect("/profile/create");
+}
+
+// Fetch tricks for catalog
+const { data: tricks } = await supabase.from("tricks").select("*").order("name");
+
+const beginner = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficulty === "beginner") ?? [];
+const intermediate = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficulty === "intermediate") ?? [];
+const advanced = (tricks as Tables<"tricks">[] | null)?.filter((t) => t.difficulty === "advanced") ?? [];
 ---
 
 <Layout title="Dashboard">
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-center text-white backdrop-blur-xl">
-      <h1 class="mb-4 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-        Dashboard
-      </h1>
-      <p class="text-blue-100/80">
-        Welcome, <span class="font-semibold text-white">{user?.email}</span>
-      </p>
-      <p class="mt-2 text-sm text-blue-100/50">This page is only for authenticated users.</p>
-      <div class="mt-6 flex flex-col gap-3">
-        <a
-          href="/profile"
-          class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-        >
-          View Profile
-        </a>
-        <form method="POST" action="/api/auth/signout">
-          <button
-            type="submit"
-            class="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-          >
-            Sign out
-          </button>
-        </form>
+  <div class="bg-cosmic min-h-screen p-6">
+    <div class="mx-auto max-w-7xl">
+      <div class="mb-8 text-white">
+        <h1 class="mb-2 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-4xl font-bold text-transparent">
+          Trick Catalog
+        </h1>
+        <p class="text-blue-100/80">Browse tricks and start training with your dog</p>
       </div>
+
+      {
+        tricks && tricks.length > 0 ? (
+          <div class="space-y-10">
+            {/* Beginner Section */}
+            {beginner.length > 0 && (
+              <section>
+                <h2 class="mb-4 text-2xl font-semibold text-white">⭐ Beginner</h2>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {beginner.map((trick) => (
+                    <TrickCard trick={trick} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Intermediate Section */}
+            {intermediate.length > 0 && (
+              <section>
+                <h2 class="mb-4 text-2xl font-semibold text-white">⭐⭐ Intermediate</h2>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {intermediate.map((trick) => (
+                    <TrickCard trick={trick} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Advanced Section */}
+            {advanced.length > 0 && (
+              <section>
+                <h2 class="mb-4 text-2xl font-semibold text-white">⭐⭐⭐ Advanced</h2>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {advanced.map((trick) => (
+                    <TrickCard trick={trick} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        ) : (
+          <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-center text-white backdrop-blur-xl">
+            <p class="text-blue-100/80">No tricks in catalog yet. Check back soon!</p>
+          </div>
+        )
+      }
     </div>
   </div>
 </Layout>
