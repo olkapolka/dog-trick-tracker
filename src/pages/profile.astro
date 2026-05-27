@@ -2,8 +2,8 @@
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
 import { createClient } from "@/lib/supabase";
-import { PhotoUpload } from "@/components/profile/PhotoUpload";
 import { calculateProgressScore } from "@/lib/calculate-score";
+import ProfileDisplay from "@/components/profile/ProfileDisplay.astro";
 
 const user = Astro.locals.user;
 if (!user) {
@@ -55,145 +55,15 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") ?? [];
         My Profile
       </h1>
 
-      <div class="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
-        <div class="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-          <div class="flex-shrink-0">
-            <PhotoUpload value={profile.photo_url} client:load />
-          </div>
-
-          <div class="flex-grow text-center sm:text-left">
-            <h2 class="text-3xl font-bold text-blue-100">{profile.dog_name}</h2>
-            <p class="text-sm text-blue-100/70">@{profile.login_name}</p>
-
-            <div class="mt-4 space-y-2 text-sm">
-              <div class="flex flex-col gap-1 sm:flex-row sm:gap-2">
-                <span class="font-medium text-blue-100">Breed:</span>
-                <span class="text-blue-100/80">{profile.breed}</span>
-              </div>
-              <div class="flex flex-col gap-1 sm:flex-row sm:gap-2">
-                <span class="font-medium text-blue-100">Age:</span>
-                <span class="text-blue-100/80">{age} year{age !== 1 ? "s" : ""} old</span>
-              </div>
-              <div class="flex flex-col gap-1 sm:flex-row sm:gap-2">
-                <span class="font-medium text-blue-100">Sex:</span>
-                <span class="text-blue-100/80">{profile.sex}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-8 border-t border-white/10 pt-6">
-          <div class="text-center">
-            <div class="text-5xl font-bold text-purple-300">{score}</div>
-            <div class="text-sm text-blue-100/80">training points</div>
-            <p class="mt-2 text-xs text-blue-100/50">Mark tricks as finished to earn points!</p>
-          </div>
-        </div>
-
-        <!-- Tricks grouped by status -->
-        <div class="mt-8 space-y-6">
-          <!-- Favorites -->
-          {
-            favorites.length > 0 && (
-              <div>
-                <h3 class="mb-3 flex items-center gap-2 text-lg font-semibold text-blue-100">
-                  <span>⭐</span>
-                  <span>Favorites</span>
-                </h3>
-                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {favorites.map((ut) => (
-                    <a
-                      href={`/tricks/${ut.tricks.slug}`}
-                      class="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-blue-100 transition-colors hover:bg-white/10"
-                    >
-                      {ut.tricks.name}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )
-          }
-
-          <!-- In Progress -->
-          {
-            inProgress.length > 0 && (
-              <div>
-                <h3 class="mb-3 flex items-center gap-2 text-lg font-semibold text-blue-100">
-                  <span>🕒</span>
-                  <span>In Progress</span>
-                </h3>
-                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {inProgress.map((ut) => (
-                    <a
-                      href={`/tricks/${ut.tricks.slug}`}
-                      class="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-blue-100 transition-colors hover:bg-white/10"
-                    >
-                      {ut.tricks.name}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )
-          }
-
-          <!-- Finished -->
-          {
-            finished.length > 0 && (
-              <div>
-                <h3 class="mb-3 flex items-center gap-2 text-lg font-semibold text-blue-100">
-                  <span>✅</span>
-                  <span>Finished</span>
-                </h3>
-                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {finished.map((ut) => (
-                    <a
-                      href={`/tricks/${ut.tricks.slug}`}
-                      class="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-blue-100 transition-colors hover:bg-white/10"
-                    >
-                      {ut.tricks.name}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )
-          }
-
-          {
-            favorites.length === 0 && inProgress.length === 0 && finished.length === 0 && (
-              <div class="py-8 text-center">
-                <p class="text-blue-100/60">No tricks tracked yet</p>
-                <a href="/dashboard" class="mt-2 inline-block text-sm text-purple-300 hover:text-purple-200">
-                  Browse the catalog →
-                </a>
-              </div>
-            )
-          }
-        </div>
-
-        <div class="mt-6">
-          <button
-            id="copy-link-btn"
-            class="w-full rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 font-medium text-white transition-all hover:from-purple-600 hover:to-blue-600 focus:ring-2 focus:ring-purple-400/50 focus:outline-none"
-          >
-            Copy profile link
-          </button>
-        </div>
-      </div>
+      <ProfileDisplay
+        profile={profile}
+        age={age}
+        score={score}
+        favorites={favorites}
+        inProgress={inProgress}
+        finished={finished}
+        isOwnProfile={true}
+      />
     </div>
   </div>
-
-  <script define:vars={{ loginName: profile.login_name }}>
-    const btn = document.getElementById("copy-link-btn");
-    if (btn) {
-      btn.addEventListener("click", () => {
-        const url = `${window.location.origin}/user/${loginName}`;
-        navigator.clipboard.writeText(url).then(() => {
-          btn.textContent = "✓ Link copied!";
-          setTimeout(() => {
-            btn.textContent = "Copy profile link";
-          }, 2000);
-        });
-      });
-    }
-  </script>
 </Layout>

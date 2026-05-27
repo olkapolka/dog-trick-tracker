@@ -118,7 +118,7 @@ CREATE TABLE profiles (
   dog_name TEXT NOT NULL,
   breed TEXT NOT NULL,
   date_of_birth DATE NOT NULL,
-  sex TEXT NOT NULL CHECK (sex IN ('Male', 'Female', 'Other')),
+  sex TEXT NOT NULL CHECK (sex IN ('Male', 'Female')),
   photo_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -426,7 +426,7 @@ Build the profile creation form (username, dog name, breed, DOB, sex), API route
 - `dog_name` (text input, required)
 - `breed` (select dropdown from `DOG_BREEDS` constant)
 - `date_of_birth` (date input, max=today)
-- `sex` (radio buttons: Male / Female / Other)
+- `sex` (radio buttons: Male / Female)
 
 Form action: `POST /api/profile/create`. Use `FormField` component for inputs, `SubmitButton` for submission. Validation regex for `login_name`: `/^[a-z][a-z0-9-]{2,19}$/` (starts with letter, lowercase + numbers + hyphens, 3-20 chars).
 
