@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface PhotoUploadProps {
@@ -10,6 +10,15 @@ export function PhotoUpload({ value }: PhotoUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+
+  // Cleanup blob URLs to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith("blob:")) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -33,6 +42,7 @@ export function PhotoUpload({ value }: PhotoUploadProps) {
   };
 
   const handleUpload = async () => {
+    if (uploading) return; // Prevent concurrent uploads
     if (!file) return;
 
     setUploading(true);

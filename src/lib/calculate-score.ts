@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
+interface UserTrickWithWeight {
+  tricks: {
+    difficulty_weight: number;
+  } | null;
+}
+
 export async function calculateProgressScore(supabase: SupabaseClient<Database>, userId: string): Promise<number> {
   const { data } = await supabase
     .from("user_tricks")
@@ -9,8 +15,7 @@ export async function calculateProgressScore(supabase: SupabaseClient<Database>,
     .eq("status", "finished");
 
   return (
-    data?.reduce((sum, row) => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    (data as UserTrickWithWeight[] | null)?.reduce((sum, row) => {
       const weight = row.tricks?.difficulty_weight;
       return sum + (typeof weight === "number" ? weight : 0);
     }, 0) ?? 0
