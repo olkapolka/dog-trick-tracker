@@ -21,8 +21,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // Skip profile check for profile creation flows
-    const isProfileCreationFlow = 
-      context.url.pathname.startsWith("/profile/create") || 
+    const isProfileCreationFlow =
+      context.url.pathname.startsWith("/profile/create") ||
       context.url.pathname.startsWith("/api/profile/create") ||
       context.url.pathname.startsWith("/api/profile/check-username");
 
