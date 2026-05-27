@@ -1,4 +1,5 @@
 ---
+/* eslint-disable prettier/prettier */
 import { PhotoUpload } from "./PhotoUpload";
 
 interface Props {
@@ -12,9 +13,9 @@ interface Props {
   };
   age: number;
   score: number;
-  favorites: Array<{ tricks: { name: string; slug: string } }>;
-  inProgress: Array<{ tricks: { name: string; slug: string } }>;
-  finished: Array<{ tricks: { name: string; slug: string } }>;
+  favorites: { tricks: { name: string; slug: string } }[];
+  inProgress: { tricks: { name: string; slug: string } }[];
+  finished: { tricks: { name: string; slug: string } }[];
   isOwnProfile?: boolean;
 }
 
@@ -176,18 +177,18 @@ const { profile, age, score, favorites, inProgress, finished, isOwnProfile = fal
 {
   isOwnProfile && (
     <script define:vars={{ loginName: profile.login_name }}>
-      const btn = document.getElementById("copy-link-btn");
-      if (btn) {
-        btn.addEventListener("click", () => {
-          const url = `${window.location.origin}/user/${loginName}`;
-          navigator.clipboard.writeText(url).then(() => {
+      document.getElementById("copy-link-btn")?.addEventListener("click", () => {
+        const url = `${window.location.origin}/user/${loginName}`;
+        navigator.clipboard.writeText(url).then(() => {
+          const btn = document.getElementById("copy-link-btn");
+          if (btn) {
             btn.textContent = "✓ Link copied!";
             setTimeout(() => {
               btn.textContent = "Copy profile link";
             }, 2000);
-          });
+          }
         });
-      }
+      });
     </script>
   )
 }

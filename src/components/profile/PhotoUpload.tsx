@@ -14,7 +14,7 @@ export function PhotoUpload({ value }: PhotoUploadProps) {
   // Cleanup blob URLs to prevent memory leaks
   useEffect(() => {
     return () => {
-      if (preview && preview.startsWith("blob:")) {
+      if (preview?.startsWith("blob:")) {
         URL.revokeObjectURL(preview);
       }
     };

@@ -1,11 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
 
-type UserTrickWithWeight = {
+interface UserTrickWithWeight {
   tricks: {
     difficulty_weight: number;
   } | null;
-};
+}
 
 export async function calculateProgressScore(supabase: SupabaseClient<Database>, userId: string): Promise<number> {
   const { data } = await supabase
