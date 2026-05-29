@@ -3,7 +3,7 @@ project: Dog Trick Tracker
 version: 1
 status: draft
 created: 2026-05-25
-updated: 2026-05-25
+updated: 2026-05-29
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -29,7 +29,7 @@ Dog owners training at home have no systematic way to track which tricks they're
 |---|---|---|---|---|---|
 | F-01 | database-schema | (foundation) Schema and migrations in place — users, profiles, dogs, tricks, user_tricks, difficulty levels | — | Access Control, Business Logic, FR-003 | ready |
 | F-02 | seed-trick-catalog | (foundation) Starter trick catalog seeded — 10-15 tricks across 3 difficulty levels | F-01 | Vision, Business Logic, Success Criteria guardrail | proposed |
-| S-01 | first-trick-tracking | Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score | F-01, F-02 | US-01, FR-001-012, Business Logic, Success Criteria (primary) | proposed |
+| S-01 | first-trick-tracking | Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score | F-01, F-02 | US-01, FR-001-012, Business Logic, Success Criteria (primary) | done |
 | S-02 | shareable-profile-link | Generate and copy profile link to share with others | S-01 | FR-005 | proposed |
 | S-03 | public-profile-view | Visit another user's profile via shared link and see their dog info and trick progress | S-02 | FR-013, FR-017, Success Criteria (primary) | proposed |
 | S-04 | follow-relationships | Follow users, view list of followed profiles in Friends tab, view list of followers in Friends tab | S-03 | FR-014, FR-015, FR-016, Access Control | proposed |
@@ -99,7 +99,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Should profile creation happen immediately after registration (wizard flow), or as a separate step? Owner: user. Block: no (PRD doesn't specify timing; implementation detail; both are valid).
 - **Risk:** This is the largest slice — it spans registration, profile creation, catalog browsing, detail pages, status mutations, and progress score calculation. If too broad for one `/10x-plan` invocation, that skill will split it. Per speed goal, keeping it unified as the north star is acceptable; the PRD's US-01 Acceptance Criteria validate this as one coherent flow.
-- **Status:** proposed
+- **Status:** done
 
 ### S-02: User can share their profile link
 
@@ -200,4 +200,4 @@ Roadmap migrated to GitHub Issues on 2026-05-25.
 
 ## Done
 
-(Empty on first generation. `/10x-archive` appends entries here when changes matching roadmap items are archived.)
+- **S-01: Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score** — Archived 2026-05-29 → `context/archive/2026-05-25-first-trick-tracking/`. Lesson: —.
