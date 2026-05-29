@@ -1,6 +1,6 @@
 ---
-/* eslint-disable prettier/prettier */
 import { PhotoUpload } from "./PhotoUpload";
+import ShareModal from "./ShareModal";
 
 interface Props {
   profile: {
@@ -156,12 +156,11 @@ const { profile, age, score, favorites, inProgress, finished, isOwnProfile = fal
   <div class="mt-6">
     {
       isOwnProfile ? (
-        <button
-          id="copy-link-btn"
-          class="w-full rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 font-medium text-white transition-all hover:from-purple-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-purple-400/50"
-        >
-          Copy profile link
-        </button>
+        <ShareModal
+          profileUrl={`${Astro.url.origin}/user/${profile.login_name}`}
+          username={profile.login_name}
+          client:load
+        />
       ) : (
         <a
           href="/dashboard"
@@ -173,22 +172,3 @@ const { profile, age, score, favorites, inProgress, finished, isOwnProfile = fal
     }
   </div>
 </div>
-
-{
-  isOwnProfile && (
-    <script define:vars={{ loginName: profile.login_name }}>
-      document.getElementById("copy-link-btn")?.addEventListener("click", () => {
-        const url = `${window.location.origin}/user/${loginName}`;
-        navigator.clipboard.writeText(url).then(() => {
-          const btn = document.getElementById("copy-link-btn");
-          if (btn) {
-            btn.textContent = "✓ Link copied!";
-            setTimeout(() => {
-              btn.textContent = "Copy profile link";
-            }, 2000);
-          }
-        });
-      });
-    </script>
-  )
-}

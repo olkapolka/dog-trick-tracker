@@ -380,22 +380,22 @@ Existing copy-to-clipboard functionality is replaced but delivers same core capa
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npm run typecheck`
-- [ ] 3.2 Linting passes: `npm run lint`
-- [ ] 3.3 Build succeeds: `npm run build`
+- [x] 3.1 Type checking passes: `npm run typecheck`
+- [x] 3.2 Linting passes: `npm run lint`
+- [x] 3.3 Build succeeds: `npm run build`
 
 #### Manual
 
-- [ ] 3.4 "Share Profile" button appears on own profile page
-- [ ] 3.5 Button does NOT appear on other users' profiles
-- [ ] 3.6 Clicking button opens modal
-- [ ] 3.7 Modal displays all three sharing options
-- [ ] 3.8 Copy link works and shows toast
-- [ ] 3.9 QR code displays correct URL
-- [ ] 3.10 Email link opens with correct content
-- [ ] 3.11 Modal closes properly (ESC, click outside, X button)
-- [ ] 3.12 No console errors
-- [ ] 3.13 Previous "Copy profile link" button is gone
+- [x] 3.4 "Share Profile" button appears on own profile page
+- [x] 3.5 Button does NOT appear on other users' profiles
+- [x] 3.6 Clicking button opens modal
+- [x] 3.7 Modal displays all three sharing options
+- [x] 3.8 Copy link works and shows toast
+- [x] 3.9 QR code displays correct URL
+- [x] 3.10 Email link opens with correct content
+- [x] 3.11 Modal closes properly (ESC, click outside, X button)
+- [x] 3.12 No console errors
+- [x] 3.13 Previous "Copy profile link" button is gone
 
 ### Phase 4: Polish & Accessibility
 
