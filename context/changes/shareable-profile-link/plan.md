@@ -360,42 +360,42 @@ Existing copy-to-clipboard functionality is replaced but delivers same core capa
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `npm run typecheck`
-- [x] 2.2 Linting passes: `npm run lint`
-- [x] 2.3 Component builds without errors: `npm run build`
+- [x] 2.1 Type checking passes: `npm run typecheck` — 190e948
+- [x] 2.2 Linting passes: `npm run lint` — 190e948
+- [x] 2.3 Component builds without errors: `npm run build` — 190e948
 
 #### Manual
 
-- [ ] 2.4 Modal renders with proper overlay and centered content
-- [ ] 2.5 All three sections (Copy, QR, Email) are visible
-- [ ] 2.6 Icons from lucide-react display correctly
-- [ ] 2.7 Modal is dismissible via ESC key
-- [ ] 2.8 Modal is dismissible via click outside
-- [ ] 2.9 Modal is dismissible via X button
-- [ ] 2.10 QR code renders and encodes correct URL
-- [ ] 2.11 Copy button triggers clipboard write
-- [ ] 2.12 Email button opens mailto: link correctly
+- [x] 2.4 Modal renders with proper overlay and centered content — 190e948
+- [x] 2.5 All three sections (Copy, QR, Email) are visible — 190e948
+- [x] 2.6 Icons from lucide-react display correctly — 190e948
+- [x] 2.7 Modal is dismissible via ESC key — 190e948
+- [x] 2.8 Modal is dismissible via click outside — 190e948
+- [x] 2.9 Modal is dismissible via X button — 190e948
+- [x] 2.10 QR code renders and encodes correct URL — 190e948
+- [x] 2.11 Copy button triggers clipboard write — 190e948
+- [x] 2.12 Email button opens mailto: link correctly — 190e948
 
 ### Phase 3: Integrate into ProfileDisplay
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `npm run typecheck`
-- [x] 3.2 Linting passes: `npm run lint`
-- [x] 3.3 Build succeeds: `npm run build`
+- [x] 3.1 Type checking passes: `npm run typecheck` — 8869c4c
+- [x] 3.2 Linting passes: `npm run lint` — 8869c4c
+- [x] 3.3 Build succeeds: `npm run build` — 8869c4c
 
 #### Manual
 
-- [x] 3.4 "Share Profile" button appears on own profile page
-- [x] 3.5 Button does NOT appear on other users' profiles
-- [x] 3.6 Clicking button opens modal
-- [x] 3.7 Modal displays all three sharing options
-- [x] 3.8 Copy link works and shows toast
-- [x] 3.9 QR code displays correct URL
-- [x] 3.10 Email link opens with correct content
-- [x] 3.11 Modal closes properly (ESC, click outside, X button)
-- [x] 3.12 No console errors
-- [x] 3.13 Previous "Copy profile link" button is gone
+- [x] 3.4 "Share Profile" button appears on own profile page — 8869c4c
+- [x] 3.5 Button does NOT appear on other users' profiles — 8869c4c
+- [x] 3.6 Clicking button opens modal — 8869c4c
+- [x] 3.7 Modal displays all three sharing options — 8869c4c
+- [x] 3.8 Copy link works and shows toast — 8869c4c
+- [x] 3.9 QR code displays correct URL — 8869c4c
+- [x] 3.10 Email link opens with correct content — 8869c4c
+- [x] 3.11 Modal closes properly (ESC, click outside, X button) — 8869c4c
+- [x] 3.12 No console errors — 8869c4c
+- [x] 3.13 Previous "Copy profile link" button is gone — 8869c4c
 
 ### Phase 4: Polish & Accessibility
 
