@@ -347,9 +347,9 @@ Existing copy-to-clipboard functionality is replaced but delivers same core capa
 
 #### Automated
 
-- [ ] 1.1 Dependencies install cleanly: `npm install`
-- [ ] 1.2 No version conflicts in package-lock.json
-- [ ] 1.3 Type checking passes: `npm run typecheck`
+- [x] 1.1 Dependencies install cleanly: `npm install`
+- [x] 1.2 No version conflicts in package-lock.json
+- [x] 1.3 Type checking passes: `npm run typecheck`
 
 #### Manual
 
