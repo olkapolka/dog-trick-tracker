@@ -353,8 +353,8 @@ Existing copy-to-clipboard functionality is replaced but delivers same core capa
 
 #### Manual
 
-- [ ] 1.4 Verify exact versions appear in package.json (no ^ or ~ prefixes)
-- [ ] 1.5 Check package-lock.json shows expected resolved versions
+- [x] 1.4 Verify exact versions appear in package.json (no ^ or ~ prefixes)
+- [x] 1.5 Check package-lock.json shows expected resolved versions
 
 ### Phase 2: Create ShareModal Component
 
@@ -401,17 +401,17 @@ Existing copy-to-clipboard functionality is replaced but delivers same core capa
 
 #### Automated
 
-- [ ] 4.1 Linting passes (including a11y rules): `npm run lint`
+- [x] 4.1 Linting passes (including a11y rules): `npm run lint`
 
 #### Manual
 
-- [ ] 4.2 Tab navigation works through all modal elements
-- [ ] 4.3 ESC key closes modal
-- [ ] 4.4 Focus returns to trigger button on close
-- [ ] 4.5 Screen reader announces modal opening (test with VoiceOver/NVDA if available)
-- [ ] 4.6 Modal content fits mobile screens (375px width)
-- [ ] 4.7 Touch targets are adequately sized on mobile
-- [ ] 4.8 Copy/Email actions work on mobile browsers
-- [ ] 4.9 QR code scans successfully with phone camera app
-- [ ] 4.10 Works in Chrome, Safari, Firefox
-- [ ] 4.11 No visual regressions in existing profile display
+- [x] 4.2 Tab navigation works through all modal elements
+- [x] 4.3 ESC key closes modal
+- [x] 4.4 Focus returns to trigger button on close
+- [x] 4.5 Screen reader announces modal opening (test with VoiceOver/NVDA if available)
+- [x] 4.6 Modal content fits mobile screens (375px width)
+- [x] 4.7 Touch targets are adequately sized on mobile
+- [x] 4.8 Copy/Email actions work on mobile browsers
+- [x] 4.9 QR code scans successfully with phone camera app
+- [x] 4.10 Works in Chrome, Safari, Firefox
+- [x] 4.11 No visual regressions in existing profile display

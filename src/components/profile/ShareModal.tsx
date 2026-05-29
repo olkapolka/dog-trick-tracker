@@ -46,7 +46,7 @@ export default function ShareModal({ profileUrl, username }: ShareModalProps) {
       <Dialog.Portal>
         <Dialog.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 bg-black/50 backdrop-blur-sm" />
         <Dialog.Content
-          className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed inset-x-4 top-4 bottom-4 overflow-y-auto rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-6 shadow-2xl focus:outline-none sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[90vh] sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:p-8"
+          className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed inset-x-4 top-4 bottom-4 overflow-y-auto rounded-2xl border border-white/10 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-6 shadow-2xl focus:outline-none sm:inset-auto sm:top-1/2 sm:left-1/2 sm:max-h-[90vh] sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:p-8"
           aria-labelledby="share-modal-title"
           aria-describedby="share-modal-description"
         >
