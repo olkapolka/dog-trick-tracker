@@ -14,51 +14,45 @@ if (!supabase) {
 }
 
 // Query following list - fetch follows then profiles separately
-const { data: followingFollows } = await supabase
-  .from("follows")
-  .select("following_id")
-  .eq("follower_id", user.id);
+const { data: followingFollows } = await supabase.from("follows").select("following_id").eq("follower_id", user.id);
 
-let followingData: Array<{ following_id: string; profiles: { login_name: string; dog_name: string } | null }> = [];
+let followingData: { following_id: string; profiles: { login_name: string; dog_name: string } | null }[] = [];
 if (followingFollows && followingFollows.length > 0) {
   const followingIds = followingFollows.map((f) => f.following_id);
   const { data: followingProfiles } = await supabase
     .from("profiles")
     .select("user_id, login_name, dog_name")
     .in("user_id", followingIds);
-  
+
   if (followingProfiles) {
     followingData = followingFollows.map((follow) => ({
       following_id: follow.following_id,
-      profiles: followingProfiles.find((p) => p.user_id === follow.following_id) || null,
+      profiles: followingProfiles.find((p) => p.user_id === follow.following_id) ?? null,
     }));
   }
 }
 
-// Query followers list - fetch follows then profiles separately  
-const { data: followersFollows } = await supabase
-  .from("follows")
-  .select("follower_id")
-  .eq("following_id", user.id);
+// Query followers list - fetch follows then profiles separately
+const { data: followersFollows } = await supabase.from("follows").select("follower_id").eq("following_id", user.id);
 
-let followersData: Array<{ follower_id: string; profiles: { login_name: string; dog_name: string } | null }> = [];
+let followersData: { follower_id: string; profiles: { login_name: string; dog_name: string } | null }[] = [];
 if (followersFollows && followersFollows.length > 0) {
   const followerIds = followersFollows.map((f) => f.follower_id);
   const { data: followerProfiles } = await supabase
     .from("profiles")
     .select("user_id, login_name, dog_name")
     .in("user_id", followerIds);
-  
+
   if (followerProfiles) {
     followersData = followersFollows.map((follow) => ({
       follower_id: follow.follower_id,
-      profiles: followerProfiles.find((p) => p.user_id === follow.follower_id) || null,
+      profiles: followerProfiles.find((p) => p.user_id === follow.follower_id) ?? null,
     }));
   }
 }
 
-const following = followingData ?? [];
-const followers = followersData ?? [];
+const following = followingData;
+const followers = followersData;
 ---
 
 <Layout title="Friends">
@@ -81,7 +75,7 @@ const followers = followersData ?? [];
             following.length > 0 ? (
               <ul class="space-y-4">
                 {following.map((follow) => {
-                  const profile = follow.profiles as { login_name: string; dog_name: string } | null;
+                  const profile = follow.profiles;
                   if (!profile) return null;
                   return (
                     <li class="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
@@ -114,7 +108,7 @@ const followers = followersData ?? [];
             followers.length > 0 ? (
               <ul class="space-y-4">
                 {followers.map((follow) => {
-                  const profile = follow.profiles as { login_name: string; dog_name: string } | null;
+                  const profile = follow.profiles;
                   if (!profile) return null;
                   return (
                     <li class="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { User, Dog, Calendar, Users } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -114,11 +114,11 @@ export default function CreateProfileForm({ serverError }: Props) {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const handleSubmit: React.SubmitEventHandler<HTMLFormElement> = (e) => {
     if (!validate()) {
       e.preventDefault();
     }
-  }
+  };
 
   const maxDate = new Date().toISOString().split("T")[0];
 

@@ -512,12 +512,12 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 
 #### Automated
 
-- [ ] 5.1 ESLint passes
-- [ ] 5.2 TypeScript compilation passes
+- [x] 5.1 ESLint passes
+- [x] 5.2 TypeScript compilation passes
 
 #### Manual
 
-- [ ] 5.3 Verify Friends link visibility
-- [ ] 5.4 Test navigation to Friends page
-- [ ] 5.5 Test link hidden when signed out
-- [ ] 5.6 Test responsive behavior
+- [x] 5.3 Verify Friends link visibility
+- [x] 5.4 Test navigation to Friends page
+- [x] 5.5 Test link hidden when signed out
+- [x] 5.6 Test responsive behavior
