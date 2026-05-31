@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Star, Clock, Check } from "lucide-react";
 import useSWRMutation from "swr/mutation";
 import { toast } from "sonner";

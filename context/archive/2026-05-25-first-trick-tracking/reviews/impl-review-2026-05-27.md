@@ -1,4 +1,5 @@
 <!-- IMPL-REVIEW-REPORT -->
+
 # Implementation Review: User Can Track Their First Trick
 
 - **Plan**: context/changes/first-trick-tracking/plan.md
@@ -9,14 +10,14 @@
 
 ## Verdicts
 
-| Dimension | Verdict |
-|-----------|---------|
-| Plan Adherence | ⚠️ WARNING |
-| Scope Discipline | ✅ PASS |
-| Safety & Quality | ⚠️ WARNING |
-| Architecture | ✅ PASS |
+| Dimension           | Verdict    |
+| ------------------- | ---------- |
+| Plan Adherence      | ⚠️ WARNING |
+| Scope Discipline    | ✅ PASS    |
+| Safety & Quality    | ⚠️ WARNING |
+| Architecture        | ✅ PASS    |
 | Pattern Consistency | ⚠️ WARNING |
-| Success Criteria | ❌ FAIL |
+| Success Criteria    | ❌ FAIL    |
 
 ## Findings
 
@@ -59,7 +60,7 @@
 - **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
 - **Dimension**: Plan Adherence
 - **Location**: src/middleware.ts:4
-- **Detail**: Plan Phase 9 specified middleware should protect /api/profile/* and /api/tricks/* but PROTECTED_ROUTES array only lists /dashboard and /profile. Each API endpoint implements individual auth checks (profile/create.ts:10, tricks/status.ts:9, upload-photo.ts:9) which is functional but inconsistent with centralized protection pattern.
+- **Detail**: Plan Phase 9 specified middleware should protect /api/profile/_ and /api/tricks/_ but PROTECTED_ROUTES array only lists /dashboard and /profile. Each API endpoint implements individual auth checks (profile/create.ts:10, tricks/status.ts:9, upload-photo.ts:9) which is functional but inconsistent with centralized protection pattern.
 - **Fix**: Add '/api/profile', '/api/tricks' to PROTECTED_ROUTES array
   - Strength: Matches plan; centralizes auth; removes duplicate checks from 3 API files.
   - Tradeoff: Minor — requires removing redundant checks from individual API routes.

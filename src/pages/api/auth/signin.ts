@@ -5,6 +5,7 @@ export const POST: APIRoute = async (context) => {
   const form = await context.request.formData();
   const email = form.get("email") as string;
   const password = form.get("password") as string;
+  const returnTo = form.get("returnTo") as string | null;
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
@@ -23,5 +24,6 @@ export const POST: APIRoute = async (context) => {
     return context.redirect("/profile/create");
   }
 
-  return context.redirect("/dashboard");
+  // Redirect to returnTo if provided, otherwise dashboard
+  return context.redirect(returnTo ?? "/dashboard");
 };

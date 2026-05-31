@@ -21,24 +21,27 @@ Cloudflare Pages offers a truly free tier (100k requests/day) that eliminates mo
 
 ### Full Scoring Matrix
 
-| Platform | CLI-first | Managed/Serverless | Agent-readable docs | Stable deploy API | MCP / Integration | Cost (10k-100k req/month) |
-|---|---|---|---|---|---|---|
-| **Cloudflare Pages** | Pass* | Pass | Partial | Pass | Partial | **$0 (free tier)** |
-| Vercel | Pass | Pass | Partial | Pass | Partial | $0 (free tier) |
-| Netlify | Partial† | Pass | Partial | Pass | Partial | $0 (free tier, spins down) |
-| Fly.io | Pass | Pass | Pass | Pass | Pass | $5-15 |
-| Railway | Pass | Pass | Pass | Pass | Pass | $5-30 |
-| Render | Pass | Pass | Pass | Pass | Pass | $32-55 (always-on) |
+| Platform             | CLI-first | Managed/Serverless | Agent-readable docs | Stable deploy API | MCP / Integration | Cost (10k-100k req/month)  |
+| -------------------- | --------- | ------------------ | ------------------- | ----------------- | ----------------- | -------------------------- |
+| **Cloudflare Pages** | Pass\*    | Pass               | Partial             | Pass              | Partial           | **$0 (free tier)**         |
+| Vercel               | Pass      | Pass               | Partial             | Pass              | Partial           | $0 (free tier)             |
+| Netlify              | Partial†  | Pass               | Partial             | Pass              | Partial           | $0 (free tier, spins down) |
+| Fly.io               | Pass      | Pass               | Pass                | Pass              | Pass              | $5-15                      |
+| Railway              | Pass      | Pass               | Pass                | Pass              | Pass              | $5-30                      |
+| Render               | Pass      | Pass               | Pass                | Pass              | Pass              | $32-55 (always-on)         |
 
 **Key:**
-- *Cloudflare Pages: Logs are dashboard-only (no `wrangler tail` for Pages); Workers support CLI logs but Astro SSR runs on Pages context
+
+- \*Cloudflare Pages: Logs are dashboard-only (no `wrangler tail` for Pages); Workers support CLI logs but Astro SSR runs on Pages context
 - †Netlify: Rollback requires UI navigation; function logs accessible only via dashboard
 
 **Hard filters applied:**
+
 - **Persistent connections (Q1: No)** — No platforms dropped; stateless request/response architecture is compatible with all candidates
 - **Tech stack (Astro + Supabase)** — All platforms support Node.js/TypeScript and Astro via official adapters; no incompatibilities found
 
 **Soft weights applied:**
+
 - **Cost minimization (Q2)** — Free-tier platforms (Cloudflare, Vercel, Netlify) heavily favored; paid platforms (Fly.io, Railway, Render) scored lower despite perfect agent-friendliness
 - **No platform familiarity (Q3)** — No tie-breaking preference applied
 - **Single-region deployment (Q4)** — Edge-native platforms (Cloudflare, Vercel, Netlify) not penalized, but global CDN benefit considered neutral
@@ -122,20 +125,20 @@ How Cloudflare Pages operates day-to-day for this Astro + Supabase MVP. Every an
 
 For each identified risk: name, the cross-check lens that surfaced it, likelihood, impact, and a concrete mitigation step. Every risk ties back to a lens or research finding for auditability.
 
-| Risk | Source | Likelihood | Impact | Mitigation |
-|---|---|---|---|---|
-| **Dashboard-only log access blocks agent autonomy** | Devil's advocate | High | Medium | Configure third-party log drain (e.g., Logtail, Better Stack) with API access for agent queries. Alternative: accept manual log checks for MVP; revisit if debugging frequency exceeds 1x/week. |
-| **D1 (SQLite) not a Postgres replacement if Supabase migration needed** | Devil's advocate, Pre-mortem | Medium | High | Keep Supabase as the permanent database layer, or budget for Railway/Fly.io migration if consolidation becomes necessary. Do not assume D1 is a drop-in replacement for Postgres. |
-| **Middleware cannot use in-memory session state** | Devil's advocate | Low | Medium | Use Supabase auth sessions (already implemented) or Cloudflare KV for server-side session storage. Avoid third-party middleware that assumes Node.js `global` or in-process memory. |
-| **Node.js compatibility gaps for edge runtime** | Devil's advocate, Unknown unknowns | Medium | Medium | Test all third-party dependencies in `wrangler pages dev` locally before deploying. Prefer packages marked "edge-compatible" or "Cloudflare Workers compatible." Avoid packages using `fs`, `path`, or native modules. |
-| **Outbound WebSocket API is beta** | Devil's advocate, Research finding | Low | Low | Supabase client handles WebSocket connections internally (no developer action needed). If custom WebSocket client is added later, use Durable Objects (GA) as workaround until native API reaches GA. |
-| **Preview deployments on forks are public by default** | Unknown unknowns | Medium | High | Enable "Require access token for preview deployments" in Pages dashboard. Disable "Deploy pull requests from forks" to prevent untrusted code from triggering builds. Never commit `.env` or hardcoded secrets. |
-| **`nodejs_compat` doesn't guarantee npm package compatibility** | Unknown unknowns | High | Medium | Test new dependencies in `wrangler pages dev` locally. Check package docs for "Cloudflare Workers" or "edge runtime" compatibility. Avoid packages with native modules or sync I/O. |
-| **500-build-per-month cap may throttle CI** | Unknown unknowns | Medium | Low | Configure GitHub Actions to deploy only on `push` to `main` and `pull_request` events (not on every commit). Use `wrangler pages dev` for local testing instead of relying on preview deploys. |
-| **Workers Secrets don't sync to Pages env vars** | Unknown unknowns | High | Medium | Use `wrangler pages secret put` (not `wrangler secret put`) or set secrets directly in Pages dashboard under Environment variables. Document this in team runbook. |
-| **No regional data residency control** | Unknown unknowns | Low | Low | Accept global edge routing for MVP (no PII beyond Supabase-managed email). If GDPR or data residency becomes a hard requirement, plan migration to Fly.io (regional pinning) or Railway (EU-West). |
-| **40+ hours lost to dashboard debugging over 6 months** | Pre-mortem | Medium | Medium | Accept manual log checks for MVP scope (3 weeks). If debugging frequency exceeds 1x/week post-launch, migrate to Railway or Fly.io where `railway logs` or `fly logs` provide CLI access. |
-| **Pay-per-use costs (KV, Queues) scale faster than expected** | Pre-mortem | Low | Medium | Monitor Cloudflare billing weekly during first month post-launch. If any service exceeds $10/month, evaluate Railway ($20/month flat with Postgres/Redis included) as cost-predictable alternative. |
+| Risk                                                                    | Source                             | Likelihood | Impact | Mitigation                                                                                                                                                                                                             |
+| ----------------------------------------------------------------------- | ---------------------------------- | ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dashboard-only log access blocks agent autonomy**                     | Devil's advocate                   | High       | Medium | Configure third-party log drain (e.g., Logtail, Better Stack) with API access for agent queries. Alternative: accept manual log checks for MVP; revisit if debugging frequency exceeds 1x/week.                        |
+| **D1 (SQLite) not a Postgres replacement if Supabase migration needed** | Devil's advocate, Pre-mortem       | Medium     | High   | Keep Supabase as the permanent database layer, or budget for Railway/Fly.io migration if consolidation becomes necessary. Do not assume D1 is a drop-in replacement for Postgres.                                      |
+| **Middleware cannot use in-memory session state**                       | Devil's advocate                   | Low        | Medium | Use Supabase auth sessions (already implemented) or Cloudflare KV for server-side session storage. Avoid third-party middleware that assumes Node.js `global` or in-process memory.                                    |
+| **Node.js compatibility gaps for edge runtime**                         | Devil's advocate, Unknown unknowns | Medium     | Medium | Test all third-party dependencies in `wrangler pages dev` locally before deploying. Prefer packages marked "edge-compatible" or "Cloudflare Workers compatible." Avoid packages using `fs`, `path`, or native modules. |
+| **Outbound WebSocket API is beta**                                      | Devil's advocate, Research finding | Low        | Low    | Supabase client handles WebSocket connections internally (no developer action needed). If custom WebSocket client is added later, use Durable Objects (GA) as workaround until native API reaches GA.                  |
+| **Preview deployments on forks are public by default**                  | Unknown unknowns                   | Medium     | High   | Enable "Require access token for preview deployments" in Pages dashboard. Disable "Deploy pull requests from forks" to prevent untrusted code from triggering builds. Never commit `.env` or hardcoded secrets.        |
+| **`nodejs_compat` doesn't guarantee npm package compatibility**         | Unknown unknowns                   | High       | Medium | Test new dependencies in `wrangler pages dev` locally. Check package docs for "Cloudflare Workers" or "edge runtime" compatibility. Avoid packages with native modules or sync I/O.                                    |
+| **500-build-per-month cap may throttle CI**                             | Unknown unknowns                   | Medium     | Low    | Configure GitHub Actions to deploy only on `push` to `main` and `pull_request` events (not on every commit). Use `wrangler pages dev` for local testing instead of relying on preview deploys.                         |
+| **Workers Secrets don't sync to Pages env vars**                        | Unknown unknowns                   | High       | Medium | Use `wrangler pages secret put` (not `wrangler secret put`) or set secrets directly in Pages dashboard under Environment variables. Document this in team runbook.                                                     |
+| **No regional data residency control**                                  | Unknown unknowns                   | Low        | Low    | Accept global edge routing for MVP (no PII beyond Supabase-managed email). If GDPR or data residency becomes a hard requirement, plan migration to Fly.io (regional pinning) or Railway (EU-West).                     |
+| **40+ hours lost to dashboard debugging over 6 months**                 | Pre-mortem                         | Medium     | Medium | Accept manual log checks for MVP scope (3 weeks). If debugging frequency exceeds 1x/week post-launch, migrate to Railway or Fly.io where `railway logs` or `fly logs` provide CLI access.                              |
+| **Pay-per-use costs (KV, Queues) scale faster than expected**           | Pre-mortem                         | Low        | Medium | Monitor Cloudflare billing weekly during first month post-launch. If any service exceeds $10/month, evaluate Railway ($20/month flat with Postgres/Redis included) as cost-predictable alternative.                    |
 
 ## Getting Started
 
@@ -174,6 +177,7 @@ wrangler whoami
 Add Supabase credentials to Cloudflare Pages (cannot be done via CLI; requires dashboard or `wrangler pages secret put`):
 
 **Option A (Dashboard, recommended for first-time):**
+
 1. Go to Cloudflare dashboard > Pages > Select project (or create if first deploy)
 2. Settings > Environment variables > Production
 3. Add `SUPABASE_URL` = `<your-supabase-project-url>`
@@ -181,6 +185,7 @@ Add Supabase credentials to Cloudflare Pages (cannot be done via CLI; requires d
 5. Repeat for Preview environment if needed
 
 **Option B (CLI, requires project to exist):**
+
 ```bash
 wrangler pages secret put SUPABASE_URL --project-name dog-trick-tracker
 # Paste value when prompted
@@ -252,6 +257,7 @@ jobs:
 ```
 
 Add secrets to GitHub repo: Settings > Secrets and variables > Actions > New repository secret:
+
 - `CLOUDFLARE_API_TOKEN` (create in Cloudflare dashboard: My Profile > API Tokens > Create Token > Edit Cloudflare Workers)
 - `CLOUDFLARE_ACCOUNT_ID` (visible in Cloudflare dashboard URL or Workers overview)
 

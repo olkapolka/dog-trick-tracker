@@ -17,21 +17,22 @@ Users visiting their own profile see a "Share Profile" button. Clicking it opens
 
 ## Key Decisions Made
 
-| Decision                       | Choice                        | Why (1 sentence)                                                                                               | Source   |
-| ------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------- | -------- |
-| UI pattern                     | Modal with all options        | Discoverable, shows all three methods at once, follows standard share UX patterns                             | Plan     |
-| QR library                     | qrcode.react 4.1.0            | React-native API, 2.5M weekly downloads, exact version matches project policy                                  | Plan     |
-| Email mechanism                | mailto: link                  | Zero backend complexity, works everywhere, user controls recipients                                            | Plan     |
-| QR download                    | Scan only, no download        | Simpler UI, QR is primarily for mobile scanning use case                                                       | Plan     |
-| Modal close behavior           | ESC / click-outside / X       | Standard modal UX, matches user expectations                                                                   | Plan     |
-| User feedback                  | Sonner toast notifications    | Non-disruptive, library already configured, better UX than button text change                                  | Plan     |
-| Modal library                  | @radix-ui/react-dialog 1.1.4  | Fits with existing @radix-ui/react-slot, battle-tested accessibility (ARIA, focus trap), matches shadcn pattern | Plan     |
-| Scope                          | Copy/QR/Email only            | Complete focused scope, can add social sharing later if needed                                                 | Plan     |
-| URL format                     | /user/username (client-side)  | Already implemented and working, follows REST conventions                                                      | Research |
+| Decision             | Choice                       | Why (1 sentence)                                                                                                | Source   |
+| -------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------- | -------- |
+| UI pattern           | Modal with all options       | Discoverable, shows all three methods at once, follows standard share UX patterns                               | Plan     |
+| QR library           | qrcode.react 4.1.0           | React-native API, 2.5M weekly downloads, exact version matches project policy                                   | Plan     |
+| Email mechanism      | mailto: link                 | Zero backend complexity, works everywhere, user controls recipients                                             | Plan     |
+| QR download          | Scan only, no download       | Simpler UI, QR is primarily for mobile scanning use case                                                        | Plan     |
+| Modal close behavior | ESC / click-outside / X      | Standard modal UX, matches user expectations                                                                    | Plan     |
+| User feedback        | Sonner toast notifications   | Non-disruptive, library already configured, better UX than button text change                                   | Plan     |
+| Modal library        | @radix-ui/react-dialog 1.1.4 | Fits with existing @radix-ui/react-slot, battle-tested accessibility (ARIA, focus trap), matches shadcn pattern | Plan     |
+| Scope                | Copy/QR/Email only           | Complete focused scope, can add social sharing later if needed                                                  | Plan     |
+| URL format           | /user/username (client-side) | Already implemented and working, follows REST conventions                                                       | Research |
 
 ## Scope
 
 **In scope:**
+
 - Install `@radix-ui/react-dialog` and `qrcode.react` with exact versions
 - Create ShareModal React component with three sharing methods
 - Replace existing copy button with modal trigger
@@ -42,6 +43,7 @@ Users visiting their own profile see a "Share Profile" button. Clicking it opens
 - Mobile and desktop responsive design
 
 **Out of scope:**
+
 - Social share buttons (Twitter, Facebook, WhatsApp)
 - Share analytics or tracking
 - QR code download functionality
@@ -55,12 +57,12 @@ Build a new `ShareModal.tsx` React component using Radix UI Dialog primitives fo
 
 ## Phases at a Glance
 
-| Phase          | What it delivers                                                   | Key risk                                             |
-| -------------- | ------------------------------------------------------------------ | ---------------------------------------------------- |
-| 1. Dependencies | qrcode.react and @radix-ui/react-dialog added with exact versions | Version conflicts (mitigated by exact pinning)       |
-| 2. ShareModal  | Complete modal component with Copy/QR/Email                        | Accessibility gaps (mitigated by Radix primitives)   |
-| 3. Integration | Modal replaces existing button in ProfileDisplay                   | Breaking current copy functionality during swap      |
-| 4. Polish      | Accessibility audit, responsive design, cross-browser testing      | Mobile layout issues or keyboard nav gaps            |
+| Phase           | What it delivers                                                  | Key risk                                           |
+| --------------- | ----------------------------------------------------------------- | -------------------------------------------------- |
+| 1. Dependencies | qrcode.react and @radix-ui/react-dialog added with exact versions | Version conflicts (mitigated by exact pinning)     |
+| 2. ShareModal   | Complete modal component with Copy/QR/Email                       | Accessibility gaps (mitigated by Radix primitives) |
+| 3. Integration  | Modal replaces existing button in ProfileDisplay                  | Breaking current copy functionality during swap    |
+| 4. Polish       | Accessibility audit, responsive design, cross-browser testing     | Mobile layout issues or keyboard nav gaps          |
 
 **Prerequisites:** Node 22+ (per AGENTS.md), clean npm install, dev server running  
 **Estimated effort:** ~2-3 focused sessions across 4 incremental phases

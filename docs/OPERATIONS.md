@@ -18,21 +18,23 @@
 ### View Logs
 
 **Cloudflare Workers logs** (dashboard-only):
+
 1. Go to https://dash.cloudflare.com
 2. Workers & Pages → dog-trick-tracker
 3. Logs tab → Real-time logs (shows last 200 requests)
 
 **Deployment logs:**
+
 - GitHub Actions → Deploy workflow → Click latest run → View detailed logs
 
 ### Common Issues
 
-| Issue | Diagnosis | Fix |
-|-------|-----------|-----|
-| Auth errors on production | Supabase secrets missing/wrong | Verify `wrangler secret list` shows both secrets, re-add if needed |
-| 500 errors after deploy | Check Cloudflare logs for stack trace | Rollback using procedure below |
-| Build failures on CI | Check GitHub Actions logs | Verify GitHub secrets are set correctly |
-| Sign-in redirect loop | Cookie/session issue | Check browser DevTools → Application → Cookies for `sb-*` cookies |
+| Issue                     | Diagnosis                             | Fix                                                                |
+| ------------------------- | ------------------------------------- | ------------------------------------------------------------------ |
+| Auth errors on production | Supabase secrets missing/wrong        | Verify `wrangler secret list` shows both secrets, re-add if needed |
+| 500 errors after deploy   | Check Cloudflare logs for stack trace | Rollback using procedure below                                     |
+| Build failures on CI      | Check GitHub Actions logs             | Verify GitHub secrets are set correctly                            |
+| Sign-in redirect loop     | Cookie/session issue                  | Check browser DevTools → Application → Cookies for `sb-*` cookies  |
 
 ## Deployment Procedures
 
@@ -46,6 +48,7 @@
 ### Emergency Rollback
 
 **Option 1: Wrangler CLI (fastest)**
+
 ```bash
 # List recent deployments
 npx wrangler deployments list
@@ -55,6 +58,7 @@ npx wrangler rollback --message "Emergency rollback"
 ```
 
 **Option 2: Git revert + auto-deploy**
+
 ```bash
 # Revert the problematic commit
 git revert <commit-hash>
@@ -64,6 +68,7 @@ git push origin main
 ```
 
 **Option 3: Cloudflare Dashboard (slowest)**
+
 1. Go to Workers & Pages → dog-trick-tracker
 2. Deployments tab
 3. Find last known-good deployment
@@ -76,16 +81,19 @@ git push origin main
 Set up external monitoring with free tier services:
 
 **Option 1: UptimeRobot (https://uptimerobot.com)**
+
 - Free tier: 50 monitors, 5-minute checks
 - Monitor: https://dog-trick-tracker.oliwia-achyna.workers.dev
 - Alert via: Email or Slack
 
 **Option 2: Better Stack Uptime (https://betterstack.com)**
+
 - Free tier: 10 monitors, 30-second checks
 - Includes status page
 - Alert via: Email, SMS, Slack, PagerDuty
 
 **Recommended setup:**
+
 1. Create HTTP(s) monitor for production URL
 2. Check interval: 5 minutes
 3. Alert after: 3 consecutive failures
@@ -96,6 +104,7 @@ Set up external monitoring with free tier services:
 For deeper health checks beyond "URL responds 200":
 
 **Checkly (https://www.checklyhq.com)**
+
 - Free tier: 10k check runs/month
 - Can test full auth flow: signup → signin → dashboard access
 - Playwright-based browser checks
@@ -106,6 +115,7 @@ For deeper health checks beyond "URL responds 200":
 Cloudflare dashboard logs are limited to last 200 requests. For historical analysis:
 
 **Logtail / Better Stack Logs (https://betterstack.com/logtail)**
+
 - Free tier: 1GB logs/month, 3-day retention
 - Requires Cloudflare Logpush (Workers Paid plan) or app-level integration
 - **Defer until**: You need > 3 days of log history or querying across deployments
@@ -115,6 +125,7 @@ Cloudflare dashboard logs are limited to last 200 requests. For historical analy
 Track real user performance:
 
 **Cloudflare Web Analytics** (free, built-in):
+
 1. Cloudflare dashboard → Analytics & Logs → Web Analytics
 2. Add site: dog-trick-tracker.oliwia-achyna.workers.dev
 3. Install JS snippet in `<head>` of Layout.astro
@@ -167,11 +178,13 @@ If entire Worker is deleted:
 ### Data Backup
 
 **Supabase:**
+
 - Automatic backups on paid plan (daily)
 - Manual export: Supabase dashboard → Database → Backups
 - For critical data: Set up periodic `pg_dump` via cron
 
 **Cloudflare KV (session storage):**
+
 - Sessions are ephemeral, no backup needed
 - Users re-authenticate if sessions lost
 
@@ -206,22 +219,26 @@ When you add Supabase tables/schemas:
 ### Cloudflare Workers
 
 **Free tier limits:**
+
 - 100k requests/day
 - 10ms CPU time per request
 - Check usage: Cloudflare dashboard → Workers & Pages → dog-trick-tracker → Metrics
 
 **What triggers paid plan:**
+
 - Exceeding 100k requests/day → $5/month base + $0.50 per million requests
 - Using Logpush, Analytics Engine, Durable Objects
 
 ### Supabase
 
 **Free tier limits:**
+
 - 500MB database
 - 2GB bandwidth
 - Check usage: Supabase dashboard → Settings → Usage
 
 **What triggers paid plan ($25/month):**
+
 - > 500MB database
 - > 2GB bandwidth
 - Need daily backups or PITR (point-in-time recovery)
@@ -229,10 +246,12 @@ When you add Supabase tables/schemas:
 ### GitHub Actions
 
 **Free tier (public repos):**
+
 - Unlimited minutes for public repositories
 - 2000 minutes/month for private repositories
 
 **Current usage:**
+
 - CI workflow: ~2 minutes per run
 - Deploy workflow: ~3 minutes per run
 - Typical month with 50 deploys: ~250 minutes (well within limit)

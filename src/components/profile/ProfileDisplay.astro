@@ -1,25 +1,36 @@
 ---
 import { PhotoUpload } from "./PhotoUpload";
 import ShareModal from "./ShareModal";
+import { FollowButton } from "./FollowButton";
+import type { Database } from "@/lib/database.types";
+
+type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface Props {
-  profile: {
-    dog_name: string;
-    login_name: string;
-    breed: string;
-    date_of_birth: string;
-    sex: string;
-    photo_url: string | null;
-  };
+  profile: ProfileRow;
   age: number;
   score: number;
   favorites: { tricks: { name: string; slug: string } }[];
   inProgress: { tricks: { name: string; slug: string } }[];
   finished: { tricks: { name: string; slug: string } }[];
   isOwnProfile?: boolean;
+  currentUserId?: string | null;
+  isFollowing?: boolean;
+  currentPath?: string;
 }
 
-const { profile, age, score, favorites, inProgress, finished, isOwnProfile = false } = Astro.props;
+const {
+  profile,
+  age,
+  score,
+  favorites,
+  inProgress,
+  finished,
+  isOwnProfile = false,
+  currentUserId = null,
+  isFollowing = false,
+  currentPath = "",
+} = Astro.props;
 ---
 
 <div class="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
@@ -162,12 +173,13 @@ const { profile, age, score, favorites, inProgress, finished, isOwnProfile = fal
           client:load
         />
       ) : (
-        <a
-          href="/dashboard"
-          class="block w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-center text-sm text-blue-100 transition-colors hover:bg-white/20"
-        >
-          ← Back to Dashboard
-        </a>
+        <FollowButton
+          followingId={profile.user_id}
+          initialIsFollowing={isFollowing}
+          isAuthenticated={!!currentUserId}
+          currentPath={currentPath}
+          client:load
+        />
       )
     }
   </div>

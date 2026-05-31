@@ -6,7 +6,8 @@ VALUES (
   true,
   2097152,  -- 2MB in bytes
   ARRAY['image/jpeg', 'image/png', 'image/webp']
-);
+)
+ON CONFLICT (id) DO NOTHING;
 
 -- RLS policies for storage.objects
 CREATE POLICY "Users can upload own photos"

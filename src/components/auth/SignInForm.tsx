@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Mail, Lock, LogIn } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
@@ -7,9 +7,10 @@ import { ServerError } from "@/components/auth/ServerError";
 
 interface Props {
   serverError?: string | null;
+  returnTo?: string | null;
 }
 
-export default function SignInForm({ serverError }: Props) {
+export default function SignInForm({ serverError, returnTo }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -33,14 +34,15 @@ export default function SignInForm({ serverError }: Props) {
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
 
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  const handleSubmit: React.SubmitEventHandler<HTMLFormElement> = (e) => {
     if (!validate()) {
       e.preventDefault();
     }
-  }
+  };
 
   return (
     <form method="POST" action="/api/auth/signin" className="space-y-4" onSubmit={handleSubmit} noValidate>
+      {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
       <FormField
         id="email"
         type="email"

@@ -25,6 +25,7 @@ This plan deploys Dog Trick Tracker to Cloudflare Pages with Supabase authentica
 ## Phase Overview
 
 **Required Phases (0-7):**
+
 - **Phase 0**: Prerequisites & Environment Setup — Supabase project, local `.env`/`.dev.vars`, verify local dev works
 - **Phase 1**: Pre-Flight Configuration — Fix project naming, verify production build
 - **Phase 2**: Cloudflare Authentication — Wrangler CLI login
@@ -35,9 +36,11 @@ This plan deploys Dog Trick Tracker to Cloudflare Pages with Supabase authentica
 - **Phase 7**: Automated CI/CD — Connect GitHub for auto-deploy on push to `master`
 
 **Optional Phase:**
+
 - **Phase 8**: Operational Readiness — Rollback procedures, monitoring, log drains
 
 **Estimated Time:**
+
 - Phases 0-7 (first-time): ~2-3 hours (includes account creation, waiting for builds)
 - Phases 0-7 (if accounts exist): ~45-60 minutes
 - Phase 8: ~30-60 minutes (depends on monitoring service chosen)
@@ -84,18 +87,22 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 #### Option 2: Supabase Local Development (Docker Required)
 
 - [ ] **0.1** Verify Docker is running:
+
   ```bash
   docker --version
   # Should output: Docker version 20.x or higher
   docker ps
   # Should connect without errors
   ```
+
   - If Docker not installed: Download from https://www.docker.com/products/docker-desktop
 
 - [ ] **0.2** Start local Supabase:
+
   ```bash
   npx supabase start
   ```
+
   - First run downloads Docker images (~2-3 minutes)
   - Outputs local credentials to terminal:
     - **API URL**: `http://127.0.0.1:54321`
@@ -111,9 +118,11 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 ### Part B: Local Environment Configuration
 
 - [x] **0.4** Create `.env` file for local development:
+
   ```bash
   cp .env.example .env
   ```
+
   - Open `.env` in editor
   - Fill in Supabase credentials from 0.2 or 0.2 (local):
     ```bash
@@ -127,6 +136,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
   ```bash
   cp .env.example .dev.vars
   ```
+
   - Open `.dev.vars` in editor
   - Fill in same Supabase credentials:
     ```bash
@@ -139,6 +149,7 @@ Choose **Option 1** (Cloud) for production deployment or **Option 2** (Local) fo
 ### Part C: Dependencies & Cloudflare CLI Setup
 
 **⚠️ Node.js Requirement:** This project requires Node.js v22+ for Wrangler CLI compatibility. Before running any `npm` or `npx` commands below, ensure the correct Node version is active:
+
 ```bash
 nvm use 22
 # or if .nvmrc exists:
@@ -149,16 +160,22 @@ node --version  # Should show v22.x.x or higher
 
 - [x] **0.6** Install project dependencies:
   - ```bash
-  npm install
+    npm install
+    ```
+
   ```
   - Installs Astro, Supabase client, Cloudflare adapter, and Wrangler CLI
   - Expected output: `added XXX packages` with no errors
   - This includes `wrangler` as devDependency
 
+  ```
+
 - [x] **0.7** Verify Wrangler CLI is available:
+
   ```bash
   npx wrangler --version
   ```
+
   - Should output: `⛅️ wrangler 4.90.0` (or similar)
   - If not available: run `npm install` again
 
@@ -166,15 +183,18 @@ node --version  # Should show v22.x.x or higher
   ```bash
   npm install -g wrangler
   ```
+
   - Allows running `wrangler` instead of `npx wrangler`
   - Not required, but makes commands shorter
 
 ### Part D: Verify Local Development Works
 
 - [x] **0.9** Test Astro dev server:
+
   ```bash
   npm run dev
   ```
+
   - Expected output: `🚀 astro  v6.0.0-beta.11 started in XXXms`
   - Open browser to `http://localhost:4321`
   - Homepage should load without "Config Error" banner
@@ -229,7 +249,7 @@ node --version  # Should show v22.x.x or higher
 
 ## Phase 2: Cloudflare Authentication
 
-**Goal:** Authenticate Wrangler CLI for deployment 
+**Goal:** Authenticate Wrangler CLI for deployment
 
 - [ ] **2.1** Install Wrangler globally (if not already): `npm install -g wrangler`
   - Wrangler is already in `devDependencies`, but global install allows `wrangler` command outside npm scripts
@@ -378,7 +398,6 @@ node --version  # Should show v22.x.x or higher
   - Created scoped API token at https://dash.cloudflare.com/profile/api-tokens
   - Used "Edit Cloudflare Workers" template
   - Token permissions: Workers Scripts → Edit
-  
 - [x] **7.2** Add GitHub secrets for deployment:
   - Added `CLOUDFLARE_API_TOKEN` - API token from step 7.1
   - Added `CLOUDFLARE_ACCOUNT_ID` - Account ID from `wrangler whoami`
@@ -426,7 +445,7 @@ node --version  # Should show v22.x.x or higher
 
 - **If you want to keep manual deploys via `wrangler pages deploy` AND GitHub auto-deploy**: They're compatible! GitHub integration handles commits pushed to GitHub, `wrangler` handles manual deploys. Both update the same Pages project. Just ensure project name in `wrangler.jsonc` matches Cloudflare project name.
 
-- **If build quota concerns (500/month cap)**: 
+- **If build quota concerns (500/month cap)**:
   - Option A: Disable preview deployments for branches (only deploy `master`)
   - Option B: Disable "Deploy pull requests from forks" (Phase 6.2)
   - Option C: Monitor usage at Pages → `dog-trick-tracker` → Analytics → Builds
@@ -492,6 +511,7 @@ node --version  # Should show v22.x.x or higher
 - [x] **Phase 8**: Operational documentation created, monitoring recommendations documented
 
 **CI/CD Pipeline Verified:**
+
 - CI workflow runs on every push/PR to `main`
 - Deploy workflow automatically deploys to production on push to `main`
 - Both workflows tested and passing

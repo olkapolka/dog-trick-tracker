@@ -18,31 +18,32 @@ User registers → completes profile creation wizard (unique username, dog info,
 
 ## Key Decisions Made
 
-| Decision | Choice | Why (1 sentence) | Source |
-|----------|--------|------------------|--------|
-| Profile creation timing | Immediate wizard after signup | Ensures every user has a profile before accessing features; no empty-state handling needed | Plan |
-| Catalog organization | Grouped by difficulty with cards | Clear progression path matches weighted scoring model; easy to scan on mobile | Plan |
-| Status mutation UX | Icon buttons with optimistic updates | Meets "single click, no confirmation" UX requirement and instant feedback expectation | Plan |
-| Breed data source | Hardcoded TypeScript constant (~50 breeds) | Zero database overhead; easy to extend by editing code; acceptable for finite list | Plan |
-| Photo upload timing | After profile creation (optional) | Prevents orphaned Storage files if profile creation fails; profile created first, then photo updates it | Plan |
-| Photo upload | Full Supabase Storage integration | User chose complete feature over deferring; requires bucket setup and RLS policies | Plan |
-| Detail page structure | Dedicated page per trick | Focused content, shareable URLs, mobile-friendly; 10-15 tricks small enough for page loads | Plan |
-| Progress score calculation | On-demand query from user_tricks | Always accurate; fast with indexed user_id; no denormalization complexity | Plan |
-| Username uniqueness | Check before save + schema constraint | Application-level feedback ("Username taken") with database-level enforcement prevents races | Plan |
+| Decision                     | Choice                                                               | Why (1 sentence)                                                                                                   | Source    |
+| ---------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------- |
+| Profile creation timing      | Immediate wizard after signup                                        | Ensures every user has a profile before accessing features; no empty-state handling needed                         | Plan      |
+| Catalog organization         | Grouped by difficulty with cards                                     | Clear progression path matches weighted scoring model; easy to scan on mobile                                      | Plan      |
+| Status mutation UX           | Icon buttons with optimistic updates                                 | Meets "single click, no confirmation" UX requirement and instant feedback expectation                              | Plan      |
+| Breed data source            | Hardcoded TypeScript constant (~50 breeds)                           | Zero database overhead; easy to extend by editing code; acceptable for finite list                                 | Plan      |
+| Photo upload timing          | After profile creation (optional)                                    | Prevents orphaned Storage files if profile creation fails; profile created first, then photo updates it            | Plan      |
+| Photo upload                 | Full Supabase Storage integration                                    | User chose complete feature over deferring; requires bucket setup and RLS policies                                 | Plan      |
+| Detail page structure        | Dedicated page per trick                                             | Focused content, shareable URLs, mobile-friendly; 10-15 tricks small enough for page loads                         | Plan      |
+| Progress score calculation   | On-demand query from user_tricks                                     | Always accurate; fast with indexed user_id; no denormalization complexity                                          | Plan      |
+| Username uniqueness          | Check before save + schema constraint                                | Application-level feedback ("Username taken") with database-level enforcement prevents races                       | Plan      |
 | Reserved username validation | Blocklist ["dashboard", "profile", "api", "auth", "tricks", "admin"] | Prevents route conflicts where user profiles collide with static routes; shows "Username reserved by system" error | Review F4 |
-| Edge case handling | Helpful empty states | Graceful degradation (placeholder avatar, "No tricks yet" message) guides users | Plan |
-| Testing approach | Focused unit + integration + manual | Balances coverage on business logic and critical paths; manual for mobile responsiveness | Plan |
-| Performance target | Optimize for 10-15 tricks | Meets <2s catalog load guardrail; simple implementation; scales to hundreds without refactor needed | Plan |
-| Error handling | Toast notifications + rollback + field errors | Matches existing auth pattern; non-blocking UX; clear user recovery path | Plan |
-| Dashboard route | Shows catalog directly | Users land on core feature immediately; no extra navigation layer | Plan |
-| Profile URLs | `/user/username` for public, `/profile` for own | Clean shareable URLs; separates public view from editing | Plan |
-| Navigation | Top bar (Catalog, Profile, Sign out) | Consistent with existing Topbar; mobile-friendly; authenticated-only links | Plan |
-| Client-side mutations | Add SWR (4KB) + sonner for toasts | Enables optimistic UX and error feedback without reinventing; minimal bundle increase | Plan |
-| Trick catalog visibility | Public catalog + details, protected mutations | SEO-friendly, content marketing, users preview before signup; status toggles require auth | Plan |
+| Edge case handling           | Helpful empty states                                                 | Graceful degradation (placeholder avatar, "No tricks yet" message) guides users                                    | Plan      |
+| Testing approach             | Focused unit + integration + manual                                  | Balances coverage on business logic and critical paths; manual for mobile responsiveness                           | Plan      |
+| Performance target           | Optimize for 10-15 tricks                                            | Meets <2s catalog load guardrail; simple implementation; scales to hundreds without refactor needed                | Plan      |
+| Error handling               | Toast notifications + rollback + field errors                        | Matches existing auth pattern; non-blocking UX; clear user recovery path                                           | Plan      |
+| Dashboard route              | Shows catalog directly                                               | Users land on core feature immediately; no extra navigation layer                                                  | Plan      |
+| Profile URLs                 | `/user/username` for public, `/profile` for own                      | Clean shareable URLs; separates public view from editing                                                           | Plan      |
+| Navigation                   | Top bar (Catalog, Profile, Sign out)                                 | Consistent with existing Topbar; mobile-friendly; authenticated-only links                                         | Plan      |
+| Client-side mutations        | Add SWR (4KB) + sonner for toasts                                    | Enables optimistic UX and error feedback without reinventing; minimal bundle increase                              | Plan      |
+| Trick catalog visibility     | Public catalog + details, protected mutations                        | SEO-friendly, content marketing, users preview before signup; status toggles require auth                          | Plan      |
 
 ## Scope
 
 **In scope:**
+
 - Profile creation (username, dog name, breed, DOB, sex, photo upload to Storage)
 - Trick catalog browsing (public, grouped by difficulty: beginner/intermediate/advanced)
 - Trick detail pages (step-by-step teaching descriptions)
@@ -55,6 +56,7 @@ User registers → completes profile creation wizard (unique username, dog info,
 - Toast error notifications + rollback on mutation failures
 
 **Out of scope:**
+
 - Following relationships (deferred to S-04: no follow button, no Friends tab, no follower list)
 - Profile editing (create-once only; editing username or dog info deferred to post-MVP)
 - Admin trick management (no CRUD for tricks; deferred to S-05)
@@ -68,6 +70,7 @@ User registers → completes profile creation wizard (unique username, dog info,
 ## Architecture / Approach
 
 **Data flow:**
+
 1. Profile creation: Client form → `POST /api/profile/create` → Supabase `profiles` insert (photo_url = null) → redirect to dashboard
 2. Photo upload (optional, after profile exists): Client file picker → `POST /api/profile/upload-photo` → verify profile exists → Supabase Storage bucket `dog-photos` → UPDATE `profiles.photo_url`
 3. Catalog display: Server-side fetch all tricks in `.astro` frontmatter → render grouped by difficulty
@@ -75,6 +78,7 @@ User registers → completes profile creation wizard (unique username, dog info,
 5. Progress score: On-demand query `SUM(tricks.difficulty_weight)` for finished tricks
 
 **Key components:**
+
 - `CreateProfileForm.tsx` — React form with validation (username uniqueness check, breed dropdown, DOB, sex, photo upload)
 - `PhotoUpload.tsx` — File input with preview and 2MB validation
 - `TrickCard.astro` — Catalog card (title, difficulty badge, description preview, link to detail)
@@ -83,30 +87,33 @@ User registers → completes profile creation wizard (unique username, dog info,
 - `tricks/[slug].astro` — Dynamic route for trick details
 
 **Libraries added:**
+
 - **SWR** (4KB) — Client-side data fetching with optimistic updates and automatic revalidation
 - **sonner** — Toast notifications for error feedback
 
 **Progressive enhancement:**
+
 - Auth flows stay server-side (form POST → redirect)
 - Trick status tracking adds client-side mutations for optimistic UX
 - Catalog and detail pages are public (work without JavaScript), status toggles require auth and JS
 
 ## Phases at a Glance
 
-| Phase | What it delivers | Key risk |
-|-------|------------------|----------|
-| 0. Database Schema | Tables (profiles, tricks, user_tricks), RLS policies, seed 12 tricks, generate TypeScript types | Schema design errors cascade to all phases; SQL syntax errors block progress |
-| 1. Foundation Setup | SWR + sonner installed, breeds constant created | Minimal risk; straightforward npm install and constant file |
-| 2. Profile Creation | Profile form, API route, username uniqueness check, wizard redirect from signup, signin profile checks | Username uniqueness race condition if two users submit simultaneously (mitigated by schema constraint) |
-| 3. Photo Upload | Supabase Storage bucket migration, RLS policies, upload component that updates existing profile | RLS policy syntax tricky; photo upload requires profile to exist first (new flow prevents orphans) |
-| 4. Catalog on Dashboard | Dashboard shows tricks grouped by difficulty, trick cards, empty state, profile existence check | Phase 0 seed data must exist; implementer sees empty dashboard until this phase completes |
-| 5. Trick Detail Pages | Dynamic `/tricks/[slug]` route, step-by-step description, 404 handling | Slug collisions if two tricks have same name (mitigated by Phase 0 seed data design) |
-| 6. Status Tracking | Icon buttons, optimistic updates, API mutation, toast errors, rollback | SWR mutation complexity; optimistic rollback logic must handle all error cases |
-| 7. Progress Score | Score calculation utility, display on profile, auto-update on status change | Score query performance (acceptable for 12 tricks, may need denormalization at scale) |
-| 8. Public Profiles | `/user/username` dynamic route, public view, copy link button, 404 for missing users | Simple nested dynamic route (`user/[username].astro`) with straightforward username extraction |
-| 9. Navigation & Polish | Topbar links, protected routes, mobile responsiveness | Mobile testing requires real devices or thorough emulator testing; edge cases may slip through |
+| Phase                   | What it delivers                                                                                       | Key risk                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| 0. Database Schema      | Tables (profiles, tricks, user_tricks), RLS policies, seed 12 tricks, generate TypeScript types        | Schema design errors cascade to all phases; SQL syntax errors block progress                           |
+| 1. Foundation Setup     | SWR + sonner installed, breeds constant created                                                        | Minimal risk; straightforward npm install and constant file                                            |
+| 2. Profile Creation     | Profile form, API route, username uniqueness check, wizard redirect from signup, signin profile checks | Username uniqueness race condition if two users submit simultaneously (mitigated by schema constraint) |
+| 3. Photo Upload         | Supabase Storage bucket migration, RLS policies, upload component that updates existing profile        | RLS policy syntax tricky; photo upload requires profile to exist first (new flow prevents orphans)     |
+| 4. Catalog on Dashboard | Dashboard shows tricks grouped by difficulty, trick cards, empty state, profile existence check        | Phase 0 seed data must exist; implementer sees empty dashboard until this phase completes              |
+| 5. Trick Detail Pages   | Dynamic `/tricks/[slug]` route, step-by-step description, 404 handling                                 | Slug collisions if two tricks have same name (mitigated by Phase 0 seed data design)                   |
+| 6. Status Tracking      | Icon buttons, optimistic updates, API mutation, toast errors, rollback                                 | SWR mutation complexity; optimistic rollback logic must handle all error cases                         |
+| 7. Progress Score       | Score calculation utility, display on profile, auto-update on status change                            | Score query performance (acceptable for 12 tricks, may need denormalization at scale)                  |
+| 8. Public Profiles      | `/user/username` dynamic route, public view, copy link button, 404 for missing users                   | Simple nested dynamic route (`user/[username].astro`) with straightforward username extraction         |
+| 9. Navigation & Polish  | Topbar links, protected routes, mobile responsiveness                                                  | Mobile testing requires real devices or thorough emulator testing; edge cases may slip through         |
 
 **Prerequisites:**
+
 - Local Supabase running (`npx supabase start`) or production Supabase project configured
 - Supabase env vars (`SUPABASE_URL`, `SUPABASE_KEY`) set in `.env` and `.dev.vars`
 - Node.js v22+ active (`nvm use 22`)

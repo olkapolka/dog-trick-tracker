@@ -63,6 +63,9 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") ?? [];
         inProgress={inProgress}
         finished={finished}
         isOwnProfile={true}
+        currentUserId={user.id}
+        isFollowing={false}
+        currentPath={Astro.url.pathname}
       />
     </div>
   </div>
