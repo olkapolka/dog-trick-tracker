@@ -1,10 +1,10 @@
 ---
 change_id: public-profile-view
 title: Public profile view
-status: impl_reviewed
+status: archived
 created: 2026-05-31
 updated: 2026-05-31
-archived_at: null
+archived_at: 2026-05-31T15:33:17Z
 ---
 
 ## Notes

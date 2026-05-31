@@ -31,7 +31,7 @@ Dog owners training at home have no systematic way to track which tricks they're
 | F-02 | seed-trick-catalog     | (foundation) Starter trick catalog seeded — 10-15 tricks across 3 difficulty levels                                  | F-01          | Vision, Business Logic, Success Criteria guardrail            | proposed |
 | S-01 | first-trick-tracking   | Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score | F-01, F-02    | US-01, FR-001-012, Business Logic, Success Criteria (primary) | done     |
 | S-02 | shareable-profile-link | Share profile via copy link, QR code, or email (enhances existing copy button with modal UI)                         | S-01          | FR-005 (already met; this adds enhancements)                  | done     |
-| S-03 | public-profile-view    | Visit another user's profile via shared link and see their dog info and trick progress                               | S-02          | FR-013, FR-017, Success Criteria (primary)                    | proposed |
+| S-03 | public-profile-view    | Visit another user's profile via shared link and see their dog info and trick progress                               | S-02          | FR-013, FR-017, Success Criteria (primary)                    | done     |
 | S-04 | follow-relationships   | Follow users, view list of followed profiles in Friends tab, view list of followers in Friends tab                   | S-03          | FR-014, FR-015, FR-016, Access Control                        | proposed |
 | S-05 | admin-trick-crud       | (admin) Add, edit, and remove tricks from catalog                                                                    | F-01, F-02    | FR-018, FR-019, FR-020, Access Control                        | blocked  |
 
@@ -124,7 +124,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - What should happen if a user visits a profile link for a non-existent username? Owner: team. Block: no (standard 404 or "Profile not found" page; implementation detail).
 - **Risk:** Privacy model is simple per PRD NFR ("any user with a profile link can view that profile; no public listing or search"). Low risk.
-- **Status:** proposed
+- **Status:** done
 
 ### S-04: User can follow users and see follow relationships
 
@@ -203,3 +203,4 @@ Roadmap migrated to GitHub Issues on 2026-05-25.
 
 - **S-01: Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score** — Archived 2026-05-29 → `context/archive/2026-05-25-first-trick-tracking/`. Lesson: —.
 - **S-02: User can share their profile via three methods: copy link to clipboard, display QR code for scanning, or open email with pre-filled profile link. Replaces existing copy button with accessible modal UI.** — Archived 2026-05-31 → `context/archive/2026-05-29-shareable-profile-link/`. Lesson: —.
+- **S-03: Visit another user's profile via shared link and see their dog info and trick progress** — Archived 2026-05-31 → `context/archive/2026-05-31-public-profile-view/`. Lesson: —.
