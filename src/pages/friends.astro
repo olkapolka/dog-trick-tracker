@@ -90,7 +90,7 @@ const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
             Following ({followingCount ?? 0})
           </h2>
           {
-            following && following.length > 0 ? (
+            following.length > 0 ? (
               <>
                 <ul class="space-y-4">
                   {following.map((follow) => {
@@ -116,11 +116,12 @@ const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
                   <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-6">
                     <a
                       href={`/friends?followingPage=${followingPage - 1}&followersPage=${followersPage}`}
-                      class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      class:list={[
+                        "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                         followingPage === 1
                           ? "cursor-not-allowed bg-white/5 text-blue-100/40"
-                          : "bg-purple-500 text-white hover:bg-purple-600"
-                      }`}
+                          : "bg-purple-500 text-white hover:bg-purple-600",
+                      ]}
                       aria-disabled={followingPage === 1}
                     >
                       Previous
@@ -130,11 +131,12 @@ const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
                     </span>
                     <a
                       href={`/friends?followingPage=${followingPage + 1}&followersPage=${followersPage}`}
-                      class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      class:list={[
+                        "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                         followingPage === followingTotalPages
                           ? "cursor-not-allowed bg-white/5 text-blue-100/40"
-                          : "bg-purple-500 text-white hover:bg-purple-600"
-                      }`}
+                          : "bg-purple-500 text-white hover:bg-purple-600",
+                      ]}
                       aria-disabled={followingPage === followingTotalPages}
                     >
                       Next
@@ -154,7 +156,7 @@ const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
             Followers ({followersCount ?? 0})
           </h2>
           {
-            followers && followers.length > 0 ? (
+            followers.length > 0 ? (
               <>
                 <ul class="space-y-4">
                   {followers.map((follow) => {
@@ -180,11 +182,12 @@ const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
                   <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-6">
                     <a
                       href={`/friends?followingPage=${followingPage}&followersPage=${followersPage - 1}`}
-                      class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      class:list={[
+                        "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                         followersPage === 1
                           ? "cursor-not-allowed bg-white/5 text-blue-100/40"
-                          : "bg-purple-500 text-white hover:bg-purple-600"
-                      }`}
+                          : "bg-purple-500 text-white hover:bg-purple-600",
+                      ]}
                       aria-disabled={followersPage === 1}
                     >
                       Previous
@@ -194,11 +197,12 @@ const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
                     </span>
                     <a
                       href={`/friends?followingPage=${followingPage}&followersPage=${followersPage + 1}`}
-                      class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                      class:list={[
+                        "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
                         followersPage === followersTotalPages
                           ? "cursor-not-allowed bg-white/5 text-blue-100/40"
-                          : "bg-purple-500 text-white hover:bg-purple-600"
-                      }`}
+                          : "bg-purple-500 text-white hover:bg-purple-600",
+                      ]}
                       aria-disabled={followersPage === followersTotalPages}
                     >
                       Next
