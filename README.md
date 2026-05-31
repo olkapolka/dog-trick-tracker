@@ -3,7 +3,7 @@
 [![CI](https://github.com/olkapolka/dog-trick-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/olkapolka/dog-trick-tracker/actions/workflows/ci.yml)
 [![Deploy](https://github.com/olkapolka/dog-trick-tracker/actions/workflows/deploy.yml/badge.svg)](https://github.com/olkapolka/dog-trick-tracker/actions/workflows/deploy.yml)
 
-A web application for tracking dog trick training progress.
+A web application for tracking dog trick training progress online.
 
 **Production:** https://dog-trick-tracker.oliwia-achyna.workers.dev
 
