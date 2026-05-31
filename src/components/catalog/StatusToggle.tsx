@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Star, Clock, Check } from "lucide-react";
 import useSWRMutation from "swr/mutation";
 import { toast } from "sonner";
@@ -28,7 +28,7 @@ async function updateStatus(
 export default function StatusToggle({ trickId, initialStatus }: Props) {
   const [optimisticStatus, setOptimisticStatus] = useState<Enums<"trick_status"> | null>(initialStatus);
 
-  const { trigger, isMutating } = useSWRMutation("/api/tricks/status", updateStatus);
+  const { trigger, isMutating} = useSWRMutation("/api/tricks/status", updateStatus);
 
   async function handleStatusClick(newStatus: Enums<"trick_status">) {
     // Optimistic update

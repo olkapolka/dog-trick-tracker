@@ -103,7 +103,7 @@ const formattedDescription = trick.description.split("\n").filter((line: string)
           user && (
             <div class="mt-8 border-t border-white/10 pt-6">
               <h3 class="mb-3 text-sm font-medium text-blue-200">Track Your Progress</h3>
-              <StatusToggle trickId={trick.id} initialStatus={userStatus} client:only="react" />
+              <StatusToggle trickId={trick.id} initialStatus={userStatus} client:load />
             </div>
           )
         }

@@ -7,6 +7,7 @@ Add one-way following functionality to the existing public profile view. Users c
 ## Current State Analysis
 
 ### What exists:
+
 - Public profile route at [/user/[username].astro](src/pages/user/[username].astro#L1-L68) displaying dog info, progress score, and tricks organized by status (FR-013 ✓)
 - ProfileDisplay component ([src/components/profile/ProfileDisplay.astro](src/components/profile/ProfileDisplay.astro#L1-L175)) with `isOwnProfile` prop controlling ShareModal vs "Back to Dashboard" link
 - Database schema with profiles, tricks, user_tricks tables (see [database.types.ts](src/lib/database.types.ts#L22-L132))
@@ -15,6 +16,7 @@ Add one-way following functionality to the existing public profile view. Users c
 - API patterns established: JSON responses with status codes, inline validation ([src/pages/api/tricks/status.ts](src/pages/api/tricks/status.ts) example)
 
 ### What's missing:
+
 - ❌ `follows` database table for tracking follower/following relationships
 - ❌ Follow/Unfollow API endpoints
 - ❌ Follow button UI in ProfileDisplay when viewing other users
@@ -23,6 +25,7 @@ Add one-way following functionality to the existing public profile view. Users c
 - ❌ Logic to check if current user already follows a profile
 
 ### Key Discoveries:
+
 - Migration pattern: `YYYYMMDDHHMMSS_description.sql` with composite PK for junction tables ([20260526132227_create_user_tricks_table.sql](supabase/migrations/20260526132227_create_user_tricks_table.sql#L5-L13))
 - Foreign keys use `ON DELETE CASCADE` — when a user is deleted, their follow relationships are automatically cleaned up
 - RLS policies always enabled: public read (`USING (true)`), auth-gated write (`WITH CHECK (auth.uid() = user_id)`)
@@ -31,13 +34,14 @@ Add one-way following functionality to the existing public profile view. Users c
 
 ## Desired End State
 
-When a user visits another user's profile (`/user/someuser`), they see a Follow button (or "Following" if already following) below the training points display. Clicking it immediately toggles the state with optimistic UI and shows a toast confirmation. Clicking "Following" unfollows with confirmation. 
+When a user visits another user's profile (`/user/someuser`), they see a Follow button (or "Following" if already following) below the training points display. Clicking it immediately toggles the state with optimistic UI and shows a toast confirmation. Clicking "Following" unfollows with confirmation.
 
 Authenticated users can navigate to a new `/friends` page from the Topbar to see two sections: "Following" (profiles they follow) and "Followers" (who follows them). Each list shows dog names, usernames, and profile links. Empty states guide users to discover profiles via shared links.
 
 Unauthenticated users viewing public profiles see the Follow button but get redirected to `/auth/signin?returnTo=/user/username` when clicking it, preserving their intent.
 
 ### Verification:
+
 - User A can follow User B from `/user/userb` → see "Following" button state → visit `/friends` and see User B in "Following" list
 - User B visits `/friends` → sees User A in "Followers" list
 - User A clicks "Following" on `/user/userb` → unfollows → button returns to "Follow" state
@@ -61,6 +65,7 @@ Incremental database-first approach: create the follows junction table with prop
 ## Phase 1: Database Schema & Type Generation
 
 ### Overview
+
 Create the `follows` junction table to track follower/following relationships with composite primary key, foreign key constraints, and RLS policies. Regenerate TypeScript types.
 
 ### Changes Required:
@@ -71,7 +76,7 @@ Create the `follows` junction table to track follower/following relationships wi
 
 **Intent**: Create the `follows` table with composite primary key `(follower_id, following_id)` to prevent duplicate follows, foreign keys to `auth.users` with cascade delete, and timestamp tracking. Enable RLS with public read access and auth-gated writes where users can only create/delete their own follow relationships.
 
-**Contract**: 
+**Contract**:
 
 ```sql
 -- Create follows table
@@ -160,6 +165,7 @@ follows: {
 ## Phase 2: Follow/Unfollow API Endpoints
 
 ### Overview
+
 Create REST API endpoints for follow and unfollow actions with auth gating, duplicate prevention, and self-follow blocking.
 
 ### Changes Required:
@@ -204,6 +210,7 @@ Create REST API endpoints for follow and unfollow actions with auth gating, dupl
 ## Phase 3: Follow Button in ProfileDisplay
 
 ### Overview
+
 Add a Follow/Unfollow button to ProfileDisplay when viewing another user's profile. Implements optimistic UI updates with toast feedback and auth-gated access.
 
 ### Changes Required:
@@ -215,6 +222,7 @@ Add a Follow/Unfollow button to ProfileDisplay when viewing another user's profi
 **Intent**: React component that displays "Follow" or "Following" button based on current follow state. On click, POSTs to `/api/follow` or DELETEs to `/api/unfollow`, updates local state optimistically, and shows toast confirmation. Handles errors with rollback and error toast. Redirects unauthenticated users to signin with return URL.
 
 **Contract**: Accept props `{ followingId: string, initialIsFollowing: boolean, isAuthenticated: boolean, currentPath: string }`. Use `useState` to track follow state (initialized from `initialIsFollowing`). On click:
+
 1. If not authenticated: `window.location.href = /auth/signin?returnTo=${currentPath}`
 2. Otherwise: optimistically toggle state, call API, show toast on success, rollback on error
 
@@ -227,17 +235,19 @@ Button styling: "Follow" uses purple background (`bg-purple-500 hover:bg-purple-
 **Intent**: Replace the "Back to Dashboard" link (currently shown when `isOwnProfile=false`) with the new FollowButton component. Pass the necessary props including follow state.
 
 **Contract**: At [line 140-154](src/components/profile/ProfileDisplay.astro#L140-L154), replace the conditional that shows ShareModal (own profile) vs generic link (other profile) with:
+
 - `isOwnProfile=true` → ShareModal (unchanged)
 - `isOwnProfile=false` → FollowButton with `client:load` directive
 
 New props needed for ProfileDisplay:
+
 ```typescript
 interface Props {
   // ... existing props
   isOwnProfile?: boolean;
-  currentUserId?: string | null;  // For checking follow state
-  isFollowing?: boolean;           // Server-determined follow state
-  profileUserId: string;           // Target profile's user_id
+  currentUserId?: string | null; // For checking follow state
+  isFollowing?: boolean; // Server-determined follow state
+  profileUserId: string; // Target profile's user_id
 }
 ```
 
@@ -248,6 +258,7 @@ interface Props {
 **Intent**: Query the follows table to determine if the current user (if authenticated) already follows the viewed profile. Pass this state and auth context to ProfileDisplay.
 
 **Contract**: After fetching the profile ([line 16](src/pages/user/[username].astro#L16)), add:
+
 1. Get current user from `Astro.locals.user` (may be null if not authenticated)
 2. If user exists, query: `await supabase.from("follows").select("*").eq("follower_id", user.id).eq("following_id", profile.user_id).maybeSingle()`
 3. Set `isFollowing = !!followRow`
@@ -277,6 +288,7 @@ interface Props {
 ## Phase 4: Friends Page
 
 ### Overview
+
 Create a new `/friends` page displaying two sections: Following (profiles the user follows) and Followers (who follows the user). Auth-gated with empty state messaging.
 
 ### Changes Required:
@@ -288,6 +300,7 @@ Create a new `/friends` page displaying two sections: Following (profiles the us
 **Intent**: Auth-gated page that queries the follows table to get lists of users the current user follows and users who follow them. Passes data to a display component.
 
 **Contract**: Follow standard page structure:
+
 1. Auth check: redirect to `/auth/signin` if no `Astro.locals.user`
 2. Create Supabase client
 3. Query following: `supabase.from("follows").select("following_id, profiles!follows_following_id_fkey(login_name, dog_name)").eq("follower_id", user.id)`
@@ -303,11 +316,13 @@ Create a new `/friends` page displaying two sections: Following (profiles the us
 **Contract**: Use standard page container (`bg-cosmic min-h-screen p-4 pt-20` → `mx-auto max-w-4xl`). Two sections:
 
 **Following section**:
+
 - Header: "Following" with count
 - List: Each item shows dog name, @username, link to `/user/[username]`
 - Empty state: "You're not following anyone yet. Discover profiles via shared links!"
 
 **Followers section**:
+
 - Header: "Followers" with count
 - List: Same format as following
 - Empty state: "No one is following you yet. Share your profile to get followers!"
@@ -337,6 +352,7 @@ Styling: Use card style matching ProfileDisplay (`rounded-2xl border border-whit
 ## Phase 5: Navigation Integration
 
 ### Overview
+
 Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 
 ### Changes Required:
@@ -348,16 +364,11 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 **Intent**: Add a "Friends" link next to "Dashboard" and "Profile" in the authenticated nav section.
 
 **Contract**: At [line 12-14](src/components/Topbar.astro#L12-L14), add a third link:
+
 ```astro
-<a href="/dashboard" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
-  Dashboard
-</a>
-<a href="/profile" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
-  Profile
-</a>
-<a href="/friends" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline">
-  Friends
-</a>
+<a href="/dashboard" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline"> Dashboard </a>
+<a href="/profile" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline"> Profile </a>
+<a href="/friends" class="text-purple-300 transition-colors hover:text-purple-100 hover:underline"> Friends </a>
 ```
 
 ### Success Criteria:
@@ -382,15 +393,18 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 ## Testing Strategy
 
 ### Unit Tests:
+
 - FollowButton component: test state transitions, optimistic updates, error rollback
 - API endpoints: test auth gating, duplicate prevention, self-follow blocking, error codes
 
 ### Integration Tests:
+
 - End-to-end follow flow: User A follows User B → appears in A's Following list and B's Followers list
 - Unfollow flow: User A unfollows User B → removed from both lists
 - Cascade delete: Delete a user → their follow relationships cleaned up automatically
 
 ### Manual Testing Steps:
+
 1. **Two-user flow**: Create two accounts (User A, User B)
 2. User A visits User B's profile → clicks Follow → verify button state change and toast
 3. User A visits `/friends` → verify User B appears in "Following" section
@@ -482,8 +496,8 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 
 #### Automated
 
-- [ ] 4.1 TypeScript compilation passes
-- [ ] 4.2 ESLint passes
+- [x] 4.1 TypeScript compilation passes
+- [x] 4.2 ESLint passes
 
 #### Manual
 
