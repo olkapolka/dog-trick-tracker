@@ -9,6 +9,7 @@ Enhance the existing profile link sharing feature by adding QR code generation a
 ## Current State Analysis
 
 **Existing Implementation:**
+
 - Copy-to-clipboard button exists in [ProfileDisplay.astro:158-187](src/components/profile/ProfileDisplay.astro#L158-L187)
 - Uses native `navigator.clipboard.writeText()` API
 - Constructs URL as `${window.location.origin}/user/${loginName}`
@@ -17,6 +18,7 @@ Enhance the existing profile link sharing feature by adding QR code generation a
 - Button positioned at bottom of profile card
 
 **Technology Stack:**
+
 - React 19.2.6 with TypeScript 5.9.3
 - Astro 6.3.1 with SSR
 - Exact version pinning (no ^ or ~ prefixes)
@@ -27,6 +29,7 @@ Enhance the existing profile link sharing feature by adding QR code generation a
 - No QR code library installed
 
 **Component Patterns:**
+
 - React components use `client:load` directive in .astro files
 - Props via TypeScript interfaces, default exports
 - Local state with `useState`, no Context used
@@ -77,6 +80,7 @@ Install the QR code library and Radix Dialog primitives with exact versions per 
 **Intent**: Add `qrcode.react` for QR generation and `@radix-ui/react-dialog` for accessible modal primitives. Use exact versioning (no ^ or ~) to match project policy from lessons.md. **Update**: qrcode.react@4.2.0 required for React 19 compatibility (4.1.0 only supports React ≤18).
 
 **Contract**: Add to `dependencies` object:
+
 ```json
 "@radix-ui/react-dialog": "1.1.4",
 "qrcode.react": "4.2.0"
@@ -112,12 +116,13 @@ Build the React modal component with Radix Dialog primitives. Include all three 
 **Intent**: Create modal component accepting `profileUrl` and `username` props. Use Radix Dialog for overlay, content, close button. Include three action sections with lucide-react icons. Implement copy-to-clipboard, QR rendering with qrcode.react, and mailto: link construction. Show sonner toast on copy/email actions. Wrap clipboard call in try/catch and show error toast on failure.
 
 **Contract**: Component signature:
+
 ```typescript
 interface ShareModalProps {
   profileUrl: string;
   username: string;
 }
-export default function ShareModal({ profileUrl, username }: ShareModalProps): JSX.Element
+export default function ShareModal({ profileUrl, username }: ShareModalProps): JSX.Element;
 ```
 
 Radix Dialog structure: `Dialog.Root` > `Dialog.Portal` > `Dialog.Overlay` + `Dialog.Content`. Content contains three sections (Copy, QR, Email) with appropriate ARIA labels. Email href format: `mailto:?subject={subject}&body={body}`. Clipboard write: wrap `navigator.clipboard.writeText()` in try/catch, call `toast.error("Failed to copy link")` on failure (matches PhotoUpload error pattern).
@@ -180,14 +185,17 @@ Replace the existing "Copy profile link" button implementation with the new Shar
 **Intent**: Replace the existing button conditional block (lines 158-172) and script block (lines 176-195) with ShareModal component using `client:load` directive. Pass `profileUrl` constructed server-side and `login_name` from props.
 
 **Contract**: Replace current button and script with:
+
 ```astro
-{isOwnProfile && (
-  <ShareModal 
-    profileUrl={`${Astro.url.origin}/user/${profile.login_name}`}
-    username={profile.login_name}
-    client:load 
-  />
-)}
+{
+  isOwnProfile && (
+    <ShareModal
+      profileUrl={`${Astro.url.origin}/user/${profile.login_name}`}
+      username={profile.login_name}
+      client:load
+    />
+  )
+}
 ```
 
 Note: Server constructs full URL; ShareModal receives and uses the `profileUrl` prop directly (no client-side reconstruction).
@@ -205,7 +213,7 @@ Note: Server constructs full URL; ShareModal receives and uses the `profileUrl` 
 #### Automated Verification:
 
 - Type checking passes: `npm run typecheck`
-- Linting passes: `npm run lint`  
+- Linting passes: `npm run lint`
 - Build succeeds: `npm run build`
 
 #### Manual Verification:

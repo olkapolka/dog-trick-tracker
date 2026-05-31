@@ -25,24 +25,24 @@ Dog owners training at home have no systematic way to track which tricks they're
 
 ## At a glance
 
-| ID | Change ID | Outcome (user can …) | Prerequisites | PRD refs | Status |
-|---|---|---|---|---|---|
-| F-01 | database-schema | (foundation) Schema and migrations in place — users, profiles, dogs, tricks, user_tricks, difficulty levels | — | Access Control, Business Logic, FR-003 | ready |
-| F-02 | seed-trick-catalog | (foundation) Starter trick catalog seeded — 10-15 tricks across 3 difficulty levels | F-01 | Vision, Business Logic, Success Criteria guardrail | proposed |
-| S-01 | first-trick-tracking | Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score | F-01, F-02 | US-01, FR-001-012, Business Logic, Success Criteria (primary) | done |
-| S-02 | shareable-profile-link | Share profile via copy link, QR code, or email (enhances existing copy button with modal UI) | S-01 | FR-005 (already met; this adds enhancements) | done |
-| S-03 | public-profile-view | Visit another user's profile via shared link and see their dog info and trick progress | S-02 | FR-013, FR-017, Success Criteria (primary) | proposed |
-| S-04 | follow-relationships | Follow users, view list of followed profiles in Friends tab, view list of followers in Friends tab | S-03 | FR-014, FR-015, FR-016, Access Control | proposed |
-| S-05 | admin-trick-crud | (admin) Add, edit, and remove tricks from catalog | F-01, F-02 | FR-018, FR-019, FR-020, Access Control | blocked |
+| ID   | Change ID              | Outcome (user can …)                                                                                                 | Prerequisites | PRD refs                                                      | Status   |
+| ---- | ---------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------- | -------- |
+| F-01 | database-schema        | (foundation) Schema and migrations in place — users, profiles, dogs, tricks, user_tricks, difficulty levels          | —             | Access Control, Business Logic, FR-003                        | ready    |
+| F-02 | seed-trick-catalog     | (foundation) Starter trick catalog seeded — 10-15 tricks across 3 difficulty levels                                  | F-01          | Vision, Business Logic, Success Criteria guardrail            | proposed |
+| S-01 | first-trick-tracking   | Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score | F-01, F-02    | US-01, FR-001-012, Business Logic, Success Criteria (primary) | done     |
+| S-02 | shareable-profile-link | Share profile via copy link, QR code, or email (enhances existing copy button with modal UI)                         | S-01          | FR-005 (already met; this adds enhancements)                  | done     |
+| S-03 | public-profile-view    | Visit another user's profile via shared link and see their dog info and trick progress                               | S-02          | FR-013, FR-017, Success Criteria (primary)                    | proposed |
+| S-04 | follow-relationships   | Follow users, view list of followed profiles in Friends tab, view list of followers in Friends tab                   | S-03          | FR-014, FR-015, FR-016, Access Control                        | proposed |
+| S-05 | admin-trick-crud       | (admin) Add, edit, and remove tricks from catalog                                                                    | F-01, F-02    | FR-018, FR-019, FR-020, Access Control                        | blocked  |
 
 ## Streams
 
 Navigation aid — groups items that share a Prerequisites chain. Canonical ordering still lives in the dependency graph below; this table is the proposed reading order across parallel tracks.
 
-| Stream | Theme | Chain | Note |
-|---|---|---|---|
-| A | User tracking & social | F-01 → F-02 → S-01 → S-02 → S-03 → S-04 | North star (S-01) sequenced first per speed goal; social features follow dependency order |
-| B | Catalog curation | F-01 → F-02 → S-05 | Parallel with Stream A after F-02; blocked on admin role assignment unknown (see Open Questions) |
+| Stream | Theme                  | Chain                                   | Note                                                                                             |
+| ------ | ---------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| A      | User tracking & social | F-01 → F-02 → S-01 → S-02 → S-03 → S-04 | North star (S-01) sequenced first per speed goal; social features follow dependency order        |
+| B      | Catalog curation       | F-01 → F-02 → S-05                      | Parallel with Stream A after F-02; blocked on admin role assignment unknown (see Open Questions) |
 
 ## Baseline
 
@@ -154,15 +154,15 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID | Suggested issue title | Ready for `/10x-plan` | Notes |
-|---|---|---|---|---|
-| F-01 | database-schema | Database schema & migrations for users, profiles, tricks | yes | Run `/10x-plan database-schema` |
-| F-02 | seed-trick-catalog | Seed starter trick catalog (10-15 tricks) | no | Blocked on F-01 |
-| S-01 | first-trick-tracking | User can track their first trick (north star) | no | Blocked on F-01, F-02 |
-| S-02 | shareable-profile-link | User can share their profile link | no | Blocked on S-01 |
-| S-03 | public-profile-view | User can view another user's profile and progress | no | Blocked on S-02 |
-| S-04 | follow-relationships | User can follow users and see relationships | no | Blocked on S-03 |
-| S-05 | admin-trick-crud | Admin can manage trick catalog | no | Blocked on F-01, F-02, and admin role assignment unknown |
+| Roadmap ID | Change ID              | Suggested issue title                                    | Ready for `/10x-plan` | Notes                                                    |
+| ---------- | ---------------------- | -------------------------------------------------------- | --------------------- | -------------------------------------------------------- |
+| F-01       | database-schema        | Database schema & migrations for users, profiles, tricks | yes                   | Run `/10x-plan database-schema`                          |
+| F-02       | seed-trick-catalog     | Seed starter trick catalog (10-15 tricks)                | no                    | Blocked on F-01                                          |
+| S-01       | first-trick-tracking   | User can track their first trick (north star)            | no                    | Blocked on F-01, F-02                                    |
+| S-02       | shareable-profile-link | User can share their profile link                        | no                    | Blocked on S-01                                          |
+| S-03       | public-profile-view    | User can view another user's profile and progress        | no                    | Blocked on S-02                                          |
+| S-04       | follow-relationships   | User can follow users and see relationships              | no                    | Blocked on S-03                                          |
+| S-05       | admin-trick-crud       | Admin can manage trick catalog                           | no                    | Blocked on F-01, F-02, and admin role assignment unknown |
 
 ## GitHub Issues
 
@@ -173,17 +173,18 @@ Roadmap migrated to GitHub Issues on 2026-05-25.
 
 ### Issue Mapping
 
-| Roadmap ID | Issue | Title | Labels | Status |
-|---|---|---|---|---|
-| F-01 | [#6](https://github.com/olkapolka/dog-trick-tracker/issues/6) | Database schema & migrations for users, profiles, tricks | `type: foundation` `status: ready` | Ready for `/10x-plan database-schema` |
-| F-02 | [#7](https://github.com/olkapolka/dog-trick-tracker/issues/7) | Seed starter trick catalog (10-15 tricks) | `type: foundation` `status: proposed` | Depends on #6 |
-| S-01 | [#8](https://github.com/olkapolka/dog-trick-tracker/issues/8) | User can track their first trick (north star) | `type: slice` `status: proposed` `priority: north-star` | Depends on #6, #7 — North star 🌟 |
-| S-02 | [#9](https://github.com/olkapolka/dog-trick-tracker/issues/9) | User can share their profile link | `type: slice` `status: proposed` | Depends on #8 |
-| S-03 | [#10](https://github.com/olkapolka/dog-trick-tracker/issues/10) | User can view another user's profile and progress | `type: slice` `status: proposed` | Depends on #9 |
-| S-04 | [#11](https://github.com/olkapolka/dog-trick-tracker/issues/11) | User can follow users and see relationships | `type: slice` `status: proposed` | Depends on #10 |
-| S-05 | [#12](https://github.com/olkapolka/dog-trick-tracker/issues/12) | Admin can manage trick catalog | `type: admin` `status: blocked` | Depends on #6, #7 — Blocked on admin role assignment |
+| Roadmap ID | Issue                                                           | Title                                                    | Labels                                                  | Status                                               |
+| ---------- | --------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- |
+| F-01       | [#6](https://github.com/olkapolka/dog-trick-tracker/issues/6)   | Database schema & migrations for users, profiles, tricks | `type: foundation` `status: ready`                      | Ready for `/10x-plan database-schema`                |
+| F-02       | [#7](https://github.com/olkapolka/dog-trick-tracker/issues/7)   | Seed starter trick catalog (10-15 tricks)                | `type: foundation` `status: proposed`                   | Depends on #6                                        |
+| S-01       | [#8](https://github.com/olkapolka/dog-trick-tracker/issues/8)   | User can track their first trick (north star)            | `type: slice` `status: proposed` `priority: north-star` | Depends on #6, #7 — North star 🌟                    |
+| S-02       | [#9](https://github.com/olkapolka/dog-trick-tracker/issues/9)   | User can share their profile link                        | `type: slice` `status: proposed`                        | Depends on #8                                        |
+| S-03       | [#10](https://github.com/olkapolka/dog-trick-tracker/issues/10) | User can view another user's profile and progress        | `type: slice` `status: proposed`                        | Depends on #9                                        |
+| S-04       | [#11](https://github.com/olkapolka/dog-trick-tracker/issues/11) | User can follow users and see relationships              | `type: slice` `status: proposed`                        | Depends on #10                                       |
+| S-05       | [#12](https://github.com/olkapolka/dog-trick-tracker/issues/12) | Admin can manage trick catalog                           | `type: admin` `status: blocked`                         | Depends on #6, #7 — Blocked on admin role assignment |
 
 **Next steps**:
+
 - Start with [#6 Database schema](https://github.com/olkapolka/dog-trick-tracker/issues/6) — ready for `/10x-plan database-schema`
 - All issues include full roadmap context (outcome, prerequisites with clickable task lists, PRD references, unknowns, risk assessment)
 - Dependencies are tracked via task lists in issue bodies (check boxes link to prerequisite issues)

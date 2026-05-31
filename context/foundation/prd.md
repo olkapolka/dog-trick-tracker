@@ -30,13 +30,16 @@ Existing pet or habit-tracking apps are too complex or too generic — they don'
 ## Success Criteria
 
 ### Primary
+
 - User can track which tricks their dog knows (favorite / in-progress / finished) and successfully change status on any trick in the catalog
 - User can share their profile link and another user can visit it, click "follow", and see that user's trick progress
 
 ### Secondary
+
 - (None for MVP — scoped down to prove core tracking works first)
 
 ### Guardrails
+
 - **UX:** Changing trick status (favorite → in-progress → finished) is immediate with a single click; no multi-step confirmation flow
 - **Performance:** Catalog loads and displays all 10-15 starter tricks without noticeable delay (< 2 seconds on average connection)
 - **Data integrity:** User's trick progress persists correctly across sessions; no accidental status resets or data loss
@@ -50,6 +53,7 @@ Existing pet or habit-tracking apps are too complex or too generic — they don'
 - **Then** they see that trick listed under "in-progress" on their profile page, in the catalog, and in the trick's detail page
 
 #### Acceptance Criteria
+
 - Status change is immediate (no page refresh or confirmation dialog required)
 - In-progress badge/indicator is visible in all three locations within 1 second of marking
 - User can change the status again (e.g., from in-progress to finished) without navigating away
@@ -57,65 +61,85 @@ Existing pet or habit-tracking apps are too complex or too generic — they don'
 ## Functional Requirements
 
 ### Authentication
+
 - FR-001: User can register with email and password. Priority: must-have
+
   > Socrates: Counter-argument considered: "Email registration adds friction; magic link or OAuth-only would be faster." Resolution: kept; email/password is familiar to broad consumer market and doesn't require external OAuth dependencies for MVP.
 
 - FR-002: User can log in with email and password. Priority: must-have
   > Socrates: Counter-argument considered: "If we used magic links, traditional login becomes redundant." Resolution: kept; consistent with registration method; no magic link infrastructure needed for MVP.
 
 ### Profile Management
+
 - FR-003: User can create their profile with unique login name and dog info (name, breed from dropdown, date of birth, sex, optional photo). Priority: must-have
+
   > Socrates: Counter-argument considered: "Unique login name creates namespace conflicts; email should be the identity." Resolution: kept; unique login name allows friendly sharing (example.com/@username) and gives users control over their public identity separate from email.
 
 - FR-004: User can view their own profile showing dog info, owner nickname, and tricks organized by status (favorite, in-progress, finished). Priority: must-have
+
   > Socrates: No counter-argument; it stands as written.
 
 - FR-005: User can generate and copy their own profile link to share with others. Priority: must-have
   > Socrates: Counter-argument considered: "If usernames are unique, couldn't users just type example.com/@username? Link generation is redundant." Resolution: kept with clarification; show the profile URL and allow copying to clipboard for easy sharing.
 
 ### Trick Catalog
+
 - FR-006: User can browse the trick catalog as a flat list. Priority: must-have
+
   > Socrates: Counter-argument considered: "With only 10-15 tricks, detail pages are over-engineering." Resolution: kept; detail pages are essential because they contain step-by-step teaching descriptions that users need to learn the trick.
 
 - FR-007: User can view trick detail pages. Priority: must-have
+
   > Socrates: Detail pages must have step-by-step descriptions of the trick — this is where users learn how to teach it. Essential to product value.
 
 - FR-008: User can mark a trick as favorite. Priority: must-have
+
   > Socrates: No counter-argument; it stands as written.
 
 - FR-009: User can mark a trick as in-progress. Priority: must-have
+
   > Socrates: No counter-argument; it stands as written.
 
 - FR-010: User can mark a trick as finished. Priority: must-have
+
   > Socrates: No counter-argument; it stands as written.
 
 - FR-011: User can change trick status directly from catalog preview. Priority: must-have
+
   > Socrates: No counter-argument; it stands as written.
 
 - FR-012: User can change trick status from trick detail page. Priority: must-have
   > Socrates: No counter-argument; it stands as written.
 
 ### Following & Social
+
 - FR-013: User can visit another user's profile via a shared link. Priority: must-have
+
   > Socrates: Counter-argument considered: "Following without a feed means users manually visit profiles — limited value." Resolution: kept with clarification; following in MVP is simplified to profile bookmarks (users save profiles they want to check back on). Feed aggregation comes in v2.
 
 - FR-014: User can follow another user's profile. Priority: must-have
+
   > Socrates: See FR-013; following is profile bookmarking for MVP.
 
 - FR-015: User can view list of profiles they follow in Friends tab. Priority: must-have
+
   > Socrates: See FR-013; this is the bookmark list.
 
 - FR-016: User can view list of their followers in Friends tab. Priority: must-have
+
   > Socrates: See FR-013; knowing who follows you creates reciprocity even without a feed.
 
 - FR-017: User can view followed users' trick progress on their profiles. Priority: must-have
   > Socrates: See FR-013; users manually visit bookmarked profiles to see progress.
 
 ### Admin Capabilities
+
 - FR-018: Admin can add tricks to the catalog (with step-by-step teaching descriptions). Priority: must-have
+
   > Socrates: No counter-argument; it stands as written.
 
 - FR-019: Admin can edit tricks in the catalog. Priority: must-have
+
   > Socrates: No counter-argument; it stands as written.
 
 - FR-020: Admin can remove tricks from the catalog. Priority: must-have
@@ -158,6 +182,7 @@ This MVP explicitly avoids the following to keep scope tight:
 - **Leaderboards or competitive features**: The progress score is personal only; no rankings, no public leaderboards, no comparison with other users. Rationale: competition can add engagement at scale (10k+ users noted as future direction), but MVP focuses on personal tracking motivation first.
 
 ### Scale insight
+
 At 100x scale (10,000 users instead of 100), the product would need a larger trick catalog and leaderboards/competitive features to maintain engagement. The core weighted scoring rule would remain, but social competition becomes load-bearing.
 
 ## Open Questions

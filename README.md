@@ -158,11 +158,13 @@ This project deploys to [Cloudflare Workers](https://workers.cloudflare.com/) wi
 ### Automated Deployment (Recommended)
 
 Every push to `main` branch automatically:
+
 1. Runs lint and build checks (CI workflow)
 2. Deploys to production (Deploy workflow)
 3. Updates https://dog-trick-tracker.oliwia-achyna.workers.dev
 
 **Required GitHub Secrets:**
+
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_KEY` - Supabase anon key
 - `CLOUDFLARE_API_TOKEN` - Cloudflare API token with Workers write access
@@ -216,11 +218,13 @@ npx wrangler rollback --message "Rollback to stable version"
 ## Known Constraints
 
 **Cloudflare Workers limitations:**
+
 - Runtime logs accessible only via Cloudflare dashboard (no `wrangler tail` for deployed Workers)
 - No in-memory session stores - use Supabase cookies or KV
 - Cold starts can take 1-2 seconds on first request
 
 **Supabase:**
+
 - Must use external Supabase (cloud or self-hosted) - Cloudflare D1 is SQLite, not Postgres-compatible
 - Email confirmations disabled for development - enable in production via Supabase dashboard
 
@@ -231,4 +235,5 @@ GitHub Actions runs lint + build on every push and PR to `main`. Successful buil
 ## License
 
 MIT
+
 # dog-trick-tracker

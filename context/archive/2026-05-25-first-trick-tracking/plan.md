@@ -9,6 +9,7 @@ This plan is self-contained. Phase 0 creates the database schema (profiles, tric
 ## Current State Analysis
 
 **What exists:**
+
 - ✅ Astro v6 + React v19 + TypeScript v5 + Tailwind CSS v4
 - ✅ Supabase auth (signup/signin/signout) fully working via email/password
 - ✅ Middleware-based route protection (`PROTECTED_ROUTES` array in `src/middleware.ts`)
@@ -20,6 +21,7 @@ This plan is self-contained. Phase 0 creates the database schema (profiles, tric
 - ✅ Cloudflare Workers deployment + GitHub Actions CI/CD
 
 **What's missing:**
+
 - ❌ No profile management (users land on empty dashboard after signup)
 - ❌ No trick browsing or detail pages
 - ❌ No status tracking (user_tricks table is empty)
@@ -32,6 +34,7 @@ This plan is self-contained. Phase 0 creates the database schema (profiles, tric
 - ❌ No dynamic routes ([username].astro, tricks/[slug].astro)
 
 **Codebase patterns to follow:**
+
 - Form validation: Real-time error clearing + on-submit check (see `SignUpForm.tsx:23-43`)
 - API routes: `await context.request.formData()` → `createClient()` → query → `context.redirect()` (see `src/pages/api/auth/signin.ts`)
 - Error handling: Redirect with `?error=${encodeURIComponent(message)}`, display via `<ServerError>` component
@@ -41,6 +44,7 @@ This plan is self-contained. Phase 0 creates the database schema (profiles, tric
 ## Desired End State
 
 **User journey (north star validation):**
+
 1. New user registers → immediately redirected to profile creation wizard
 2. User fills form (unique username, dog name, breed from dropdown, date of birth, sex, uploads photo)
 3. After saving, user lands on dashboard showing trick catalog grouped by difficulty (Beginner/Intermediate/Advanced cards)
@@ -52,6 +56,7 @@ This plan is self-contained. Phase 0 creates the database schema (profiles, tric
 9. Another user visits that URL → sees public profile with dog info and progress (no edit capabilities)
 
 **Verification checklist:**
+
 - [ ] After signup, user cannot reach dashboard without completing profile creation
 - [ ] Profile creation enforces unique username (shows "Username taken" error if conflict)
 - [ ] Photo uploads to Supabase Storage bucket `dog-photos` and URL saves to `profiles.photo_url`
@@ -79,11 +84,13 @@ This plan is self-contained. Phase 0 creates the database schema (profiles, tric
 ## Implementation Approach
 
 **Progressive enhancement strategy:**
+
 - Auth flows remain server-side (form POST → redirect) matching existing pattern
 - Trick status tracking adds client-side mutations via SWR for optimistic UX without breaking server-side fallback
 - Catalog and detail pages are public (SEO-friendly, content marketing) but status toggles require auth
 
 **Data flow:**
+
 1. Profile creation: Client form → POST `/api/profile/create` → Supabase `profiles` insert → redirect
 2. Photo upload: Client file picker → POST `/api/profile/upload-photo` → Supabase Storage → return public URL → save to `profiles.photo_url`
 3. Catalog display: Server-side fetch all tricks in `.astro` frontmatter → render grouped cards
@@ -91,6 +98,7 @@ This plan is self-contained. Phase 0 creates the database schema (profiles, tric
 5. Progress score: Calculated on-demand via query `SELECT SUM(tricks.difficulty_weight) FROM user_tricks JOIN tricks WHERE status='finished'`
 
 **Dependency injection:**
+
 - Assumes `profiles` table has: `id`, `user_id` (FK to auth.users), `login_name` (unique), `dog_name`, `breed`, `date_of_birth`, `sex`, `photo_url`
 - Assumes `tricks` table has: `id`, `name`, `slug`, `difficulty` (beginner/intermediate/advanced), `difficulty_weight` (1/2/3), `description` (step-by-step text)
 - Assumes `user_tricks` table has: `user_id`, `trick_id`, `status` (favorite/in-progress/finished), composite PK or unique constraint
@@ -110,6 +118,7 @@ Create the database schema (profiles, tricks, user_tricks tables) and seed the s
 **Intent**: Store dog profile data with unique login_name for public URLs.
 
 **Contract**: SQL migration creating `profiles` table with RLS policies:
+
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -149,6 +158,7 @@ CREATE POLICY "Users can update own profile"
 **Intent**: Store trick catalog with difficulty levels (beginner/intermediate/advanced) and weighted scoring (1/2/3 points).
 
 **Contract**: SQL migration creating `tricks` table with difficulty enum:
+
 ```sql
 CREATE TYPE difficulty_level AS ENUM ('beginner', 'intermediate', 'advanced');
 
@@ -179,6 +189,7 @@ CREATE POLICY "Tricks are publicly readable"
 **Intent**: Track which tricks each user has marked as favorite/in-progress/finished.
 
 **Contract**: SQL migration creating junction table with status enum and RLS:
+
 ```sql
 CREATE TYPE trick_status AS ENUM ('favorite', 'in-progress', 'finished');
 
@@ -216,6 +227,7 @@ CREATE POLICY "Users can update own trick progress"
 **Intent**: Populate 12 starter tricks across three difficulty levels (4 beginner @ 1pt, 4 intermediate @ 2pt, 4 advanced @ 3pt).
 
 **Contract**: SQL seed data with step-by-step teaching descriptions:
+
 ```sql
 INSERT INTO tricks (name, slug, difficulty, difficulty_weight, description) VALUES
 (
@@ -311,6 +323,7 @@ INSERT INTO tricks (name, slug, difficulty, difficulty_weight, description) VALU
 **Intent**: Auto-generate TypeScript interfaces from the newly created database schema to ensure type safety in subsequent phases.
 
 **Contract**: Run Supabase CLI command after migrations are applied:
+
 ```bash
 npx supabase gen types typescript --local > src/lib/database.types.ts
 ```
@@ -351,6 +364,7 @@ Install client-side data fetching and toast notification libraries (SWR and sonn
 **Intent**: Add SWR (4KB, React hooks for data fetching) and sonner (toast notifications) to enable optimistic UI updates and error feedback.
 
 **Contract**: Add to `dependencies`:
+
 ```json
 "swr": "^2.2.5",
 "sonner": "^1.5.0"
@@ -365,6 +379,7 @@ Run `npm install` after editing.
 **Intent**: Provide a fixed list of ~50 common dog breeds for the profile creation dropdown. Hardcoded to avoid database overhead.
 
 **Contract**: Export constant array of breed strings, alphabetically sorted:
+
 ```typescript
 export const DOG_BREEDS = [
   "Australian Shepherd",
@@ -383,7 +398,7 @@ export const DOG_BREEDS = [
   // ... expand to ~50 breeds
 ] as const;
 
-export type DogBreed = typeof DOG_BREEDS[number];
+export type DogBreed = (typeof DOG_BREEDS)[number];
 ```
 
 ### Success Criteria:
@@ -422,6 +437,7 @@ Build the profile creation form (username, dog name, breed, DOB, sex), API route
 **Intent**: React form capturing dog info and unique username. Follows existing `SignUpForm` pattern with real-time validation and error clearing.
 
 **Contract**: Form fields:
+
 - `login_name` (text input, 3-20 chars, kebab-case validation, uniqueness check on blur)
 - `dog_name` (text input, required)
 - `breed` (select dropdown from `DOG_BREEDS` constant)
@@ -431,18 +447,20 @@ Build the profile creation form (username, dog name, breed, DOB, sex), API route
 Form action: `POST /api/profile/create`. Use `FormField` component for inputs, `SubmitButton` for submission. Validation regex for `login_name`: `/^[a-z][a-z0-9-]{2,19}$/` (starts with letter, lowercase + numbers + hyphens, 3-20 chars).
 
 Reserved username blocklist (prevents route conflicts):
+
 ```typescript
 const RESERVED_USERNAMES = ["dashboard", "profile", "api", "auth", "tricks", "admin"];
 ```
 
 Client-side validation:
+
 ```typescript
 async function checkUsernameAvailable(username: string): Promise<boolean> {
   // Check reserved list first
   if (RESERVED_USERNAMES.includes(username.toLowerCase())) {
     return false;
   }
-  
+
   const res = await fetch(`/api/profile/check-username?username=${encodeURIComponent(username)}`);
   return res.ok;
 }
@@ -457,12 +475,9 @@ Show error "Username reserved by the system" if in blocklist, "Username taken" i
 **Intent**: Return 200 if username available, 409 if taken.
 
 **Contract**: GET endpoint, query param `username`. Query Supabase `profiles` table:
+
 ```typescript
-const { data } = await supabase
-  .from("profiles")
-  .select("login_name")
-  .eq("login_name", username)
-  .single();
+const { data } = await supabase.from("profiles").select("login_name").eq("login_name", username).single();
 
 if (data) return new Response(null, { status: 409 });
 return new Response(null, { status: 200 });
@@ -474,9 +489,10 @@ return new Response(null, { status: 200 });
 
 **Intent**: Insert new profile row linked to authenticated user, enforce uniqueness constraint, handle conflicts.
 
-**Contract**: POST endpoint. Extract FormData fields. Get `user` from `Astro.locals` (set by middleware). 
+**Contract**: POST endpoint. Extract FormData fields. Get `user` from `Astro.locals` (set by middleware).
 
 Server-side reserved username validation (prevent route conflicts):
+
 ```typescript
 const RESERVED_USERNAMES = ["dashboard", "profile", "api", "auth", "tricks", "admin"];
 const loginName = formData.get("login_name") as string;
@@ -487,6 +503,7 @@ if (RESERVED_USERNAMES.includes(loginName.toLowerCase())) {
 ```
 
 Insert into `profiles` table:
+
 ```typescript
 const { error } = await supabase.from("profiles").insert({
   user_id: user.id,
@@ -495,7 +512,7 @@ const { error } = await supabase.from("profiles").insert({
   breed: formData.get("breed"),
   date_of_birth: formData.get("date_of_birth"),
   sex: formData.get("sex"),
-  photo_url: null // Photo added in Phase 3
+  photo_url: null, // Photo added in Phase 3
 });
 ```
 
@@ -524,17 +541,15 @@ If `error.code === "23505"` (unique violation), redirect to `/profile/create?err
 **Intent**: Prevent users without profiles from bypassing profile creation when signing in (e.g., users who signed up before this feature, cleared cookies, or use multiple devices).
 
 **Contract**: After successful signin, check if profile exists before redirecting. First, update the signInWithPassword() destructuring to capture `data`:
+
 ```typescript
 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 ```
 
 Then add profile query before redirect:
+
 ```typescript
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("id")
-  .eq("user_id", data.user.id)
-  .single();
+const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", data.user.id).single();
 
 if (!profile) {
   return context.redirect("/profile/create");
@@ -552,12 +567,9 @@ Note: This requires the authenticated session to be established (which signin do
 **Intent**: Show authenticated user's own profile (read-only for now, editing deferred).
 
 **Contract**: Protected route. Fetch profile from Supabase by `user_id`:
+
 ```typescript
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("*")
-  .eq("user_id", user.id)
-  .single();
+const { data: profile } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
 ```
 
 If no profile, redirect to `/profile/create`. Display dog name, breed, DOB, sex. Photo placeholder if `photo_url` is null. Show copy link button (functionality in Phase 8). Placeholder for progress score (added in Phase 7).
@@ -599,6 +611,7 @@ Set up Supabase Storage bucket for dog photos with RLS policies, build photo upl
 **Contract**: Bucket name: `dog-photos`. Public read access (no auth required to view). RLS policies enforce authenticated users can upload to `{user_id}/*` path only; public read; owner-only UPDATE/DELETE.
 
 SQL migration:
+
 ```sql
 -- Create public bucket for dog photos
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -614,7 +627,7 @@ VALUES (
 CREATE POLICY "Users can upload own photos"
   ON storage.objects FOR INSERT
   WITH CHECK (
-    bucket_id = 'dog-photos' 
+    bucket_id = 'dog-photos'
     AND auth.uid()::text = (storage.foldername(name))[1]
   );
 
@@ -646,6 +659,7 @@ CREATE POLICY "Users can delete own photos"
 **Contract**: Controlled component with `value: string | null` (photo URL) and `onChange: (url: string) => void`. File input triggers validation, shows preview via `URL.createObjectURL()`. On upload button click, POST file to `/api/profile/upload-photo` as `multipart/form-data`, receive public URL, call `onChange(url)`.
 
 Client validation:
+
 ```typescript
 if (file.size > 2 * 1024 * 1024) {
   setError("Photo must be under 2MB");
@@ -664,13 +678,16 @@ if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
 **Intent**: Receive file upload, save to Supabase Storage, update user's existing profile row with photo URL. Ensures profile exists before uploading (prevents orphaned files).
 
 **⚠️ Pre-implementation requirement**: Before coding this step, verify Supabase Storage API structure. Create a scratch file and test:
+
 ```typescript
 const result = supabase.storage.from("dog-photos").getPublicUrl("test.jpg");
 console.log(result); // Confirm structure matches { data: { publicUrl: string } }
 ```
+
 The installed @supabase/supabase-js v2.99.1 has never been used for Storage in this codebase. If the actual structure differs (e.g., `{ publicUrl }` flat or `{ data: { url } }`), update the destructuring below accordingly.
 
 **Contract**: POST endpoint. Extract file from `FormData`. Get `user` from `Astro.locals`. Verify profile exists, upload to Storage, update profile:
+
 ```typescript
 const file = formData.get("photo") as File;
 
@@ -689,31 +706,26 @@ if (profileError || !profile) {
 const fileExt = file.name.split(".").pop();
 const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
-const { data, error } = await supabase.storage
-  .from("dog-photos")
-  .upload(fileName, file, { contentType: file.type });
+const { data, error } = await supabase.storage.from("dog-photos").upload(fileName, file, { contentType: file.type });
 
 if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
 
 // Get public URL
-const { data: { publicUrl } } = supabase.storage.from("dog-photos").getPublicUrl(fileName);
+const {
+  data: { publicUrl },
+} = supabase.storage.from("dog-photos").getPublicUrl(fileName);
 
 // Update profile row with photo URL
-const { error: updateError } = await supabase
-  .from("profiles")
-  .update({ photo_url: publicUrl })
-  .eq("user_id", user.id);
+const { error: updateError } = await supabase.from("profiles").update({ photo_url: publicUrl }).eq("user_id", user.id);
 
 if (updateError) {
   // Cleanup: delete uploaded file since profile update failed
-  const { error: deleteError } = await supabase.storage
-    .from("dog-photos")
-    .remove([fileName]);
-  
+  const { error: deleteError } = await supabase.storage.from("dog-photos").remove([fileName]);
+
   if (deleteError) {
     console.error("Failed to cleanup orphaned file:", deleteError);
   }
-  
+
   return new Response(JSON.stringify({ error: updateError.message }), { status: 500 });
 }
 
@@ -780,35 +792,30 @@ Replace the current empty dashboard with the trick catalog, fetching all tricks 
 **Intent**: Fetch all tricks from Supabase, group by difficulty, render as three sections (Beginner, Intermediate, Advanced) with cards. Ensure users have profiles before showing catalog.
 
 **Contract**: Server-side fetch in frontmatter. First, check if user has a profile (redirect to creation if missing):
+
 ```typescript
 // Check if user has profile
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("id")
-  .eq("user_id", user.id)
-  .single();
+const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", user.id).single();
 
 if (!profile) {
   return Astro.redirect("/profile/create");
 }
 
 // Fetch tricks for catalog
-const { data: tricks } = await supabase
-  .from("tricks")
-  .select("*")
-  .order("name");
+const { data: tricks } = await supabase.from("tricks").select("*").order("name");
 
-const beginner = tricks?.filter(t => t.difficulty === "beginner") || [];
-const intermediate = tricks?.filter(t => t.difficulty === "intermediate") || [];
-const advanced = tricks?.filter(t => t.difficulty === "advanced") || [];
+const beginner = tricks?.filter((t) => t.difficulty === "beginner") || [];
+const intermediate = tricks?.filter((t) => t.difficulty === "intermediate") || [];
+const advanced = tricks?.filter((t) => t.difficulty === "advanced") || [];
 ```
 
 Render:
+
 ```astro
 <section>
   <h2>⭐ Beginner</h2>
   <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-    {beginner.map(trick => <TrickCard trick={trick} />)}
+    {beginner.map((trick) => <TrickCard trick={trick} />)}
   </div>
 </section>
 <!-- Repeat for intermediate and advanced -->
@@ -858,12 +865,9 @@ Create dynamic route for trick detail pages (`/tricks/[slug].astro`), fetch tric
 **Intent**: Dynamic route to show individual trick details including full step-by-step teaching description.
 
 **Contract**: Extract slug from `Astro.params.slug`. Fetch trick from Supabase:
+
 ```typescript
-const { data: trick, error } = await supabase
-  .from("tricks")
-  .select("*")
-  .eq("slug", Astro.params.slug)
-  .single();
+const { data: trick, error } = await supabase.from("tricks").select("*").eq("slug", Astro.params.slug).single();
 
 if (error || !trick) {
   return Astro.redirect("/404", 404);
@@ -871,6 +875,7 @@ if (error || !trick) {
 ```
 
 Render:
+
 - Trick name as `<h1>`
 - Difficulty badge
 - Full `description` (step-by-step teaching instructions) rendered as prose
@@ -917,6 +922,7 @@ Build the status toggle component with icon buttons (Star for favorite, Clock fo
 **Intent**: Three icon buttons to change trick status. Optimistically updates UI, calls API mutation via SWR, shows toast on error and rolls back.
 
 **Contract**: Props: `trickId: string`, `initialStatus: 'favorite' | 'in-progress' | 'finished' | null`. Uses lucide-react icons: `Star` (favorite), `Clock` (in-progress), `Check` (finished). Active status button is highlighted (filled icon + primary color). Clicking a button triggers SWR mutation:
+
 ```typescript
 import useSWRMutation from "swr/mutation";
 import { toast } from "sonner";
@@ -927,7 +933,7 @@ const { trigger } = useSWRMutation(
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(arg)
+      body: JSON.stringify(arg),
     });
     if (!res.ok) throw new Error(await res.text());
     return res.json();
@@ -936,8 +942,8 @@ const { trigger } = useSWRMutation(
     onError: (err) => {
       toast.error(`Failed to update status: ${err.message}`);
       // Rollback handled by reverting optimistic state
-    }
-  }
+    },
+  },
 );
 ```
 
@@ -950,16 +956,18 @@ Optimistic update: set local state immediately on click, revert if mutation fail
 **Intent**: Upsert `user_tricks` row with new status.
 
 **Contract**: POST endpoint, JSON body `{ trickId, status }`. Get `user` from `Astro.locals`. Upsert into `user_tricks`:
+
 ```typescript
 const { trickId, status } = await request.json();
 
-const { error } = await supabase
-  .from("user_tricks")
-  .upsert({
+const { error } = await supabase.from("user_tricks").upsert(
+  {
     user_id: user.id,
     trick_id: trickId,
-    status
-  }, { onConflict: "user_id,trick_id" });
+    status,
+  },
+  { onConflict: "user_id,trick_id" },
+);
 
 if (error) return new Response(error.message, { status: 500 });
 return new Response(JSON.stringify({ success: true }), { status: 200 });
@@ -972,12 +980,14 @@ return new Response(JSON.stringify({ success: true }), { status: 200 });
 **Intent**: Wrap app with sonner `<Toaster>` component for global toast notifications.
 
 **Contract**: Import `<Toaster>` from sonner, render at root level:
+
 ```astro
 ---
 import { Toaster } from "sonner";
 ---
+
 <html>
-  <head>...</head>
+  <head></head>...
   <body>
     <Toaster position="bottom-right" />
     <slot />
@@ -1000,13 +1010,16 @@ import { Toaster } from "sonner";
 **Intent**: Join `user_tricks` to show which tricks user has marked.
 
 **Contract**: Fetch tricks with left join:
+
 ```typescript
 const { data: tricks } = await supabase
   .from("tricks")
-  .select(`
+  .select(
+    `
     *,
     user_tricks!left(status)
-  `)
+  `,
+  )
   .eq("user_tricks.user_id", user.id)
   .order("name");
 ```
@@ -1055,13 +1068,11 @@ Build score calculation utility that sums finished tricks × difficulty weight, 
 **Intent**: Query `user_tricks` joined with `tricks` to sum difficulty weights for finished tricks.
 
 **Contract**: Export async function:
+
 ```typescript
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-export async function calculateProgressScore(
-  supabase: SupabaseClient,
-  userId: string
-): Promise<number> {
+export async function calculateProgressScore(supabase: SupabaseClient, userId: string): Promise<number> {
   const { data } = await supabase
     .from("user_tricks")
     .select("tricks(difficulty_weight)")
@@ -1079,11 +1090,13 @@ export async function calculateProgressScore(
 **Intent**: Show weighted progress score prominently on user's profile.
 
 **Contract**: Call `calculateProgressScore()` in frontmatter:
+
 ```typescript
 const score = await calculateProgressScore(supabase, user.id);
 ```
 
 Render score display:
+
 ```astro
 <div class="text-center">
   <div class="text-5xl font-bold text-purple-300">{score}</div>
@@ -1130,31 +1143,30 @@ Create dynamic route for public profile URLs (`/user/username` via `user/[userna
 **Intent**: Dynamic route matching `/user/username` URLs to display public profile.
 
 **Contract**: Extract username from `Astro.params.username`. Fetch profile:
+
 ```typescript
 const username = Astro.params.username;
 
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("*")
-  .eq("login_name", username)
-  .single();
+const { data: profile } = await supabase.from("profiles").select("*").eq("login_name", username).single();
 
 if (!profile) return Astro.redirect("/404", 404);
 ```
 
 Fetch user's trick progress:
+
 ```typescript
 const { data: userTricks } = await supabase
   .from("user_tricks")
   .select("trick_id, status, tricks(*)")
   .eq("user_id", profile.user_id);
 
-const favorites = userTricks?.filter(ut => ut.status === "favorite") || [];
-const inProgress = userTricks?.filter(ut => ut.status === "in-progress") || [];
-const finished = userTricks?.filter(ut => ut.status === "finished") || [];
+const favorites = userTricks?.filter((ut) => ut.status === "favorite") || [];
+const inProgress = userTricks?.filter((ut) => ut.status === "in-progress") || [];
+const finished = userTricks?.filter((ut) => ut.status === "finished") || [];
 ```
 
 Render:
+
 - Dog photo + name + breed + owner nickname (read-only, no edit)
 - Progress score (call `calculateProgressScore()`)
 - Three sections: "⭐ Favorites", "🕐 In Progress", "✅ Finished"
@@ -1167,11 +1179,14 @@ Render:
 **Intent**: Add button to copy profile URL (`/user/{login_name}`) to clipboard.
 
 **Contract**: Client-side button component:
+
 ```tsx
-<button onclick={() => {
-  navigator.clipboard.writeText(`${window.location.origin}/user/${profile.login_name}`);
-  toast.success("Profile link copied!");
-}}>
+<button
+  onclick={() => {
+    navigator.clipboard.writeText(`${window.location.origin}/user/${profile.login_name}`);
+    toast.success("Profile link copied!");
+  }}
+>
   Copy profile link
 </button>
 ```
@@ -1219,6 +1234,7 @@ Update top navigation bar with Catalog and Profile links, add `/catalog` and `/p
 **Intent**: Add links to Catalog and Profile for authenticated users.
 
 **Contract**: Modify existing topbar (currently shows sign in/out). For authenticated users (`Astro.locals.user`), show:
+
 - "Catalog" link → `/dashboard`
 - "Profile" link → `/profile`
 - "Sign out" button (existing)
@@ -1230,6 +1246,7 @@ Update top navigation bar with Catalog and Profile links, add `/catalog` and `/p
 **Intent**: Protect `/profile` and `/catalog` (if separate from dashboard).
 
 **Contract**: Update `PROTECTED_ROUTES` array:
+
 ```typescript
 const PROTECTED_ROUTES = ["/dashboard", "/profile", "/catalog"];
 ```
@@ -1243,6 +1260,7 @@ Note: `/catalog` may not be needed if dashboard IS the catalog (per Phase 4 impl
 **Intent**: Confirm that empty state scenarios are handled gracefully with clear messaging.
 
 **Contract**: Verify the following empty states are implemented:
+
 - `/dashboard` — If user has no profile, redirect to `/profile/create` (already implemented in Phase 4 step 2)
 - `/dashboard` — If tricks array is empty, show inline message "No tricks in catalog yet. Check back soon!" (already implemented in Phase 4 step 2)
 - `/profile` and `/user/username` — If `photo_url` is null, show placeholder avatar `/placeholder-dog.png` (already implemented in Phase 3)
@@ -1256,6 +1274,7 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 **Intent**: Ensure all pages are usable on mobile devices (320px+ width).
 
 **Contract**: Test on Chrome DevTools mobile emulator (iPhone SE, iPad). Verify:
+
 - No horizontal scroll
 - Touch targets ≥44px (status icons, buttons)
 - Text readable without zoom (≥16px base font)
@@ -1309,20 +1328,24 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 ## Performance Considerations
 
 **Catalog load time (< 2s guardrail):**
+
 - Server-side fetch of 10-15 tricks in `.astro` frontmatter is fast (< 100ms)
 - No pagination needed at this scale
 - Photo lazy loading via browser native `loading="lazy"` attribute
 
 **Score calculation:**
+
 - On-demand query (no caching for MVP) is acceptable with indexed `user_tricks.user_id` and small dataset
 - If score query becomes slow (> 200ms), consider denormalizing into `profiles.score` column + database trigger (deferred to post-MVP)
 
 **Optimistic updates:**
+
 - SWR handles caching and revalidation
 - Mutation latency hidden by instant UI update
 - No perceived delay even on slow 3G networks
 
 **Photo uploads:**
+
 - 2MB limit enforced client + server
 - Supabase Storage CDN handles delivery
 - Consider adding WebP compression in post-MVP for smaller file sizes
@@ -1330,6 +1353,7 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 ## Migration Notes
 
 **Initial setup (one-time, after F-01 migrations applied):**
+
 1. Run `npx supabase start` to spin up local Supabase stack
 2. Apply F-01 migrations: `npx supabase db reset` (if starting fresh) or `npx supabase migration up`
 3. Verify schema: `npx supabase db diff` should show no changes
@@ -1338,12 +1362,14 @@ Note: Reusable `EmptyState` component is deferred until a third distinct empty s
 6. Create Storage bucket `dog-photos` (manual dashboard step or migration, see Phase 3)
 
 **Data assumptions:**
+
 - Existing users in `auth.users` from Supabase Auth (untouched by this plan)
 - New `profiles` table starts empty — users create profiles after signup
 - `tricks` and `user_tricks` tables seeded by F-02 with 10-15 starter tricks
 - No existing profile data to migrate (greenfield)
 
 **Deployment checklist:**
+
 1. Push to `main` branch → GitHub Actions CI runs (`npm ci`, `npm run lint`, `npm run build`)
 2. Deploy workflow pushes to Cloudflare Workers
 3. Set Supabase env vars in Cloudflare Workers dashboard (or via `wrangler secret put`)

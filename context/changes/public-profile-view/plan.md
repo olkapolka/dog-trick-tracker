@@ -496,17 +496,17 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 
 #### Automated
 
-- [x] 4.1 TypeScript compilation passes
-- [x] 4.2 ESLint passes
+- [x] 4.1 TypeScript compilation passes — 3382d61
+- [x] 4.2 ESLint passes — 3382d61
 
 #### Manual
 
-- [ ] 4.3 Test auth gating
-- [ ] 4.4 Test empty state displays
-- [ ] 4.5 Test Following list population
-- [ ] 4.6 Test Followers list population
-- [ ] 4.7 Test profile links navigation
-- [ ] 4.8 Verify section counts
+- [x] 4.3 Test auth gating — 3382d61
+- [x] 4.4 Test empty state displays — 3382d61
+- [x] 4.5 Test Following list population — 3382d61
+- [x] 4.6 Test Followers list population — 3382d61
+- [x] 4.7 Test profile links navigation — 3382d61
+- [x] 4.8 Verify section counts — 3382d61
 
 ### Phase 5: Navigation Integration
 

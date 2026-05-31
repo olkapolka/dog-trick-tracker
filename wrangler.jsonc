@@ -7,8 +7,8 @@
   "kv_namespaces": [
     {
       "binding": "SESSION",
-      "id": "4a259daaa96d4c208610af32efe8a0f3"
-    }
+      "id": "4a259daaa96d4c208610af32efe8a0f3",
+    },
   ],
   "assets": {
     "binding": "ASSETS",

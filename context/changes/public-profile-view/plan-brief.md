@@ -16,22 +16,23 @@ Users viewing another user's profile see a Follow button below the training poin
 
 ## Key Decisions Made
 
-| Decision                       | Choice                        | Why (1 sentence)                                                                                               | Source   |
-| ------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------- | -------- |
-| Scope                          | Complete follow feature       | Users get the full FR-014 through FR-016 experience in one deployment, matches roadmap S-03+S-04 merge         | Plan     |
-| Database constraint            | Composite unique constraint   | Database-level guarantee of no duplicate follows, matches standard social graph pattern                        | Plan     |
-| Follow UX                      | Immediate toggle with toast   | Fast feedback, matches modern social UX and existing share modal toast pattern in ProfileDisplay              | Plan     |
-| Button state                   | Text + style toggle           | Clear state, matches Twitter/Instagram pattern users recognize                                                 | Plan     |
-| Friends page UI                | Single page, two sections     | Simple, all info in one scroll - matches small MVP scale (< 100 users)                                         | Plan     |
-| Navigation                     | Add Friends to Topbar         | Discoverable, consistent with existing nav pattern                                                             | Plan     |
-| Self-follow prevention         | Block via CHECK constraint    | Prevents illogical state at database level, matches social norms                                               | Plan     |
-| Empty state                    | Prompt with Dashboard link    | Guides user to action - matches PRD note that profiles aren't publicly listed, so discovery happens via links  | Plan     |
-| Auth boundary                  | Redirect to signin            | Standard auth gating, preserves profile URL so user can follow after signing in                                | Plan     |
-| Following type                 | One-way (no mutual approval)  | Matches PRD Access Control specification and Twitter/Instagram pattern                                         | PRD      |
+| Decision               | Choice                       | Why (1 sentence)                                                                                              | Source |
+| ---------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------- | ------ |
+| Scope                  | Complete follow feature      | Users get the full FR-014 through FR-016 experience in one deployment, matches roadmap S-03+S-04 merge        | Plan   |
+| Database constraint    | Composite unique constraint  | Database-level guarantee of no duplicate follows, matches standard social graph pattern                       | Plan   |
+| Follow UX              | Immediate toggle with toast  | Fast feedback, matches modern social UX and existing share modal toast pattern in ProfileDisplay              | Plan   |
+| Button state           | Text + style toggle          | Clear state, matches Twitter/Instagram pattern users recognize                                                | Plan   |
+| Friends page UI        | Single page, two sections    | Simple, all info in one scroll - matches small MVP scale (< 100 users)                                        | Plan   |
+| Navigation             | Add Friends to Topbar        | Discoverable, consistent with existing nav pattern                                                            | Plan   |
+| Self-follow prevention | Block via CHECK constraint   | Prevents illogical state at database level, matches social norms                                              | Plan   |
+| Empty state            | Prompt with Dashboard link   | Guides user to action - matches PRD note that profiles aren't publicly listed, so discovery happens via links | Plan   |
+| Auth boundary          | Redirect to signin           | Standard auth gating, preserves profile URL so user can follow after signing in                               | Plan   |
+| Following type         | One-way (no mutual approval) | Matches PRD Access Control specification and Twitter/Instagram pattern                                        | PRD    |
 
 ## Scope
 
 **In scope:**
+
 - Create `follows` database table with composite PK and RLS policies
 - POST `/api/follow` and DELETE `/api/unfollow` endpoints
 - FollowButton React component with optimistic UI
@@ -44,6 +45,7 @@ Users viewing another user's profile see a Follow button below the training poin
 - Toast notifications for follow/unfollow actions
 
 **Out of scope:**
+
 - Aggregated activity feed showing friends' progress
 - Follow request / mutual acceptance flow
 - Follow limits or rate limiting
@@ -58,13 +60,13 @@ Database-first incremental approach: create the `follows` junction table with co
 
 ## Phases at a Glance
 
-| Phase          | What it delivers                                                   | Key risk                                             |
-| -------------- | ------------------------------------------------------------------ | ---------------------------------------------------- |
-| 1. Database    | `follows` table with composite PK, RLS policies, TypeScript types | Migration conflicts or incorrect foreign key setup  |
-| 2. API         | POST `/api/follow` and DELETE `/api/unfollow` endpoints           | Concurrent follow requests creating duplicate rows   |
-| 3. Follow UI   | FollowButton in ProfileDisplay with optimistic updates            | Optimistic UI rollback on network errors             |
-| 4. Friends     | `/friends` page showing Following/Followers lists                 | Query joins failing or incorrect relationship joins  |
-| 5. Navigation  | Friends link in Topbar                                             | Accessibility or responsive layout issues            |
+| Phase         | What it delivers                                                  | Key risk                                            |
+| ------------- | ----------------------------------------------------------------- | --------------------------------------------------- |
+| 1. Database   | `follows` table with composite PK, RLS policies, TypeScript types | Migration conflicts or incorrect foreign key setup  |
+| 2. API        | POST `/api/follow` and DELETE `/api/unfollow` endpoints           | Concurrent follow requests creating duplicate rows  |
+| 3. Follow UI  | FollowButton in ProfileDisplay with optimistic updates            | Optimistic UI rollback on network errors            |
+| 4. Friends    | `/friends` page showing Following/Followers lists                 | Query joins failing or incorrect relationship joins |
+| 5. Navigation | Friends link in Topbar                                            | Accessibility or responsive layout issues           |
 
 **Prerequisites:** Node 22+ (per AGENTS.md), Supabase local dev running (`npx supabase start`), clean npm install  
 **Estimated effort:** ~3-4 focused sessions across 5 incremental phases
@@ -80,7 +82,7 @@ Database-first incremental approach: create the `follows` junction table with co
 ## Success Criteria (Summary)
 
 - User A can follow User B from User B's profile → see "Following" button state → visit `/friends` and see User B in "Following" list
-- User B visits `/friends` → sees User A in "Followers" list  
+- User B visits `/friends` → sees User A in "Followers" list
 - User A clicks "Following" on User B's profile → unfollows → button returns to "Follow" state with toast confirmation
 - Unauthenticated user clicks Follow → redirected to `/auth/signin?returnTo=/user/username` → completes signin → can now follow
 - Self-follow attempt (via direct API call) returns 400 error with constraint violation
