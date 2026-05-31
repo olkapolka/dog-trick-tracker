@@ -465,18 +465,18 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 
 #### Automated
 
-- [x] 3.1 TypeScript compilation passes
-- [x] 3.2 ESLint passes
+- [x] 3.1 TypeScript compilation passes — c87caaa
+- [x] 3.2 ESLint passes — c87caaa
 
 #### Manual
 
-- [x] 3.3 Test authenticated Follow button
-- [x] 3.4 Test Follow click and state change
-- [x] 3.5 Test Unfollow with hover state
-- [x] 3.6 Test unauthenticated redirect
-- [x] 3.7 Test signin return flow
-- [x] 3.8 Verify own profile shows ShareModal
-- [x] 3.9 Test error handling with rollback
+- [x] 3.3 Test authenticated Follow button — c87caaa
+- [x] 3.4 Test Follow click and state change — c87caaa
+- [x] 3.5 Test Unfollow with hover state — c87caaa
+- [x] 3.6 Test unauthenticated redirect — c87caaa
+- [x] 3.7 Test signin return flow — c87caaa
+- [x] 3.8 Verify own profile shows ShareModal — c87caaa
+- [x] 3.9 Test error handling with rollback — c87caaa
 
 ### Phase 4: Friends Page
 
