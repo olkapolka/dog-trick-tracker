@@ -1,10 +1,10 @@
 ---
 change_id: follow-relationships
 title: Follow relationships
-status: new
+status: archived
 created: 2026-05-31
 updated: 2026-05-31
-archived_at: null
+archived_at: 2026-05-31T17:17:01Z
 ---
 
 ## Notes
