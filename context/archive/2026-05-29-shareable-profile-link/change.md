@@ -1,10 +1,10 @@
 ---
 change_id: shareable-profile-link
 title: Shareable profile link
-status: impl_reviewed
+status: archived
 created: 2026-05-29
-updated: 2026-05-29
-archived_at: null
+updated: 2026-05-31
+archived_at: 2026-05-31T11:21:28Z
 ---
 
 ## Notes
