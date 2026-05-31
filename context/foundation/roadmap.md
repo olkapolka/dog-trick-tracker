@@ -3,7 +3,7 @@ project: Dog Trick Tracker
 version: 1
 status: draft
 created: 2026-05-25
-updated: 2026-05-29
+updated: 2026-05-31
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -30,7 +30,7 @@ Dog owners training at home have no systematic way to track which tricks they're
 | F-01 | database-schema | (foundation) Schema and migrations in place — users, profiles, dogs, tricks, user_tricks, difficulty levels | — | Access Control, Business Logic, FR-003 | ready |
 | F-02 | seed-trick-catalog | (foundation) Starter trick catalog seeded — 10-15 tricks across 3 difficulty levels | F-01 | Vision, Business Logic, Success Criteria guardrail | proposed |
 | S-01 | first-trick-tracking | Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score | F-01, F-02 | US-01, FR-001-012, Business Logic, Success Criteria (primary) | done |
-| S-02 | shareable-profile-link | Generate and copy profile link to share with others | S-01 | FR-005 | proposed |
+| S-02 | shareable-profile-link | Share profile via copy link, QR code, or email (enhances existing copy button with modal UI) | S-01 | FR-005 (already met; this adds enhancements) | done |
 | S-03 | public-profile-view | Visit another user's profile via shared link and see their dog info and trick progress | S-02 | FR-013, FR-017, Success Criteria (primary) | proposed |
 | S-04 | follow-relationships | Follow users, view list of followed profiles in Friends tab, view list of followers in Friends tab | S-03 | FR-014, FR-015, FR-016, Access Control | proposed |
 | S-05 | admin-trick-crud | (admin) Add, edit, and remove tricks from catalog | F-01, F-02 | FR-018, FR-019, FR-020, Access Control | blocked |
@@ -101,17 +101,17 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** This is the largest slice — it spans registration, profile creation, catalog browsing, detail pages, status mutations, and progress score calculation. If too broad for one `/10x-plan` invocation, that skill will split it. Per speed goal, keeping it unified as the north star is acceptable; the PRD's US-01 Acceptance Criteria validate this as one coherent flow.
 - **Status:** done
 
-### S-02: User can share their profile link
+### S-02: User can share their profile link (enhanced)
 
-- **Outcome:** User can generate and copy their profile link (example.com/@username) to share with others
+- **Outcome:** User can share their profile via three methods: copy link to clipboard, display QR code for scanning, or open email with pre-filled profile link. Replaces existing copy button with accessible modal UI.
 - **Change ID:** shareable-profile-link
-- **PRD refs:** FR-005
+- **PRD refs:** FR-005 (must-have: "User can generate and copy their own profile link" — already fully implemented via copy button in ProfileDisplay per research.md; this slice delivers enhancements for improved sharing UX)
 - **Prerequisites:** S-01 (must have profile with unique login name first)
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Smallest slice; low risk. Unique login name (from S-01) enables friendly URLs.
-- **Status:** proposed
+- **Risk:** Medium scope (~2-3 focused sessions across 4 phases). Adds 2 new dependencies (~60KB gzipped: @radix-ui/react-dialog, qrcode.react). Enhancement is intentional — roadmap permits polish on core social feature before moving to follow relationships (S-04). Low implementation risk (well-understood patterns).
+- **Status:** done
 
 ### S-03: User can view another user's profile and their trick progress
 
@@ -201,3 +201,4 @@ Roadmap migrated to GitHub Issues on 2026-05-25.
 ## Done
 
 - **S-01: Create profile with dog info, browse trick catalog with detail pages, mark trick status, see weighted progress score** — Archived 2026-05-29 → `context/archive/2026-05-25-first-trick-tracking/`. Lesson: —.
+- **S-02: User can share their profile via three methods: copy link to clipboard, display QR code for scanning, or open email with pre-filled profile link. Replaces existing copy button with accessible modal UI.** — Archived 2026-05-31 → `context/archive/2026-05-29-shareable-profile-link/`. Lesson: —.
