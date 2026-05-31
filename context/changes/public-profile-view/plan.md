@@ -431,25 +431,25 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 
 #### Automated
 
-- [x] 1.1 Migration applies cleanly
-- [x] 1.2 Type generation completes
-- [x] 1.3 TypeScript compilation passes
-- [x] 1.4 No ESLint errors
+- [x] 1.1 Migration applies cleanly — 64b449f
+- [x] 1.2 Type generation completes — 64b449f
+- [x] 1.3 TypeScript compilation passes — 64b449f
+- [x] 1.4 No ESLint errors — 64b449f
 
 #### Manual
 
-- [ ] 1.5 Verify follows table structure
-- [ ] 1.6 Verify composite PK prevents duplicates
-- [ ] 1.7 Verify CHECK constraint blocks self-follow
-- [ ] 1.8 Verify cascade delete cleanup
-- [ ] 1.9 Inspect generated types
+- [x] 1.5 Verify follows table structure — 64b449f
+- [x] 1.6 Verify composite PK prevents duplicates — 64b449f
+- [x] 1.7 Verify CHECK constraint blocks self-follow — 64b449f
+- [x] 1.8 Verify cascade delete cleanup — 64b449f
+- [x] 1.9 Inspect generated types — 64b449f
 
 ### Phase 2: Follow/Unfollow API Endpoints
 
 #### Automated
 
-- [ ] 2.1 TypeScript compilation passes
-- [ ] 2.2 ESLint passes
+- [x] 2.1 TypeScript compilation passes
+- [x] 2.2 ESLint passes
 
 #### Manual
 
