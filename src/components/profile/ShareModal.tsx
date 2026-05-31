@@ -18,7 +18,7 @@ export default function ShareModal({ profileUrl, username }: ShareModalProps) {
       await navigator.clipboard.writeText(profileUrl);
       toast.success("Link copied to clipboard!");
     } catch (_err) {
-      toast.error("Failed to copy link");
+      toast.error("Clipboard unavailable. Please copy the link manually.");
     }
   };
 

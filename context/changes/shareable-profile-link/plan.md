@@ -74,12 +74,12 @@ Install the QR code library and Radix Dialog primitives with exact versions per 
 
 **File**: `package.json`
 
-**Intent**: Add `qrcode.react` for QR generation and `@radix-ui/react-dialog` for accessible modal primitives. Use exact versioning (no ^ or ~) to match project policy from lessons.md.
+**Intent**: Add `qrcode.react` for QR generation and `@radix-ui/react-dialog` for accessible modal primitives. Use exact versioning (no ^ or ~) to match project policy from lessons.md. **Update**: qrcode.react@4.2.0 required for React 19 compatibility (4.1.0 only supports React ≤18).
 
 **Contract**: Add to `dependencies` object:
 ```json
 "@radix-ui/react-dialog": "1.1.4",
-"qrcode.react": "4.1.0"
+"qrcode.react": "4.2.0"
 ```
 
 ### Success Criteria:
