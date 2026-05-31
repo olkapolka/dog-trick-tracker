@@ -431,10 +431,10 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 
 #### Automated
 
-- [ ] 1.1 Migration applies cleanly
-- [ ] 1.2 Type generation completes
-- [ ] 1.3 TypeScript compilation passes
-- [ ] 1.4 No ESLint errors
+- [x] 1.1 Migration applies cleanly
+- [x] 1.2 Type generation completes
+- [x] 1.3 TypeScript compilation passes
+- [x] 1.4 No ESLint errors
 
 #### Manual
 
