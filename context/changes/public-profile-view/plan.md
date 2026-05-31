@@ -448,35 +448,35 @@ Add a "Friends" link to the Topbar navigation, making the feature discoverable.
 
 #### Automated
 
-- [x] 2.1 TypeScript compilation passes
-- [x] 2.2 ESLint passes
+- [x] 2.1 TypeScript compilation passes — 5748be5
+- [x] 2.2 ESLint passes — 5748be5
 
 #### Manual
 
-- [ ] 2.3 Test follow flow with curl/Postman
-- [ ] 2.4 Test duplicate follow returns 409
-- [ ] 2.5 Test self-follow returns 400
-- [ ] 2.6 Test invalid target returns 400
-- [ ] 2.7 Test unauthorized follow returns 401
-- [ ] 2.8 Test unfollow flow
-- [ ] 2.9 Test idempotent unfollow
+- [x] 2.3 Test follow flow with curl/Postman — 5748be5
+- [x] 2.4 Test duplicate follow returns 409 — 5748be5
+- [x] 2.5 Test self-follow returns 400 — 5748be5
+- [x] 2.6 Test invalid target returns 400 — 5748be5
+- [x] 2.7 Test unauthorized follow returns 401 — 5748be5
+- [x] 2.8 Test unfollow flow — 5748be5
+- [x] 2.9 Test idempotent unfollow — 5748be5
 
 ### Phase 3: Follow Button in ProfileDisplay
 
 #### Automated
 
-- [ ] 3.1 TypeScript compilation passes
-- [ ] 3.2 ESLint passes
+- [x] 3.1 TypeScript compilation passes
+- [x] 3.2 ESLint passes
 
 #### Manual
 
-- [ ] 3.3 Test authenticated Follow button
-- [ ] 3.4 Test Follow click and state change
-- [ ] 3.5 Test Unfollow with hover state
-- [ ] 3.6 Test unauthenticated redirect
-- [ ] 3.7 Test signin return flow
-- [ ] 3.8 Verify own profile shows ShareModal
-- [ ] 3.9 Test error handling with rollback
+- [x] 3.3 Test authenticated Follow button
+- [x] 3.4 Test Follow click and state change
+- [x] 3.5 Test Unfollow with hover state
+- [x] 3.6 Test unauthenticated redirect
+- [x] 3.7 Test signin return flow
+- [x] 3.8 Verify own profile shows ShareModal
+- [x] 3.9 Test error handling with rollback
 
 ### Phase 4: Friends Page
 
