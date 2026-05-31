@@ -15,9 +15,9 @@ CREATE INDEX idx_follows_following_id ON follows(following_id);
 ALTER TABLE follows ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
-CREATE POLICY "Follows are publicly readable"
+CREATE POLICY "Follows are readable by authenticated users"
   ON follows FOR SELECT
-  USING (true);
+  USING (auth.uid() IS NOT NULL);
 
 CREATE POLICY "Users can follow others"
   ON follows FOR INSERT

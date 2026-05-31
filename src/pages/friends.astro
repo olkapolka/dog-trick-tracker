@@ -13,10 +13,24 @@ if (!supabase) {
   return Astro.redirect("/auth/signin");
 }
 
-// Query following list - fetch follows then profiles separately
-const { data: followingFollows } = await supabase.from("follows").select("following_id").eq("follower_id", user.id);
+// Pagination setup
+const PAGE_SIZE = 50;
+const followingPage = Math.max(1, parseInt(Astro.url.searchParams.get("followingPage") ?? "1"));
+const followersPage = Math.max(1, parseInt(Astro.url.searchParams.get("followersPage") ?? "1"));
 
-let followingData: { following_id: string; profiles: { login_name: string; dog_name: string } | null }[] = [];
+const followingStart = (followingPage - 1) * PAGE_SIZE;
+const followingEnd = followingStart + PAGE_SIZE - 1;
+const followersStart = (followersPage - 1) * PAGE_SIZE;
+const followersEnd = followersStart + PAGE_SIZE - 1;
+
+// Query following list with pagination and count
+const { data: followingFollows, count: followingCount } = await supabase
+  .from("follows")
+  .select("following_id", { count: "exact" })
+  .eq("follower_id", user.id)
+  .range(followingStart, followingEnd);
+
+let following: { following_id: string; profiles: { login_name: string; dog_name: string } | null }[] = [];
 if (followingFollows && followingFollows.length > 0) {
   const followingIds = followingFollows.map((f) => f.following_id);
   const { data: followingProfiles } = await supabase
@@ -25,17 +39,21 @@ if (followingFollows && followingFollows.length > 0) {
     .in("user_id", followingIds);
 
   if (followingProfiles) {
-    followingData = followingFollows.map((follow) => ({
+    following = followingFollows.map((follow) => ({
       following_id: follow.following_id,
       profiles: followingProfiles.find((p) => p.user_id === follow.following_id) ?? null,
     }));
   }
 }
 
-// Query followers list - fetch follows then profiles separately
-const { data: followersFollows } = await supabase.from("follows").select("follower_id").eq("following_id", user.id);
+// Query followers list with pagination and count
+const { data: followersFollows, count: followersCount } = await supabase
+  .from("follows")
+  .select("follower_id", { count: "exact" })
+  .eq("following_id", user.id)
+  .range(followersStart, followersEnd);
 
-let followersData: { follower_id: string; profiles: { login_name: string; dog_name: string } | null }[] = [];
+let followers: { follower_id: string; profiles: { login_name: string; dog_name: string } | null }[] = [];
 if (followersFollows && followersFollows.length > 0) {
   const followerIds = followersFollows.map((f) => f.follower_id);
   const { data: followerProfiles } = await supabase
@@ -44,15 +62,15 @@ if (followersFollows && followersFollows.length > 0) {
     .in("user_id", followerIds);
 
   if (followerProfiles) {
-    followersData = followersFollows.map((follow) => ({
+    followers = followersFollows.map((follow) => ({
       follower_id: follow.follower_id,
       profiles: followerProfiles.find((p) => p.user_id === follow.follower_id) ?? null,
     }));
   }
 }
 
-const following = followingData;
-const followers = followersData;
+const followingTotalPages = Math.ceil((followingCount ?? 0) / PAGE_SIZE);
+const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
 ---
 
 <Layout title="Friends">
@@ -69,30 +87,61 @@ const followers = followersData;
         <!-- Following Section -->
         <section class="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
           <h2 class="mb-6 text-2xl font-semibold text-white">
-            Following ({following.length})
+            Following ({followingCount ?? 0})
           </h2>
           {
-            following.length > 0 ? (
-              <ul class="space-y-4">
-                {following.map((follow) => {
-                  const profile = follow.profiles;
-                  if (!profile) return null;
-                  return (
-                    <li class="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
-                      <div>
-                        <p class="font-semibold text-white">{profile.dog_name}</p>
-                        <p class="text-sm text-blue-100/60">@{profile.login_name}</p>
-                      </div>
-                      <a
-                        href={`/user/${profile.login_name}`}
-                        class="rounded-lg bg-purple-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-600"
-                      >
-                        View Profile
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
+            following && following.length > 0 ? (
+              <>
+                <ul class="space-y-4">
+                  {following.map((follow) => {
+                    const profile = follow.profiles;
+                    if (!profile) return null;
+                    return (
+                      <li class="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
+                        <div>
+                          <p class="font-semibold text-white">{profile.dog_name}</p>
+                          <p class="text-sm text-blue-100/60">@{profile.login_name}</p>
+                        </div>
+                        <a
+                          href={`/user/${profile.login_name}`}
+                          class="rounded-lg bg-purple-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-600"
+                        >
+                          View Profile
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {followingTotalPages > 1 && (
+                  <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-6">
+                    <a
+                      href={`/friends?followingPage=${followingPage - 1}&followersPage=${followersPage}`}
+                      class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                        followingPage === 1
+                          ? "cursor-not-allowed bg-white/5 text-blue-100/40"
+                          : "bg-purple-500 text-white hover:bg-purple-600"
+                      }`}
+                      aria-disabled={followingPage === 1}
+                    >
+                      Previous
+                    </a>
+                    <span class="text-sm text-blue-100/70">
+                      Page {followingPage} of {followingTotalPages}
+                    </span>
+                    <a
+                      href={`/friends?followingPage=${followingPage + 1}&followersPage=${followersPage}`}
+                      class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                        followingPage === followingTotalPages
+                          ? "cursor-not-allowed bg-white/5 text-blue-100/40"
+                          : "bg-purple-500 text-white hover:bg-purple-600"
+                      }`}
+                      aria-disabled={followingPage === followingTotalPages}
+                    >
+                      Next
+                    </a>
+                  </div>
+                )}
+              </>
             ) : (
               <p class="text-blue-100/70">You're not following anyone yet. Discover profiles via shared links!</p>
             )
@@ -102,30 +151,61 @@ const followers = followersData;
         <!-- Followers Section -->
         <section class="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
           <h2 class="mb-6 text-2xl font-semibold text-white">
-            Followers ({followers.length})
+            Followers ({followersCount ?? 0})
           </h2>
           {
-            followers.length > 0 ? (
-              <ul class="space-y-4">
-                {followers.map((follow) => {
-                  const profile = follow.profiles;
-                  if (!profile) return null;
-                  return (
-                    <li class="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
-                      <div>
-                        <p class="font-semibold text-white">{profile.dog_name}</p>
-                        <p class="text-sm text-blue-100/60">@{profile.login_name}</p>
-                      </div>
-                      <a
-                        href={`/user/${profile.login_name}`}
-                        class="rounded-lg bg-purple-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-600"
-                      >
-                        View Profile
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
+            followers && followers.length > 0 ? (
+              <>
+                <ul class="space-y-4">
+                  {followers.map((follow) => {
+                    const profile = follow.profiles;
+                    if (!profile) return null;
+                    return (
+                      <li class="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10">
+                        <div>
+                          <p class="font-semibold text-white">{profile.dog_name}</p>
+                          <p class="text-sm text-blue-100/60">@{profile.login_name}</p>
+                        </div>
+                        <a
+                          href={`/user/${profile.login_name}`}
+                          class="rounded-lg bg-purple-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-600"
+                        >
+                          View Profile
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+                {followersTotalPages > 1 && (
+                  <div class="mt-6 flex items-center justify-between border-t border-white/10 pt-6">
+                    <a
+                      href={`/friends?followingPage=${followingPage}&followersPage=${followersPage - 1}`}
+                      class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                        followersPage === 1
+                          ? "cursor-not-allowed bg-white/5 text-blue-100/40"
+                          : "bg-purple-500 text-white hover:bg-purple-600"
+                      }`}
+                      aria-disabled={followersPage === 1}
+                    >
+                      Previous
+                    </a>
+                    <span class="text-sm text-blue-100/70">
+                      Page {followersPage} of {followersTotalPages}
+                    </span>
+                    <a
+                      href={`/friends?followingPage=${followingPage}&followersPage=${followersPage + 1}`}
+                      class={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                        followersPage === followersTotalPages
+                          ? "cursor-not-allowed bg-white/5 text-blue-100/40"
+                          : "bg-purple-500 text-white hover:bg-purple-600"
+                      }`}
+                      aria-disabled={followersPage === followersTotalPages}
+                    >
+                      Next
+                    </a>
+                  </div>
+                )}
+              </>
             ) : (
               <p class="text-blue-100/70">No one is following you yet. Share your profile to get followers!</p>
             )
