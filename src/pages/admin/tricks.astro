@@ -44,7 +44,7 @@ if (error) {
           <p class="mt-2 text-blue-100/80">Create, edit, soft-delete, and restore tricks.</p>
         </div>
       </div>
-      <AdminTrickList client:load initialTricks={tricks} />
+      <AdminTrickList client:only="react" initialTricks={tricks} />
     </div>
   </div>
 </Layout>

@@ -552,31 +552,31 @@ Current foreign key constraint on `user_tricks.trick_id` uses `ON DELETE CASCADE
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `npm run typecheck`
-- [x] 4.2 Linting passes: `npm run lint`
-- [x] 4.3 React Compiler rules pass (no `react-compiler/react-compiler` errors)
+- [x] 4.1 Type checking passes: `npm run typecheck` — 8f0f10e
+- [x] 4.2 Linting passes: `npm run lint` — 8f0f10e
+- [x] 4.3 React Compiler rules pass (no `react-compiler/react-compiler` errors) — 8f0f10e
 
 #### Manual
 
-- [x] 4.4 Admin link visible to admin users, hidden from regular users
-- [x] 4.5 Create flow complete (modal opens, form validates, trick appears in list)
-- [x] 4.6 Slug uniqueness check works (error on duplicate, success on unique)
-- [x] 4.7 Edit flow complete (modal pre-fills, updates apply, difficulty badge changes)
-- [x] 4.8 Delete flow complete (confirmation toast, trick marked deleted)
-- [x] 4.9 Restore flow complete (deleted trick reactivated)
-- [x] 4.10 Form validation complete (empty form shows all errors)
-- [x] 4.11 Modal animations smooth (no layout shift, toasts appear)
+- [x] 4.4 Admin link visible to admin users, hidden from regular users — 8f0f10e
+- [x] 4.5 Create flow complete (modal opens, form validates, trick appears in list) — 8f0f10e
+- [x] 4.6 Slug uniqueness check works (error on duplicate, success on unique) — 8f0f10e
+- [x] 4.7 Edit flow complete (modal pre-fills, updates apply, difficulty badge changes) — 8f0f10e
+- [x] 4.8 Delete flow complete (confirmation toast, trick marked deleted) — 8f0f10e
+- [x] 4.9 Restore flow complete (deleted trick reactivated) — 8f0f10e
+- [x] 4.10 Form validation complete (empty form shows all errors) — 8f0f10e
+- [x] 4.11 Modal animations smooth (no layout shift, toasts appear) — 8f0f10e
 
 ### Phase 5: Score Recalculation
 
 #### Automated
 
-- [ ] 5.1 Type checking passes: `npm run typecheck`
-- [ ] 5.2 Unit tests for `recalculateScoresForTrick` pass
-- [ ] 5.3 Linting passes: `npm run lint`
+- [x] 5.1 Type checking passes: `npm run typecheck`
+- [x] 5.2 Unit tests for `recalculateScoresForTrick` pass
+- [x] 5.3 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 5.4 Score recalculation verified (difficulty edit updates user scores within 1 second)
-- [ ] 5.5 Multi-user test verified (only users with finished trick affected)
-- [ ] 5.6 Verify endpoint tested (returns correct recalculated scores)
+- [x] 5.4 Score recalculation verified (difficulty edit updates user scores within 1 second)
+- [x] 5.5 Multi-user test verified (only users with finished trick affected)
+- [x] 5.6 Verify endpoint tested (returns correct recalculated scores)

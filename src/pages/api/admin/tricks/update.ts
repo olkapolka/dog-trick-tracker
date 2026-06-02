@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { isAdmin } from "@/lib/admin";
+import { recalculateScoresForTrick } from "@/lib/recalculate-user-scores";
 import { createClient } from "@/lib/supabase";
 import { validateTrickInput } from "@/lib/validate-trick";
 import type { Enums } from "@/lib/database.types";
@@ -99,6 +100,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     const difficulty = mergedInput.difficulty as Enums<"difficulty_level">;
+    const difficultyChanged = currentTrick.difficulty !== difficulty;
 
     const { data: updatedTrick, error: updateError } = await supabase
       .from("tricks")
@@ -127,11 +129,15 @@ export const POST: APIRoute = async (context) => {
       });
     }
 
+    if (difficultyChanged) {
+      await recalculateScoresForTrick(trickId, supabase);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         trick: updatedTrick,
-        difficultyChanged: currentTrick.difficulty !== difficulty,
+        difficultyChanged,
       }),
       {
         status: 200,
