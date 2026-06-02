@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Star, Clock, Check } from "lucide-react";
+import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 import { toast } from "sonner";
 import type { Enums } from "@/lib/database.types";
+import { SCORE_KEY } from "./TrainingPoints";
 
 interface Props {
   trickId: string;
@@ -29,6 +31,7 @@ export default function StatusToggle({ trickId, initialStatus }: Props) {
   const [optimisticStatus, setOptimisticStatus] = useState<Enums<"trick_status"> | null>(initialStatus);
 
   const { trigger, isMutating } = useSWRMutation("/api/tricks/status", updateStatus);
+  const { mutate: revalidateScore } = useSWR(SCORE_KEY);
 
   async function handleStatusClick(newStatus: Enums<"trick_status">) {
     // Optimistic update
@@ -37,6 +40,7 @@ export default function StatusToggle({ trickId, initialStatus }: Props) {
 
     try {
       await trigger({ trickId, status: newStatus });
+      void revalidateScore();
     } catch (err) {
       // Rollback on error
       setOptimisticStatus(previousStatus);
