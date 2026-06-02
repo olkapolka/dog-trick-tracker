@@ -508,24 +508,24 @@ Current foreign key constraint on `user_tricks.trick_id` uses `ON DELETE CASCADE
 
 #### Automated
 
-- [x] 1.1 Migrations apply cleanly: `npx supabase db reset`
-- [x] 1.2 Type generation succeeds: `npx supabase gen types typescript --local`
-- [x] 1.3 Type checking passes: `npm run typecheck`
-- [x] 1.4 Linting passes: `npm run lint`
+- [x] 1.1 Migrations apply cleanly: `npx supabase db reset` — 417bb3a
+- [x] 1.2 Type generation succeeds: `npx supabase gen types typescript --local` — 417bb3a
+- [x] 1.3 Type checking passes: `npm run typecheck` — 417bb3a
+- [x] 1.4 Linting passes: `npm run lint` — 417bb3a
 
 #### Manual
 
-- [x] 1.5 RLS policies verified via Supabase SQL editor (admin can insert, non-admin cannot)
-- [x] 1.6 Soft-delete verified (deleted trick disappears from catalog, still in database)
+- [x] 1.5 RLS policies verified via Supabase SQL editor (admin can insert, non-admin cannot) — 417bb3a
+- [x] 1.6 Soft-delete verified (deleted trick disappears from catalog, still in database) — 417bb3a
 
 ### Phase 2: Middleware & Utilities
 
 #### Automated
 
-- [ ] 2.1 Unit tests for `generateSlug` pass
-- [ ] 2.2 Unit tests for `validateTrickInput` pass
-- [ ] 2.3 Type checking passes: `npm run typecheck`
-- [ ] 2.4 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests for `generateSlug` pass
+- [x] 2.2 Unit tests for `validateTrickInput` pass
+- [x] 2.3 Type checking passes: `npm run typecheck`
+- [x] 2.4 Linting passes: `npm run lint`
 
 #### Manual
 
