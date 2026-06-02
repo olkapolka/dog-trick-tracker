@@ -522,10 +522,10 @@ Current foreign key constraint on `user_tricks.trick_id` uses `ON DELETE CASCADE
 
 #### Automated
 
-- [x] 2.1 Unit tests for `generateSlug` pass
-- [x] 2.2 Unit tests for `validateTrickInput` pass
-- [x] 2.3 Type checking passes: `npm run typecheck`
-- [x] 2.4 Linting passes: `npm run lint`
+- [x] 2.1 Unit tests for `generateSlug` pass — a1a003e
+- [x] 2.2 Unit tests for `validateTrickInput` pass — a1a003e
+- [x] 2.3 Type checking passes: `npm run typecheck` — a1a003e
+- [x] 2.4 Linting passes: `npm run lint` — a1a003e
 
 #### Manual
 
@@ -537,9 +537,9 @@ Current foreign key constraint on `user_tricks.trick_id` uses `ON DELETE CASCADE
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `npm run typecheck`
-- [ ] 3.2 Linting passes: `npm run lint`
-- [ ] 3.3 API route files exist at expected paths
+- [x] 3.1 Type checking passes: `npm run typecheck`
+- [x] 3.2 Linting passes: `npm run lint`
+- [x] 3.3 API route files exist at expected paths
 
 #### Manual
 
