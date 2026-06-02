@@ -1,5 +1,12 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import type { Enums } from "@/lib/database.types";
+
+const VALID_STATUSES = ["favorite", "in-progress", "finished"] as const;
+
+function isTrickStatus(value: string): value is Enums<"trick_status"> {
+  return VALID_STATUSES.includes(value as Enums<"trick_status">);
+}
 
 export const POST: APIRoute = async (context) => {
   const { user } = context.locals;
@@ -32,8 +39,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     // Validate status value
-    const validStatuses = ["favorite", "in-progress", "finished"];
-    if (!validStatuses.includes(status)) {
+    if (!isTrickStatus(status)) {
       return new Response(JSON.stringify({ error: "Invalid status value" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },

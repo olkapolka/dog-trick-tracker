@@ -6,6 +6,10 @@ import type { Tables, Enums } from "@/lib/database.types";
 
 const { slug } = Astro.params;
 
+if (!slug) {
+  return Astro.redirect("/404", 404);
+}
+
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 
 if (!supabase) {
