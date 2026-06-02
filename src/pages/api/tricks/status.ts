@@ -2,6 +2,8 @@ import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
 import type { Enums } from "@/lib/database.types";
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 const VALID_STATUSES = ["favorite", "in-progress", "finished"] as const;
 
 function isTrickStatus(value: string): value is Enums<"trick_status"> {
@@ -38,7 +40,13 @@ export const POST: APIRoute = async (context) => {
       });
     }
 
-    // Validate status value
+    if (!UUID_PATTERN.test(trickId)) {
+      return new Response(JSON.stringify({ error: "Invalid trickId" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     if (!isTrickStatus(status)) {
       return new Response(JSON.stringify({ error: "Invalid status value" }), {
         status: 400,
@@ -58,7 +66,7 @@ export const POST: APIRoute = async (context) => {
     );
 
     if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+      return new Response(JSON.stringify({ error: "Internal server error" }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });

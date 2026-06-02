@@ -13,3 +13,7 @@ void test("generateSlug strips punctuation and preserves numbers", () => {
 void test("generateSlug trims separators around the slug", () => {
   assert.equal(generateSlug("  __High Five__  "), "high-five");
 });
+
+void test("generateSlug strips underscores (they are stripped before separator collapse)", () => {
+  assert.equal(generateSlug("trick_name"), "trickname");
+});

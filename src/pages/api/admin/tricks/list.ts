@@ -44,7 +44,8 @@ export const GET: APIRoute = async (context) => {
   const { data, error } = await supabase
     .from("tricks")
     .select("id, name, slug, difficulty, difficulty_weight, description, created_at, deleted_at")
-    .order("name");
+    .order("name")
+    .limit(500);
 
   if (error) {
     return new Response(JSON.stringify({ error: error.message }), {

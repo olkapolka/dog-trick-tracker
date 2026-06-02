@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { isAdmin } from "@/lib/admin";
-import { recalculateScoresForTrick } from "@/lib/recalculate-user-scores";
 import { createClient } from "@/lib/supabase";
 import { validateTrickInput } from "@/lib/validate-trick";
 import type { Enums } from "@/lib/database.types";
@@ -129,9 +128,8 @@ export const POST: APIRoute = async (context) => {
       });
     }
 
-    if (difficultyChanged) {
-      await recalculateScoresForTrick(trickId, supabase);
-    }
+    // Scores are calculated on-the-fly from user_tricks — no stored score column to update.
+    // Wire recalculateScoresForTrick back in here if score caching is added later.
 
     return new Response(
       JSON.stringify({
