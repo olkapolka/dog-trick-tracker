@@ -529,9 +529,9 @@ Current foreign key constraint on `user_tricks.trick_id` uses `ON DELETE CASCADE
 
 #### Manual
 
-- [ ] 2.5 `isAdmin` helper verified (returns true for admin, false for regular user)
-- [ ] 2.6 Utilities tested with edge cases (empty strings, special chars, Unicode)
-- [ ] 2.7 Middleware allows `/admin/tricks` access for authenticated users
+- [x] 2.5 `isAdmin` helper verified (returns true for admin, false for regular user)
+- [x] 2.6 Utilities tested with edge cases (empty strings, special chars, Unicode)
+- [x] 2.7 Middleware allows `/admin/tricks` access for authenticated users
 
 ### Phase 3: Admin API Routes
 
@@ -571,12 +571,12 @@ Current foreign key constraint on `user_tricks.trick_id` uses `ON DELETE CASCADE
 
 #### Automated
 
-- [x] 5.1 Type checking passes: `npm run typecheck`
-- [x] 5.2 Unit tests for `recalculateScoresForTrick` pass
-- [x] 5.3 Linting passes: `npm run lint`
+- [x] 5.1 Type checking passes: `npm run typecheck` — eacfec1
+- [x] 5.2 Unit tests for `recalculateScoresForTrick` pass — eacfec1
+- [x] 5.3 Linting passes: `npm run lint` — eacfec1
 
 #### Manual
 
-- [x] 5.4 Score recalculation verified (difficulty edit updates user scores within 1 second)
-- [x] 5.5 Multi-user test verified (only users with finished trick affected)
-- [x] 5.6 Verify endpoint tested (returns correct recalculated scores)
+- [x] 5.4 Score recalculation verified (difficulty edit updates user scores within 1 second) — eacfec1
+- [x] 5.5 Multi-user test verified (only users with finished trick affected) — eacfec1
+- [x] 5.6 Verify endpoint tested (returns correct recalculated scores) — eacfec1
