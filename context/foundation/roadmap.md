@@ -3,7 +3,7 @@ project: Dog Trick Tracker
 version: 1
 status: draft
 created: 2026-05-25
-updated: 2026-05-31
+updated: 2026-06-02
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -33,7 +33,7 @@ Dog owners training at home have no systematic way to track which tricks they're
 | S-02 | shareable-profile-link | Share profile via copy link, QR code, or email (enhances existing copy button with modal UI)                         | S-01          | FR-005 (already met; this adds enhancements)                  | done     |
 | S-03 | public-profile-view    | Visit another user's profile via shared link and see their dog info and trick progress                               | S-02          | FR-013, FR-017, Success Criteria (primary)                    | done     |
 | S-04 | follow-relationships   | Follow users, view list of followed profiles in Friends tab, view list of followers in Friends tab                   | S-03          | FR-014, FR-015, FR-016, Access Control                        | done     |
-| S-05 | admin-trick-crud       | (admin) Add, edit, and remove tricks from catalog                                                                    | F-01, F-02    | FR-018, FR-019, FR-020, Access Control                        | blocked  |
+| S-05 | admin-trick-crud       | (admin) Add, edit, and remove tricks from catalog                                                                    | F-01, F-02    | FR-018, FR-019, FR-020, Access Control                        | done     |
 
 ## Streams
 
@@ -150,7 +150,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - How is admin role assigned to users? PRD Access Control says "Admin" role exists and "Regular user (default)" implies admin is non-default, but doesn't specify assignment mechanism (database flag? hardcoded email? OAuth claim? manual SQL grant?). Owner: user/team. Block: yes (can't build admin UI without knowing who gets access and how to check it).
 - **Risk:** Must-have per PRD, but blocked on role assignment unknown. If resolved quickly, this slice is low risk (standard CRUD interface). If unresolved, defers to post-MVP.
-- **Status:** blocked
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -205,3 +205,4 @@ Roadmap migrated to GitHub Issues on 2026-05-25.
 - **S-02: User can share their profile via three methods: copy link to clipboard, display QR code for scanning, or open email with pre-filled profile link. Replaces existing copy button with accessible modal UI.** — Archived 2026-05-31 → `context/archive/2026-05-29-shareable-profile-link/`. Lesson: —.
 - **S-03: Visit another user's profile via shared link and see their dog info and trick progress** — Archived 2026-05-31 → `context/archive/2026-05-31-public-profile-view/`. Lesson: —.
 - **S-04: Follow users, view list of followed profiles in Friends tab, view list of followers in Friends tab** — Archived 2026-05-31 → `context/archive/2026-05-31-follow-relationships/`. Lesson: —.
+- **S-05: (admin) Add, edit, and remove tricks from catalog** — Archived 2026-06-02 → `context/archive/2026-06-02-admin-trick-crud/`. Lesson: —.
