@@ -8,7 +8,6 @@ VALUES (
   ARRAY['image/jpeg', 'image/png', 'image/webp']
 )
 ON CONFLICT (id) DO NOTHING;
-
 -- RLS policies for storage.objects
 CREATE POLICY "Users can upload own photos"
   ON storage.objects FOR INSERT
@@ -16,18 +15,15 @@ CREATE POLICY "Users can upload own photos"
     bucket_id = 'dog-photos' 
     AND auth.uid()::text = (storage.foldername(name))[1]
   );
-
 CREATE POLICY "Public read access"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'dog-photos');
-
 CREATE POLICY "Users can update own photos"
   ON storage.objects FOR UPDATE
   USING (
     bucket_id = 'dog-photos'
     AND auth.uid()::text = (storage.foldername(name))[1]
   );
-
 CREATE POLICY "Users can delete own photos"
   ON storage.objects FOR DELETE
   USING (

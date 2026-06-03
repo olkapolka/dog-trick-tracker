@@ -3,7 +3,6 @@
 ALTER TABLE profiles 
   ADD CONSTRAINT dog_name_length_check 
   CHECK (char_length(dog_name) <= 100);
-
 ALTER TABLE profiles 
   ADD CONSTRAINT breed_length_check 
   CHECK (char_length(breed) <= 100);

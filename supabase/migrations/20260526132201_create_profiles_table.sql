@@ -12,20 +12,15 @@ CREATE TABLE profiles (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX idx_profiles_user_id ON profiles(user_id);
 CREATE INDEX idx_profiles_login_name ON profiles(login_name);
-
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Profiles are publicly readable"
   ON profiles FOR SELECT
   USING (true);
-
 CREATE POLICY "Users can create own profile"
   ON profiles FOR INSERT
   WITH CHECK (auth.uid() = user_id);
-
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE
   USING (auth.uid() = user_id);
