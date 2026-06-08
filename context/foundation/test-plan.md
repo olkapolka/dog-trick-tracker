@@ -57,8 +57,8 @@ Each row is a discrete rollout phase that will open its own change folder.
 
 | Layer | Tool | Version | Notes |
 |---|---|---|---|
-| unit + integration | none yet | n/a | Sparse test base exists; bootstrap in Phase 1 |
-| API mocking | none yet | n/a | Decide with rollout based on cheapest signal |
+| unit + integration | Node test + tsx | v22 / tsx 4.x | Bootstrapped in Phase 1 — `npm run test:unit` and `npm run test:integration` |
+| API mocking | none (contract layer) | n/a | Use `src/lib/ownership-contracts.ts` and `src/lib/page-state-contracts.ts` pattern instead |
 | end-to-end | browser/runtime tooling available | n/a | Use selectively when integration is insufficient |
 | accessibility | none yet | n/a | Add only for high-signal critical screens |
 | AI-native | none yet | n/a | Add only if deterministic checks miss target signal |
@@ -83,31 +83,90 @@ Stack grounding tools (current session):
 
 ## 6. Cookbook Patterns
 
-How to add tests in this project. Entries below start as placeholders and are filled as phases ship.
+How to add tests in this project. Entries are filled in from Phase 1 of the rollout (commits 2c69a9a → 8445818).
 
 ### 6.1 Adding a unit test
 
-TBD - see section 3 phase 1 for score and rule-invariant pattern.
+**Runner:** `npm run test:unit` — executes `src/lib/*.test.ts` via Node test + tsx.
+
+**Pattern — helper error/empty distinction (from Phase 4, `src/lib/calculate-score.test.ts` and `src/lib/admin.test.ts`):**
+
+1. Build a minimal stub supabase client that returns `{ data: null, error: { message: "..." } }` for the error branch.
+2. Call the `*Result` variant of the helper (e.g. `calculateProgressScoreResult`, `getAdminCheckResult`).
+3. Assert `result.ok === false` and `result.error` matches expected message.
+4. In a separate test, return `{ data: <empty value>, error: null }` and assert `result.ok === true` with the expected zero/false value.
+5. Oracle must come from the domain rule, not from replaying the implementation.
+
+Anti-pattern to avoid: asserting `result === 0` when the helper collapsed an error to `0` — use the `*Result` variants so error and empty are structurally different.
 
 ### 6.2 Adding an integration test
 
-TBD - see section 3 phase 1 for auth and fallback behavior pattern.
+**Runner:** `npm run test:integration` — executes `src/test/integration/**/*.test.ts` via Node test + tsx.
+
+**Pattern — auth/session contract (from Phase 2, `src/test/integration/auth-access/` and `auth-transitions/`):**
+
+1. Import the relevant function from `src/lib/auth-contracts.ts` (`shouldRedirectToSignIn`, `shouldRedirectToProfileCreate`, `resolveSignInRedirect`).
+2. Call it with controlled boolean inputs representing session state.
+3. Assert the returned path or boolean matches the PRD-derived contract (not implementation output).
+4. Keep each test to one behavior: unauthed redirect, profile-missing redirect, or session teardown.
+
+**Pattern — page failure-state contract (from Phase 4, `src/test/integration/failure-states/page-failure-contracts.test.ts`):**
+
+1. Import the relevant resolver from `src/lib/page-state-contracts.ts`.
+2. Call with `{ ...Error: true, ...Count: 0 }` for the error branch — assert `"error"`.
+3. Call with `{ ...Error: false, ...Count: 0 }` for the empty branch — assert `"empty"`.
+4. Both tests together prove error and empty are structurally distinct.
 
 ### 6.3 Adding an end-to-end test
 
-TBD - see section 3 phase 3 for privileged write-path verification pattern.
+Defer to runtime smoke path in `src/test/integration/utils/runtime-smoke.ts`. Set `TEST_RUNTIME_BASE_URL` and run:
+
+```bash
+node --import tsx -e "import { runRuntimeSmoke } from './src/test/integration/utils/runtime-smoke.ts'; ..."
+```
+
+Use only when integration layer cannot provide the required signal (e.g. actual cookie exchange or redirect chain across real network hop).
 
 ### 6.4 Adding a test for a new API endpoint
 
-TBD - see section 3 phase 3 for role-boundary and ownership-denial pattern.
+**Pattern — ownership scoping (from Phase 3, `src/test/integration/ownership-endpoints/ownership-scoping.test.ts`):**
+
+1. Add a builder function to `src/lib/ownership-contracts.ts` that constructs the write payload/filter from `actorId`.
+2. Use that builder in the endpoint handler instead of inline `user.id` references.
+3. In the test, call the builder with two distinct actor IDs (A and B) and assert the resulting payloads are structurally scoped to the respective actor.
+4. Include an ownership-dimension assertion in every denial scenario — never test auth-only without also asserting the actor scoping.
+
+**Pattern — RLS backstop (from Phase 3, `src/test/integration/ownership-rls/ownership-rls-policies.test.ts`):**
+
+1. `readFileSync` the relevant migration SQL.
+2. `assert.match` for the policy name and `WITH CHECK` / `USING` clause containing `auth.uid() = <owner_column>`.
+3. One test per write policy (INSERT / UPDATE / DELETE).
 
 ### 6.5 Adding a test for migration-sensitive behavior
 
-TBD - see section 3 phase 2 for migration/runtime consistency pattern.
+Defer to Phase 2 rollout (`testing-data-integrity-scoring-invariants`). Pattern will be captured there.
+
+For now: read the migration SQL directly and assert policy clauses with `assert.match` (see §6.4 RLS backstop pattern) as a cheap structural guard before runtime verification.
 
 ### 6.6 Per-rollout-phase notes
 
-TBD - append short lessons after each phase lands.
+**Phase 1 — Harness Bootstrap (2c69a9a)**
+- Node test + tsx is sufficient for all integration scenarios that don't need a real network hop.
+- The runtime smoke helper (`runtime-smoke.ts`) requires `TEST_RUNTIME_BASE_URL` — it skips deterministically when unset, making CI safe without a live server.
+
+**Phase 2 — Access Continuity (27f6595)**
+- Extract auth routing rules into pure functions in `src/lib/auth-contracts.ts`; keep page/middleware code thin wiring only.
+- Testing the contract function directly is cheaper and more reliable than mocking middleware internals.
+
+**Phase 3 — Ownership Denial (ae9069b)**
+- Direct import of Astro API route modules fails in Node runner (`astro:` protocol). Use ownership contract builders (`src/lib/ownership-contracts.ts`) as the testable boundary instead.
+- RLS policy structural assertions (reading migration SQL) catch policy regressions without requiring a live DB in unit/integration phase.
+- Every denial test must include both the auth check and the ownership dimension — auth-only tests produce false confidence.
+
+**Phase 4 — Failure Distinction (8445818)**
+- `calculateProgressScore` and `isAdmin` collapse errors to `0`/`false` by design for callers that just need a number/bool. For test assertions, always use the `*Result` variants (`calculateProgressScoreResult`, `getAdminCheckResult`) which return a tagged union.
+- Page state resolvers (`src/lib/page-state-contracts.ts`) are the correct unit-test surface for SSR failure/empty distinction — they are importable without Astro runtime.
+- When forcing error state manually: temporarily override `scoreResult` to `{ ok: false, error: "forced" }` in the page frontmatter; revert before committing.
 
 ## 7. What We Deliberately Don't Test
 
