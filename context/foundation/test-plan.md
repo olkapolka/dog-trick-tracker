@@ -48,7 +48,7 @@ Each row is a discrete rollout phase that will open its own change folder.
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|---|---|---|---|---|---|
-| 1 | Critical access and failure-path floor | Defend access and fallback behavior for highest-risk flows | #1, #3, #5 | integration + focused unit | change opened | context/changes/testing-critical-access-failure-floor/ |
+| 1 | Critical access and failure-path floor | Defend access and fallback behavior for highest-risk flows | #1, #3, #5 | integration + focused unit | implementing | context/changes/testing-critical-access-failure-floor/ |
 | 2 | Data integrity and scoring invariants | Protect migration/runtime integrity and weighted-score correctness | #2, #4 | migration verification + integration + unit | not started | - |
 | 3 | Privileged write-path hardening | Contain admin write-path regressions and role-boundary leaks | #6, #5 | API integration + selective end-to-end | not started | - |
 | 4 | Quality-gates wiring and cookbook capture | Enforce gates and codify reusable test patterns for future changes | cross-cutting | gates + selective visual/runtime checks | not started | - |

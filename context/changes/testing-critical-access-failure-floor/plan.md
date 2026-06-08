@@ -408,16 +408,16 @@ Update test-plan section 6 with reusable patterns proven in this rollout, and en
 
 #### Automated
 
-- [x] 4.1 Helper query error output is distinguishable from valid zero/false business outcomes
-- [x] 4.2 Required SSR query failures render explicit fallback/error contract
-- [x] 4.3 Legitimate empty/zero states render normal empty-state UX
-- [x] 4.4 Type checking passes: `npm run typecheck`
-- [x] 4.5 Linting passes: `npm run lint`
+- [x] 4.1 Helper query error output is distinguishable from valid zero/false business outcomes — 8445818
+- [x] 4.2 Required SSR query failures render explicit fallback/error contract — 8445818
+- [x] 4.3 Legitimate empty/zero states render normal empty-state UX — 8445818
+- [x] 4.4 Type checking passes: `npm run typecheck` — 8445818
+- [x] 4.5 Linting passes: `npm run lint` — 8445818
 
 #### Manual
 
-- [x] 4.6 Confirm controlled query failure shows user-visible fallback distinct from empty-state copy
-- [x] 4.7 Confirm normal empty-data case still shows expected empty-state behavior
+- [x] 4.6 Confirm controlled query failure shows user-visible fallback distinct from empty-state copy — 8445818
+- [x] 4.7 Confirm normal empty-data case still shows expected empty-state behavior — 8445818
 
 ### Phase 5: Cookbook Capture and Gate Sync
 
