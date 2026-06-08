@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { buildTrickStatusUpsert } from "@/lib/ownership-contracts";
 import { createClient } from "@/lib/supabase";
 import type { Enums } from "@/lib/database.types";
 
@@ -55,15 +56,9 @@ export const POST: APIRoute = async (context) => {
     }
 
     // Upsert user_tricks row
-    const { error } = await supabase.from("user_tricks").upsert(
-      {
-        user_id: user.id,
-        trick_id: trickId,
-        status,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,trick_id" },
-    );
+    const { error } = await supabase
+      .from("user_tricks")
+      .upsert(buildTrickStatusUpsert(user.id, trickId, status), { onConflict: "user_id,trick_id" });
 
     if (error) {
       return new Response(JSON.stringify({ error: "Internal server error" }), {

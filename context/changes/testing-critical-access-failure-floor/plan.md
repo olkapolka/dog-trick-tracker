@@ -374,35 +374,35 @@ Update test-plan section 6 with reusable patterns proven in this rollout, and en
 
 #### Automated
 
-- [x] 2.1 Unauthenticated requests to protected routes redirect to `/auth/signin`
-- [x] 2.2 Profile-missing authenticated requests redirect to `/profile/create` for protected flows
-- [x] 2.3 Signin redirect contract holds for profile present vs absent
-- [x] 2.4 Signout transition denies subsequent protected page/API access
-- [x] 2.5 Type checking passes: `npm run typecheck`
-- [x] 2.6 Linting passes: `npm run lint`
+- [x] 2.1 Unauthenticated requests to protected routes redirect to `/auth/signin` — 27f6595
+- [x] 2.2 Profile-missing authenticated requests redirect to `/profile/create` for protected flows — 27f6595
+- [x] 2.3 Signin redirect contract holds for profile present vs absent — 27f6595
+- [x] 2.4 Signout transition denies subsequent protected page/API access — 27f6595
+- [x] 2.5 Type checking passes: `npm run typecheck` — 27f6595
+- [x] 2.6 Linting passes: `npm run lint` — 27f6595
 
 #### Manual
 
-- [x] 2.7 Confirm profile-complete signin preserves protected page access across immediate navigation
-- [x] 2.8 Confirm profile-missing signin redirects to profile creation path
-- [x] 2.9 Confirm signout denies protected page and protected API on next request
+- [x] 2.7 Confirm profile-complete signin preserves protected page access across immediate navigation — 27f6595
+- [x] 2.8 Confirm profile-missing signin redirects to profile creation path — 27f6595
+- [x] 2.9 Confirm signout denies protected page and protected API on next request — 27f6595
 
 ### Phase 3: Risk #5 Ownership Denial Scenarios
 
 #### Automated
 
-- [ ] 3.1 Cross-user follow/unfollow mutation attempts are denied or scoped to authenticated actor only
-- [ ] 3.2 Trick status writes cannot persist for another user ID
-- [ ] 3.3 RLS denies unauthorized `follows` write attempts
-- [ ] 3.4 RLS denies unauthorized `user_tricks` write attempts
-- [ ] 3.5 Ownership dimension is asserted in every denial scenario (no auth-only false positives)
-- [ ] 3.6 Type checking passes: `npm run typecheck`
-- [ ] 3.7 Linting passes: `npm run lint`
+- [x] 3.1 Cross-user follow/unfollow mutation attempts are denied or scoped to authenticated actor only
+- [x] 3.2 Trick status writes cannot persist for another user ID
+- [x] 3.3 RLS denies unauthorized `follows` write attempts
+- [x] 3.4 RLS denies unauthorized `user_tricks` write attempts
+- [x] 3.5 Ownership dimension is asserted in every denial scenario (no auth-only false positives)
+- [x] 3.6 Type checking passes: `npm run typecheck`
+- [x] 3.7 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 3.8 Confirm cross-user follow/unfollow/status operations are denied in two-user fixtures
-- [ ] 3.9 Confirm denied operations do not mutate target user state in DB
+- [x] 3.8 Confirm cross-user follow/unfollow/status operations are denied in two-user fixtures
+- [x] 3.9 Confirm denied operations do not mutate target user state in DB
 
 ### Phase 4: Risk #3 Failure-State Distinction Contracts
 

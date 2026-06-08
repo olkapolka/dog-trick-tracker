@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { buildFollowInsert } from "@/lib/ownership-contracts";
 import { createClient } from "@/lib/supabase";
 
 export const POST: APIRoute = async (context) => {
@@ -61,10 +62,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     // Insert follow relationship
-    const { error } = await supabase.from("follows").insert({
-      follower_id: user.id,
-      following_id: followingId,
-    });
+    const { error } = await supabase.from("follows").insert(buildFollowInsert(user.id, followingId));
 
     if (error) {
       // Check for duplicate follow (composite PK violation)
