@@ -428,5 +428,5 @@ Update test-plan section 6 with reusable patterns proven in this rollout, and en
 
 #### Manual
 
-- [ ] 5.3 Confirm section 6 cookbook entries are actionable and match shipped test patterns
-- [ ] 5.4 Confirm continuation command and phase sequencing are clear for immediate execution
+- [x] 5.3 Confirm section 6 cookbook entries are actionable and match shipped test patterns
+- [x] 5.4 Confirm continuation command and phase sequencing are clear for immediate execution
