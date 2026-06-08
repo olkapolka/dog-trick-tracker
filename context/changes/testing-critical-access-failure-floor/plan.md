@@ -360,32 +360,32 @@ Update test-plan section 6 with reusable patterns proven in this rollout, and en
 
 #### Automated
 
-- [x] 1.1 Integration test command executes with passing bootstrap smoke test
-- [x] 1.2 Focused unit test command executes with passing baseline test
-- [x] 1.3 Type checking passes: `npm run typecheck`
-- [x] 1.4 Linting passes: `npm run lint`
+- [x] 1.1 Integration test command executes with passing bootstrap smoke test — 2c69a9a
+- [x] 1.2 Focused unit test command executes with passing baseline test — 2c69a9a
+- [x] 1.3 Type checking passes: `npm run typecheck` — 2c69a9a
+- [x] 1.4 Linting passes: `npm run lint` — 2c69a9a
 
 #### Manual
 
-- [x] 1.5 Confirm local test environment can reset fixture state reproducibly
-- [x] 1.6 Confirm runtime-backed smoke path can run once end-to-end without manual patching
+- [x] 1.5 Confirm local test environment can reset fixture state reproducibly — 2c69a9a
+- [x] 1.6 Confirm runtime-backed smoke path can run once end-to-end without manual patching — 2c69a9a
 
 ### Phase 2: Risk #1 Access Continuity Scenarios
 
 #### Automated
 
-- [ ] 2.1 Unauthenticated requests to protected routes redirect to `/auth/signin`
-- [ ] 2.2 Profile-missing authenticated requests redirect to `/profile/create` for protected flows
-- [ ] 2.3 Signin redirect contract holds for profile present vs absent
-- [ ] 2.4 Signout transition denies subsequent protected page/API access
-- [ ] 2.5 Type checking passes: `npm run typecheck`
-- [ ] 2.6 Linting passes: `npm run lint`
+- [x] 2.1 Unauthenticated requests to protected routes redirect to `/auth/signin`
+- [x] 2.2 Profile-missing authenticated requests redirect to `/profile/create` for protected flows
+- [x] 2.3 Signin redirect contract holds for profile present vs absent
+- [x] 2.4 Signout transition denies subsequent protected page/API access
+- [x] 2.5 Type checking passes: `npm run typecheck`
+- [x] 2.6 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 2.7 Confirm profile-complete signin preserves protected page access across immediate navigation
-- [ ] 2.8 Confirm profile-missing signin redirects to profile creation path
-- [ ] 2.9 Confirm signout denies protected page and protected API on next request
+- [x] 2.7 Confirm profile-complete signin preserves protected page access across immediate navigation
+- [x] 2.8 Confirm profile-missing signin redirects to profile creation path
+- [x] 2.9 Confirm signout denies protected page and protected API on next request
 
 ### Phase 3: Risk #5 Ownership Denial Scenarios
 
