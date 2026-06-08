@@ -423,10 +423,10 @@ Update test-plan section 6 with reusable patterns proven in this rollout, and en
 
 #### Automated
 
-- [x] 5.1 Linting and type checks pass after cookbook/documentation updates where applicable
-- [x] 5.2 Progress section reflects phase task granularity for downstream tracking
+- [x] 5.1 Linting and type checks pass after cookbook/documentation updates where applicable — 54d3fa5
+- [x] 5.2 Progress section reflects phase task granularity for downstream tracking — 54d3fa5
 
 #### Manual
 
-- [x] 5.3 Confirm section 6 cookbook entries are actionable and match shipped test patterns
-- [x] 5.4 Confirm continuation command and phase sequencing are clear for immediate execution
+- [x] 5.3 Confirm section 6 cookbook entries are actionable and match shipped test patterns — 54d3fa5
+- [x] 5.4 Confirm continuation command and phase sequencing are clear for immediate execution — 54d3fa5

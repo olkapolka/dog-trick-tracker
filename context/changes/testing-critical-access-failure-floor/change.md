@@ -1,7 +1,7 @@
 ---
 change_id: testing-critical-access-failure-floor
 title: Testing critical access failure floor
-status: implementing
+status: implemented
 created: 2026-06-03
 updated: 2026-06-08
 archived_at: null
