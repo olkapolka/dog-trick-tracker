@@ -2,7 +2,8 @@
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
 import { createClient } from "@/lib/supabase";
-import { calculateProgressScore } from "@/lib/calculate-score";
+import { calculateProgressScoreResult } from "@/lib/calculate-score";
+import { resolveProfileState } from "@/lib/page-state-contracts";
 import ProfileDisplay from "@/components/profile/ProfileDisplay.astro";
 
 const user = Astro.locals.user;
@@ -31,13 +32,21 @@ if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
 }
 
 // Calculate progress score
-const score = await calculateProgressScore(supabase, user.id);
+const scoreResult = await calculateProgressScoreResult(supabase, user.id);
+const score = scoreResult.ok ? scoreResult.score : 0;
 
 // Fetch user's trick progress
-const { data: userTricks } = await supabase
+const { data: userTricks, error: userTricksError } = await supabase
   .from("user_tricks")
   .select("trick_id, status, tricks(*)")
   .eq("user_id", user.id);
+
+const pageState = resolveProfileState({
+  profileError: false,
+  scoreError: !scoreResult.ok,
+  userTricksError: userTricksError !== null,
+  trickCount: userTricks?.length ?? 0,
+});
 
 // Group tricks by status
 const favorites = userTricks?.filter((ut) => ut.status === "favorite") ?? [];
@@ -55,18 +64,26 @@ const finished = userTricks?.filter((ut) => ut.status === "finished") ?? [];
         My Profile
       </h1>
 
-      <ProfileDisplay
-        profile={profile}
-        age={age}
-        score={score}
-        favorites={favorites}
-        inProgress={inProgress}
-        finished={finished}
-        isOwnProfile={true}
-        currentUserId={user.id}
-        isFollowing={false}
-        currentPath={Astro.url.pathname}
-      />
+      {
+        pageState === "error" ? (
+          <div class="rounded-2xl border border-rose-300/30 bg-rose-500/10 p-8 text-center text-white backdrop-blur-xl">
+            <p class="text-rose-100">Unable to load your profile details right now. Please refresh and try again.</p>
+          </div>
+        ) : (
+          <ProfileDisplay
+            profile={profile}
+            age={age}
+            score={score}
+            favorites={favorites}
+            inProgress={inProgress}
+            finished={finished}
+            isOwnProfile={true}
+            currentUserId={user.id}
+            isFollowing={false}
+            currentPath={Astro.url.pathname}
+          />
+        )
+      }
     </div>
   </div>
 </Layout>

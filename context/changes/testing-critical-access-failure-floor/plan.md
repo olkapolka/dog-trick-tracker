@@ -391,33 +391,33 @@ Update test-plan section 6 with reusable patterns proven in this rollout, and en
 
 #### Automated
 
-- [x] 3.1 Cross-user follow/unfollow mutation attempts are denied or scoped to authenticated actor only
-- [x] 3.2 Trick status writes cannot persist for another user ID
-- [x] 3.3 RLS denies unauthorized `follows` write attempts
-- [x] 3.4 RLS denies unauthorized `user_tricks` write attempts
-- [x] 3.5 Ownership dimension is asserted in every denial scenario (no auth-only false positives)
-- [x] 3.6 Type checking passes: `npm run typecheck`
-- [x] 3.7 Linting passes: `npm run lint`
+- [x] 3.1 Cross-user follow/unfollow mutation attempts are denied or scoped to authenticated actor only — ae9069b
+- [x] 3.2 Trick status writes cannot persist for another user ID — ae9069b
+- [x] 3.3 RLS denies unauthorized `follows` write attempts — ae9069b
+- [x] 3.4 RLS denies unauthorized `user_tricks` write attempts — ae9069b
+- [x] 3.5 Ownership dimension is asserted in every denial scenario (no auth-only false positives) — ae9069b
+- [x] 3.6 Type checking passes: `npm run typecheck` — ae9069b
+- [x] 3.7 Linting passes: `npm run lint` — ae9069b
 
 #### Manual
 
-- [x] 3.8 Confirm cross-user follow/unfollow/status operations are denied in two-user fixtures
-- [x] 3.9 Confirm denied operations do not mutate target user state in DB
+- [x] 3.8 Confirm cross-user follow/unfollow/status operations are denied in two-user fixtures — ae9069b
+- [x] 3.9 Confirm denied operations do not mutate target user state in DB — ae9069b
 
 ### Phase 4: Risk #3 Failure-State Distinction Contracts
 
 #### Automated
 
-- [ ] 4.1 Helper query error output is distinguishable from valid zero/false business outcomes
-- [ ] 4.2 Required SSR query failures render explicit fallback/error contract
-- [ ] 4.3 Legitimate empty/zero states render normal empty-state UX
-- [ ] 4.4 Type checking passes: `npm run typecheck`
-- [ ] 4.5 Linting passes: `npm run lint`
+- [x] 4.1 Helper query error output is distinguishable from valid zero/false business outcomes
+- [x] 4.2 Required SSR query failures render explicit fallback/error contract
+- [x] 4.3 Legitimate empty/zero states render normal empty-state UX
+- [x] 4.4 Type checking passes: `npm run typecheck`
+- [x] 4.5 Linting passes: `npm run lint`
 
 #### Manual
 
-- [ ] 4.6 Confirm controlled query failure shows user-visible fallback distinct from empty-state copy
-- [ ] 4.7 Confirm normal empty-data case still shows expected empty-state behavior
+- [x] 4.6 Confirm controlled query failure shows user-visible fallback distinct from empty-state copy
+- [x] 4.7 Confirm normal empty-data case still shows expected empty-state behavior
 
 ### Phase 5: Cookbook Capture and Gate Sync
 
