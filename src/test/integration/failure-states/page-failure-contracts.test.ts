@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { resolveDashboardState, resolveFriendsState, resolveProfileState } from "@/lib/page-state-contracts";
 
+// Rule: any required-query failure resolves to "error" state.
 void test("dashboard query failure resolves to explicit error state", () => {
   assert.equal(
     resolveDashboardState({
@@ -14,6 +15,19 @@ void test("dashboard query failure resolves to explicit error state", () => {
   );
 });
 
+void test("dashboard profile query failure resolves to explicit error state", () => {
+  assert.equal(
+    resolveDashboardState({
+      profileError: true,
+      scoreError: false,
+      catalogError: false,
+      catalogCount: 0,
+    }),
+    "error",
+  );
+});
+
+// Rule: empty dataset with no query failures resolves to "empty" state.
 void test("dashboard empty data resolves to empty state (not error)", () => {
   assert.equal(
     resolveDashboardState({
@@ -26,6 +40,7 @@ void test("dashboard empty data resolves to empty state (not error)", () => {
   );
 });
 
+// Rule: any required-query failure resolves to "error" state.
 void test("profile query failure resolves to explicit error state", () => {
   assert.equal(
     resolveProfileState({
@@ -38,6 +53,19 @@ void test("profile query failure resolves to explicit error state", () => {
   );
 });
 
+void test("profile profile query failure resolves to explicit error state", () => {
+  assert.equal(
+    resolveProfileState({
+      profileError: true,
+      scoreError: false,
+      userTricksError: false,
+      trickCount: 0,
+    }),
+    "error",
+  );
+});
+
+// Rule: empty dataset with no query failures resolves to "empty" state.
 void test("profile empty trick list resolves to empty state", () => {
   assert.equal(
     resolveProfileState({
@@ -50,6 +78,7 @@ void test("profile empty trick list resolves to empty state", () => {
   );
 });
 
+// Rule: any required-query failure resolves to "error" state.
 void test("friends query failure resolves to explicit error state", () => {
   assert.equal(
     resolveFriendsState({
@@ -63,6 +92,20 @@ void test("friends query failure resolves to explicit error state", () => {
   );
 });
 
+void test("friends profile query failure resolves to explicit error state", () => {
+  assert.equal(
+    resolveFriendsState({
+      followingError: false,
+      followersError: false,
+      profilesError: true,
+      followingCount: 0,
+      followersCount: 0,
+    }),
+    "error",
+  );
+});
+
+// Rule: empty dataset with no query failures resolves to "empty" state.
 void test("friends zero relationships resolves to empty state", () => {
   assert.equal(
     resolveFriendsState({

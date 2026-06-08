@@ -54,6 +54,7 @@ const tricks = (tricksData as TrickWithStatus[] | null)?.map((t) => ({
 }));
 
 const pageState = resolveDashboardState({
+  // Profile fetch failures redirect to /profile/create above, so this branch cannot reach page-state resolution.
   profileError: false,
   scoreError: !scoreResult.ok,
   catalogError: tricksError !== null,

@@ -74,7 +74,13 @@ export const POST: APIRoute = async (context) => {
 
     if (updateError) {
       // Cleanup: delete uploaded file since profile update failed
-      void supabase.storage.from("dog-photos").remove([fileName]);
+      void supabase.storage
+        .from("dog-photos")
+        .remove([fileName])
+        .catch((cleanupError: unknown) => {
+          // eslint-disable-next-line no-console -- cleanup failures are best-effort and should be surfaced for ops.
+          console.error("Failed to cleanup uploaded file after profile update error", cleanupError);
+        });
 
       return new Response(JSON.stringify({ error: updateError.message }), { status: 500 });
     }

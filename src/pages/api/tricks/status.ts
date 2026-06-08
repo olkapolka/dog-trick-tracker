@@ -61,6 +61,13 @@ export const POST: APIRoute = async (context) => {
       .upsert(buildTrickStatusUpsert(user.id, trickId, status), { onConflict: "user_id,trick_id" });
 
     if (error) {
+      if (error.code === "23503") {
+        return new Response(JSON.stringify({ error: "Invalid trickId" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
       return new Response(JSON.stringify({ error: "Internal server error" }), {
         status: 500,
         headers: { "Content-Type": "application/json" },

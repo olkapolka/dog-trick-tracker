@@ -16,8 +16,9 @@ if (!supabase) {
 
 // Pagination setup
 const PAGE_SIZE = 50;
-const followingPage = Math.max(1, parseInt(Astro.url.searchParams.get("followingPage") ?? "1"));
-const followersPage = Math.max(1, parseInt(Astro.url.searchParams.get("followersPage") ?? "1"));
+const MAX_PAGE = 1000;
+const followingPage = Math.min(MAX_PAGE, Math.max(1, parseInt(Astro.url.searchParams.get("followingPage") ?? "1")));
+const followersPage = Math.min(MAX_PAGE, Math.max(1, parseInt(Astro.url.searchParams.get("followersPage") ?? "1")));
 
 const followingStart = (followingPage - 1) * PAGE_SIZE;
 const followingEnd = followingStart + PAGE_SIZE - 1;

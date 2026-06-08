@@ -142,6 +142,8 @@ Use only when integration layer cannot provide the required signal (e.g. actual 
 2. `assert.match` for the policy name and `WITH CHECK` / `USING` clause containing `auth.uid() = <owner_column>`.
 3. One test per write policy (INSERT / UPDATE / DELETE).
 
+Runtime RLS enforcement checks against a live Supabase instance are deferred to Phase 2 rollout (`testing-data-integrity-scoring-invariants`).
+
 ### 6.5 Adding a test for migration-sensitive behavior
 
 Defer to Phase 2 rollout (`testing-data-integrity-scoring-invariants`). Pattern will be captured there.
