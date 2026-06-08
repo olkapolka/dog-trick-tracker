@@ -1,21 +1,57 @@
 import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
+import {
+  isProfileCreationFlow,
+  isProtectedPath,
+  shouldRedirectToProfileCreate,
+  shouldRedirectToSignIn,
+} from "@/lib/auth-contracts";
 
-const PROTECTED_ROUTES = [
-  "/dashboard",
-  "/profile",
-  "/friends",
-  "/admin",
-  "/api/profile",
-  "/api/admin",
-  "/api/tricks",
-  "/api/follow",
-  "/api/unfollow",
-];
+interface MinimalUser {
+  id: string;
+}
 
-export const onRequest = defineMiddleware(async (context, next) => {
-  const supabase = createClient(context.request.headers, context.cookies);
+interface MiddlewareSupabaseLike {
+  auth: {
+    getUser: () => PromiseLike<{ data: { user: MinimalUser | null } }>;
+  };
+  from: (table: "profiles") => {
+    select: (columns: string) => {
+      eq: (
+        column: string,
+        value: string,
+      ) => {
+        single: () => PromiseLike<{ data: { id: string } | null }>;
+      };
+    };
+  };
+}
 
+interface MiddlewareContextLike {
+  url: URL;
+  locals: {
+    user?: MinimalUser | null;
+  };
+  redirect: (path: string, status?: 300 | 301 | 302 | 303 | 304 | 307 | 308) => Response;
+}
+
+function withNoStore(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set("Cache-Control", "no-store, max-age=0");
+  headers.set("Pragma", "no-cache");
+  headers.set("Expires", "0");
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+export async function applyAccessGuards(
+  context: MiddlewareContextLike,
+  supabase: MiddlewareSupabaseLike | null,
+): Promise<Response | null> {
   if (supabase) {
     const {
       data: { user },
@@ -25,30 +61,49 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = null;
   }
 
-  if (PROTECTED_ROUTES.some((route) => context.url.pathname.startsWith(route))) {
-    if (!context.locals.user) {
-      return context.redirect("/auth/signin");
-    }
+  const pathname = context.url.pathname;
 
-    // Skip profile check for profile creation flows
-    const isProfileCreationFlow =
-      context.url.pathname.startsWith("/profile/create") ||
-      context.url.pathname.startsWith("/api/profile/create") ||
-      context.url.pathname.startsWith("/api/profile/check-username");
+  if (!isProtectedPath(pathname)) {
+    return null;
+  }
 
-    // Check if authenticated user has a profile (except during profile creation)
-    if (supabase && !isProfileCreationFlow) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", context.locals.user.id)
-        .single();
+  if (shouldRedirectToSignIn(pathname, Boolean(context.locals.user))) {
+    return context.redirect("/auth/signin");
+  }
 
-      if (!profile) {
-        return context.redirect("/profile/create");
-      }
+  const user = context.locals.user;
+
+  if (supabase && user && !isProfileCreationFlow(pathname)) {
+    const { data: profile } = await supabase.from("profiles").select("id").eq("user_id", user.id).single();
+
+    if (shouldRedirectToProfileCreate(pathname, true, Boolean(profile))) {
+      return context.redirect("/profile/create");
     }
   }
 
-  return next();
+  return null;
+}
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  const supabase = createClient(context.request.headers, context.cookies);
+  const guardClient: MiddlewareSupabaseLike | null = supabase
+    ? {
+        auth: {
+          getUser: () => supabase.auth.getUser(),
+        },
+        from: (table) => supabase.from(table),
+      }
+    : null;
+
+  const guardResponse = await applyAccessGuards(context, guardClient);
+  if (guardResponse) {
+    return withNoStore(guardResponse);
+  }
+
+  const response = await next();
+  if (isProtectedPath(context.url.pathname)) {
+    return withNoStore(response);
+  }
+
+  return response;
 });

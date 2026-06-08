@@ -1,5 +1,8 @@
 import type { APIRoute } from "astro";
+import { buildFollowInsert } from "@/lib/ownership-contracts";
 import { createClient } from "@/lib/supabase";
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const POST: APIRoute = async (context) => {
   const { user } = context.locals;
@@ -26,6 +29,13 @@ export const POST: APIRoute = async (context) => {
 
     if (!followingId) {
       return new Response(JSON.stringify({ error: "Missing followingId" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (!UUID_PATTERN.test(followingId)) {
+      return new Response(JSON.stringify({ error: "Invalid followingId" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
@@ -61,10 +71,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     // Insert follow relationship
-    const { error } = await supabase.from("follows").insert({
-      follower_id: user.id,
-      following_id: followingId,
-    });
+    const { error } = await supabase.from("follows").insert(buildFollowInsert(user.id, followingId));
 
     if (error) {
       // Check for duplicate follow (composite PK violation)

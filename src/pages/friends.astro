@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
+import { resolveFriendsState } from "@/lib/page-state-contracts";
 import { createClient } from "@/lib/supabase";
 
 const user = Astro.locals.user;
@@ -15,8 +16,9 @@ if (!supabase) {
 
 // Pagination setup
 const PAGE_SIZE = 50;
-const followingPage = Math.max(1, parseInt(Astro.url.searchParams.get("followingPage") ?? "1"));
-const followersPage = Math.max(1, parseInt(Astro.url.searchParams.get("followersPage") ?? "1"));
+const MAX_PAGE = 1000;
+const followingPage = Math.min(MAX_PAGE, Math.max(1, parseInt(Astro.url.searchParams.get("followingPage") ?? "1")));
+const followersPage = Math.min(MAX_PAGE, Math.max(1, parseInt(Astro.url.searchParams.get("followersPage") ?? "1")));
 
 const followingStart = (followingPage - 1) * PAGE_SIZE;
 const followingEnd = followingStart + PAGE_SIZE - 1;
@@ -24,13 +26,18 @@ const followersStart = (followersPage - 1) * PAGE_SIZE;
 const followersEnd = followersStart + PAGE_SIZE - 1;
 
 // Query following list with pagination and count
-const { data: followingFollows, count: followingCount } = await supabase
+const {
+  data: followingFollows,
+  count: followingCount,
+  error: followingError,
+} = await supabase
   .from("follows")
   .select("following_id", { count: "exact" })
   .eq("follower_id", user.id)
   .range(followingStart, followingEnd);
 
 let following: { following_id: string; profiles: { login_name: string; dog_name: string } | null }[] = [];
+let followingProfilesError = false;
 if (followingFollows && followingFollows.length > 0) {
   const followingIds = followingFollows.map((f) => f.following_id);
   const { data: followingProfiles } = await supabase
@@ -43,17 +50,24 @@ if (followingFollows && followingFollows.length > 0) {
       following_id: follow.following_id,
       profiles: followingProfiles.find((p) => p.user_id === follow.following_id) ?? null,
     }));
+  } else {
+    followingProfilesError = true;
   }
 }
 
 // Query followers list with pagination and count
-const { data: followersFollows, count: followersCount } = await supabase
+const {
+  data: followersFollows,
+  count: followersCount,
+  error: followersError,
+} = await supabase
   .from("follows")
   .select("follower_id", { count: "exact" })
   .eq("following_id", user.id)
   .range(followersStart, followersEnd);
 
 let followers: { follower_id: string; profiles: { login_name: string; dog_name: string } | null }[] = [];
+let followerProfilesError = false;
 if (followersFollows && followersFollows.length > 0) {
   const followerIds = followersFollows.map((f) => f.follower_id);
   const { data: followerProfiles } = await supabase
@@ -66,11 +80,20 @@ if (followersFollows && followersFollows.length > 0) {
       follower_id: follow.follower_id,
       profiles: followerProfiles.find((p) => p.user_id === follow.follower_id) ?? null,
     }));
+  } else {
+    followerProfilesError = true;
   }
 }
 
 const followingTotalPages = Math.ceil((followingCount ?? 0) / PAGE_SIZE);
 const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
+const pageState = resolveFriendsState({
+  followingError: followingError !== null,
+  followersError: followersError !== null,
+  profilesError: followingProfilesError || followerProfilesError,
+  followingCount: following.length,
+  followersCount: followers.length,
+});
 ---
 
 <Layout title="Friends">
@@ -82,6 +105,14 @@ const followersTotalPages = Math.ceil((followersCount ?? 0) / PAGE_SIZE);
       >
         Friends
       </h1>
+
+      {
+        pageState === "error" && (
+          <div class="mb-8 rounded-2xl border border-rose-300/30 bg-rose-500/10 p-6 text-center text-white backdrop-blur-xl">
+            <p class="text-rose-100">Unable to load your friends data right now. Please refresh and try again.</p>
+          </div>
+        )
+      }
 
       <div class="space-y-8">
         <!-- Following Section -->

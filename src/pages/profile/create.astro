@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import CreateProfileForm from "@/components/profile/CreateProfileForm";
+import { DOG_BREEDS } from "@/lib/breeds";
 import { createClient } from "@/lib/supabase";
 
 const user = Astro.locals.user;
@@ -37,7 +37,88 @@ const serverError = url.searchParams.get("error");
       </div>
 
       <div class="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
-        <CreateProfileForm serverError={serverError} client:load />
+        <form method="POST" action="/api/profile/create" class="space-y-4" novalidate>
+          <div>
+            <label for="login_name" class="mb-1 block text-sm text-blue-100/80">Username</label>
+            <input
+              id="login_name"
+              name="login_name"
+              type="text"
+              required
+              placeholder="my-awesome-dog"
+              class="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white placeholder-white/40"
+            />
+          </div>
+
+          <div>
+            <label for="dog_name" class="mb-1 block text-sm text-blue-100/80">Dog name</label>
+            <input
+              id="dog_name"
+              name="dog_name"
+              type="text"
+              required
+              placeholder="Max"
+              class="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white placeholder-white/40"
+            />
+          </div>
+
+          <div>
+            <label for="breed" class="mb-1 block text-sm text-blue-100/80">Breed</label>
+            <select
+              id="breed"
+              name="breed"
+              required
+              class="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white"
+            >
+              <option value="" class="bg-slate-800 text-white">Select a breed</option>
+              {
+                DOG_BREEDS.map((breed) => (
+                  <option value={breed} class="bg-slate-800 text-white">
+                    {breed}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+
+          <div>
+            <label for="date_of_birth" class="mb-1 block text-sm text-blue-100/80">Date of birth</label>
+            <input
+              id="date_of_birth"
+              name="date_of_birth"
+              type="date"
+              required
+              class="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white"
+            />
+          </div>
+
+          <fieldset>
+            <legend class="mb-1 block text-sm text-blue-100/80">Sex</legend>
+            <div class="flex gap-4 text-sm text-blue-100/80">
+              <label class="inline-flex items-center gap-2">
+                <input type="radio" name="sex" value="Male" required />
+                Male
+              </label>
+              <label class="inline-flex items-center gap-2">
+                <input type="radio" name="sex" value="Female" required />
+                Female
+              </label>
+            </div>
+          </fieldset>
+
+          {
+            serverError ? (
+              <p class="rounded-lg border border-red-300/40 bg-red-400/15 p-3 text-sm text-red-100">{serverError}</p>
+            ) : null
+          }
+
+          <button
+            type="submit"
+            class="w-full rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500"
+          >
+            Create profile
+          </button>
+        </form>
       </div>
 
       <p class="mt-4 text-center text-xs text-blue-100/50">Note: Usernames cannot be changed after creation</p>

@@ -18,6 +18,17 @@ const { title = "Dog Tricks Tracker" } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>{title}</title>
+    <script>
+      // On bfcache restoration (back/forward), immediately hide the page and
+      // force a fresh server request. location.replace() is more reliable than
+      // reload() for bfcache in Chrome/Safari.
+      window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+          document.body.style.setProperty("visibility", "hidden", "important");
+          location.replace(location.href);
+        }
+      });
+    </script>
   </head>
   <body>
     {

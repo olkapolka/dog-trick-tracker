@@ -3,9 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
 import TrickCard from "@/components/catalog/TrickCard.astro";
 import TrainingPoints from "@/components/catalog/TrainingPoints";
-import { createClient } from "@/lib/supabase";
+import { calculateProgressScoreResult } from "@/lib/calculate-score";
 import type { Tables, Enums } from "@/lib/database.types";
-import { calculateProgressScore } from "@/lib/calculate-score";
+import { resolveDashboardState } from "@/lib/page-state-contracts";
+import { createClient } from "@/lib/supabase";
 
 const { user } = Astro.locals;
 
@@ -27,10 +28,11 @@ if (!profile) {
 }
 
 // Calculate progress score
-const score = await calculateProgressScore(supabase, user.id);
+const scoreResult = await calculateProgressScoreResult(supabase, user.id);
+const score = scoreResult.ok ? scoreResult.score : 0;
 
 // Fetch tricks for catalog with user status
-const { data: tricksData } = await supabase
+const { data: tricksData, error: tricksError } = await supabase
   .from("tricks")
   .select(
     `
@@ -50,6 +52,14 @@ const tricks = (tricksData as TrickWithStatus[] | null)?.map((t) => ({
   ...t,
   userStatus: t.user_tricks?.[0]?.status ?? null,
 }));
+
+const pageState = resolveDashboardState({
+  // Profile fetch failures redirect to /profile/create above, so this branch cannot reach page-state resolution.
+  profileError: false,
+  scoreError: !scoreResult.ok,
+  catalogError: tricksError !== null,
+  catalogCount: tricks?.length ?? 0,
+});
 
 const beginner = tricks?.filter((t) => t.difficulty === "beginner") ?? [];
 const intermediate = tricks?.filter((t) => t.difficulty === "intermediate") ?? [];
@@ -85,7 +95,7 @@ const advanced = tricks?.filter((t) => t.difficulty === "advanced") ?? [];
             }
             <div class="flex flex-col items-start">
               <span class="text-xs text-blue-100/60">Training Points</span>
-              <TrainingPoints initialScore={score} client:load />
+              <TrainingPoints initialScore={score} client:only="react" />
             </div>
           </a>
         </div>
@@ -93,7 +103,11 @@ const advanced = tricks?.filter((t) => t.difficulty === "advanced") ?? [];
       </div>
 
       {
-        tricks && tricks.length > 0 ? (
+        pageState === "error" ? (
+          <div class="rounded-2xl border border-rose-300/30 bg-rose-500/10 p-8 text-center text-white backdrop-blur-xl">
+            <p class="text-rose-100">Unable to load your dashboard right now. Please refresh and try again.</p>
+          </div>
+        ) : tricks && tricks.length > 0 ? (
           <div class="space-y-10">
             {/* Beginner Section */}
             {beginner.length > 0 && (

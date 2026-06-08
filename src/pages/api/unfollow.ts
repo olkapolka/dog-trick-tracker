@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { buildUnfollowFilter } from "@/lib/ownership-contracts";
 import { createClient } from "@/lib/supabase";
 
 export const DELETE: APIRoute = async (context) => {
@@ -32,11 +33,13 @@ export const DELETE: APIRoute = async (context) => {
     }
 
     // Delete follow relationship (idempotent - no error if relationship doesn't exist)
+    const filter = buildUnfollowFilter(user.id, followingId);
+
     const { error } = await supabase
       .from("follows")
       .delete()
-      .eq("follower_id", user.id)
-      .eq("following_id", followingId);
+      .eq("follower_id", filter.followerId)
+      .eq("following_id", filter.followingId);
 
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), {

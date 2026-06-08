@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { buildProfilePhotoUpdateFilter } from "@/lib/ownership-contracts";
 import { createClient } from "@/lib/supabase";
 
 export const POST: APIRoute = async (context) => {
@@ -64,14 +65,22 @@ export const POST: APIRoute = async (context) => {
     } = supabase.storage.from("dog-photos").getPublicUrl(fileName);
 
     // Update profile row with photo URL
+    const ownershipFilter = buildProfilePhotoUpdateFilter(user.id);
+
     const { error: updateError } = await supabase
       .from("profiles")
       .update({ photo_url: publicUrl })
-      .eq("user_id", user.id);
+      .eq("user_id", ownershipFilter.userId);
 
     if (updateError) {
       // Cleanup: delete uploaded file since profile update failed
-      void supabase.storage.from("dog-photos").remove([fileName]);
+      void supabase.storage
+        .from("dog-photos")
+        .remove([fileName])
+        .catch((cleanupError: unknown) => {
+          // eslint-disable-next-line no-console -- cleanup failures are best-effort and should be surfaced for ops.
+          console.error("Failed to cleanup uploaded file after profile update error", cleanupError);
+        });
 
       return new Response(JSON.stringify({ error: updateError.message }), { status: 500 });
     }

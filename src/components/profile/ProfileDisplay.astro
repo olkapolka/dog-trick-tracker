@@ -38,7 +38,7 @@ const {
     <div class="flex-shrink-0">
       {
         isOwnProfile ? (
-          <PhotoUpload value={profile.photo_url} client:load />
+          <PhotoUpload value={profile.photo_url} client:only="react" />
         ) : profile.photo_url ? (
           <img
             src={profile.photo_url}
@@ -170,7 +170,7 @@ const {
         <ShareModal
           profileUrl={`${Astro.url.origin}/user/${profile.login_name}`}
           username={profile.login_name}
-          client:load
+          client:only="react"
         />
       ) : (
         <FollowButton
@@ -178,7 +178,7 @@ const {
           initialIsFollowing={isFollowing}
           isAuthenticated={!!currentUserId}
           currentPath={currentPath}
-          client:load
+          client:only="react"
         />
       )
     }
