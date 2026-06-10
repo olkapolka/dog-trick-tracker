@@ -52,7 +52,9 @@ export const DELETE: APIRoute = async (context) => {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (_err) {
+  } catch (err) {
+    // eslint-disable-next-line no-console -- unexpected server error must be surfaced for ops
+    console.error("Unhandled error in DELETE /api/unfollow", err);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

@@ -142,7 +142,9 @@ export const POST: APIRoute = async (context) => {
         headers: { "Content-Type": "application/json" },
       },
     );
-  } catch {
+  } catch (err) {
+    // eslint-disable-next-line no-console -- unexpected server error must be surfaced for ops
+    console.error("Unhandled error in PATCH /api/admin/tricks/update", err);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

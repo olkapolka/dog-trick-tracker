@@ -16,7 +16,7 @@ export default defineConfig({
       dedupe: ["react", "react-dom"],
     },
     optimizeDeps: {
-      exclude: ["swr/mutation"],
+      include: ["swr/mutation"],
     },
   },
   adapter: cloudflare(),
