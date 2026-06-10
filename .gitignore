@@ -53,3 +53,5 @@ starter-registry.yaml
 .agents/*
 CLAUDE.md
 CLAUDE.md.scaffold
+
+.playwright-cli/
