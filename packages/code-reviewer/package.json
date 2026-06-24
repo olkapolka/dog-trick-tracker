@@ -1,0 +1,19 @@
+{
+  "name": "code-reviewer",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env --import tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openrouter/ai-sdk-provider": "2.9.1",
+    "ai": "6.0.209",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

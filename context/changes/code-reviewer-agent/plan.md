@@ -229,21 +229,21 @@ export async function reviewCode(input: ReviewInput): Promise<ReviewOutput> {
 
 #### Automated
 
-- [x] 1.1 `npm run typecheck` passes after creating `schemas.ts`
+- [x] 1.1 `npm run typecheck` passes after creating `schemas.ts` — 706a7cc
 
 #### Manual
 
-- [x] 1.2 All five schema exports are present and importable
+- [x] 1.2 All five schema exports are present and importable — 706a7cc
 
 ### Phase 2: Extract Prompts
 
 #### Automated
 
-- [ ] 2.1 `npm run typecheck` passes after creating `prompts.ts`
+- [x] 2.1 `npm run typecheck` passes after creating `prompts.ts`
 
 #### Manual
 
-- [ ] 2.2 `buildReviewPrompt` and `REVIEW_SYSTEM_INSTRUCTIONS` exist and work as described
+- [x] 2.2 `buildReviewPrompt` and `REVIEW_SYSTEM_INSTRUCTIONS` exist and work as described
 
 ### Phase 3: Build the Agent Module
 
