@@ -239,19 +239,19 @@ export async function reviewCode(input: ReviewInput): Promise<ReviewOutput> {
 
 #### Automated
 
-- [x] 2.1 `npm run typecheck` passes after creating `prompts.ts`
+- [x] 2.1 `npm run typecheck` passes after creating `prompts.ts` — 4b7b806
 
 #### Manual
 
-- [x] 2.2 `buildReviewPrompt` and `REVIEW_SYSTEM_INSTRUCTIONS` exist and work as described
+- [x] 2.2 `buildReviewPrompt` and `REVIEW_SYSTEM_INSTRUCTIONS` exist and work as described — 4b7b806
 
 ### Phase 3: Build the Agent Module
 
 #### Automated
 
-- [ ] 3.1 `npm run typecheck` passes across all four files
+- [x] 3.1 `npm run typecheck` passes across all four files
 
 #### Manual
 
-- [ ] 3.2 `npm start` produces output with `summary` and `issues` fields
-- [ ] 3.3 `codeReviewerAgent`, `reviewCode`, and `CodeReviewerUIMessage` are importable from `agent.ts`
+- [x] 3.2 `npm start` produces output with `summary` and `issues` fields
+- [x] 3.3 `codeReviewerAgent`, `reviewCode`, and `CodeReviewerUIMessage` are importable from `agent.ts`
