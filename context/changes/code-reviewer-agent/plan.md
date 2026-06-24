@@ -249,9 +249,9 @@ export async function reviewCode(input: ReviewInput): Promise<ReviewOutput> {
 
 #### Automated
 
-- [x] 3.1 `npm run typecheck` passes across all four files
+- [x] 3.1 `npm run typecheck` passes across all four files — cdd96d1
 
 #### Manual
 
-- [x] 3.2 `npm start` produces output with `summary` and `issues` fields
-- [x] 3.3 `codeReviewerAgent`, `reviewCode`, and `CodeReviewerUIMessage` are importable from `agent.ts`
+- [x] 3.2 `npm start` produces output with `summary` and `issues` fields — cdd96d1
+- [x] 3.3 `codeReviewerAgent`, `reviewCode`, and `CodeReviewerUIMessage` are importable from `agent.ts` — cdd96d1

@@ -1,7 +1,7 @@
 ---
 id: code-reviewer-agent
 title: Modular Code Review Agent (ToolLoopAgent)
-status: implementing
+status: implemented
 created: 2026-06-24
 updated: 2026-06-24
 ---
