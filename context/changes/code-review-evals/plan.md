@@ -303,9 +303,9 @@ No source changes. This phase is verification only.
 
 #### Automated
 
-- [x] 1.1 `npm install` completes without error after adding promptfoo devDependency
-- [x] 1.2 `ls packages/code-reviewer/evals/fixtures` exits 0
-- [x] 1.3 `npm run typecheck` passes
+- [x] 1.1 `npm install` completes without error after adding promptfoo devDependency — bd1a726
+- [x] 1.2 `ls packages/code-reviewer/evals/fixtures` exits 0 — bd1a726
+- [x] 1.3 `npm run typecheck` passes — bd1a726
 
 #### Manual
 
@@ -316,7 +316,7 @@ No source changes. This phase is verification only.
 
 #### Automated
 
-- [ ] 2.1 `wc -l react-migration.diff` prints between 80 and 120
+- [x] 2.1 `wc -l react-migration.diff` prints between 80 and 120
 
 #### Manual
 

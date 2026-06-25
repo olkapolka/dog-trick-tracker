@@ -1,0 +1,110 @@
+diff --git a/src/components/UserCard.tsx b/src/components/UserCard.tsx
+index 3a2f1c8..7b94d1e 100644
+--- a/src/components/UserCard.tsx
++++ b/src/components/UserCard.tsx
+@@ -1,28 +1,89 @@
+-import React from 'react';
++import React, { Component } from 'react';
+
+-interface UserCardProps {
++interface Badge {
++  id: string;
++  label: string;
++  color: string;
++}
++
++interface UserCardProps {
+   userId: string;
+   name: string;
+   avatarUrl: string;
++  badges?: Badge[];
++  onCardClick?: (userId: string) => void;
+ }
+
+-export const UserCard: React.FC<UserCardProps> = ({ userId, name, avatarUrl }) => {
+-  return (
+-    <div className="user-card">
+-      <img src={avatarUrl} alt={name} />
+-      <span>{name}</span>
+-    </div>
+-  );
+-};
++interface UserCardState {
++  isLoading: boolean;
++  error: string | null;
++  followersCount: number;
++}
++
++export class UserCard extends Component<UserCardProps, UserCardState> {
++  state: UserCardState = {
++    isLoading: false,
++    error: null,
++    followersCount: 0,
++  };
++
++  async componentDidMount() {
++    const { userId } = this.props;
++    this.setState({ isLoading: true });
++    try {
++      const res = await fetch(`/api/users/${userId}/followers`);
++      if (!res.ok) throw new Error(`HTTP ${res.status}`);
++      const data = await res.json();
++      this.setState({ followersCount: data.count, isLoading: false });
++    } catch (err) {
++      this.setState({
++        error: err instanceof Error ? err.message : 'Unknown error',
++        isLoading: false,
++      });
++    }
++  }
++
++  handleClick = () => {
++    const { userId, onCardClick } = this.props;
++    if (onCardClick) {
++      onCardClick(userId);
++    }
++  };
++
++  render() {
++    const { name, avatarUrl, badges = [] } = this.props;
++    const { isLoading, error, followersCount } = this.state;
++
++    return (
++      <div className="user-card" onClick={this.handleClick}>
++        <h2 ref="cardTitle" className="user-card__name">{name}</h2>
++        <img src={avatarUrl} alt={name} className="user-card__avatar" />
++        {isLoading && <span className="user-card__loading">Loading…</span>}
++        {error && <span className="user-card__error">{error}</span>}
++        {!isLoading && !error && (
++          <span className="user-card__followers">{followersCount} followers</span>
++        )}
++        {badges.length > 0 && (
++          <ul className="user-card__badges">
++            {badges.map((badge) => (
++              <li className="badge" style={{ color: badge.color }}>
++                {badge.label}
++              </li>
++            ))}
++          </ul>
++        )}
++      </div>
++    );
++  }
++}
+
+ export default UserCard;
+diff --git a/src/index.tsx b/src/index.tsx
+index 9c3e5a2..d14f87c 100644
+--- a/src/index.tsx
++++ b/src/index.tsx
+@@ -1,8 +1,9 @@
+ import React from 'react';
+ import ReactDOM from 'react-dom';
+ import App from './App';
++import { UserCard } from './components/UserCard';
+
+-// Application entry point
++// Application entry point — React 19 migration in progress
+ ReactDOM.render(
+   <React.StrictMode>
+     <App />
