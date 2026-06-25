@@ -32,12 +32,8 @@ runs:
   steps:
     - uses: actions/checkout@v4
       with:
-        ref: ${{ inputs.base_sha }}
+        ref: ${{ inputs.head_sha }}
         fetch-depth: 0
-
-    - name: Fetch head commit
-      shell: bash
-      run: git fetch origin ${{ inputs.head_sha }}
 
     - uses: actions/setup-node@v4
       with:
