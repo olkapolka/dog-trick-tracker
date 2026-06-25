@@ -27,6 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
       - uses: ./.github/actions/code-review
         with:
           pr_number: ${{ github.event.pull_request.number }}
