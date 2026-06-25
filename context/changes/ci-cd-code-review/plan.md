@@ -317,19 +317,19 @@ This is a one-time manual step not automated by this change.
 
 #### Automated
 
-- [x] 1.1 Type checking passes in packages/code-reviewer/: npm run typecheck
+- [x] 1.1 Type checking passes in packages/code-reviewer/: npm run typecheck — 47e630e
 
 #### Manual
 
-- [ ] 1.2 cli.ts produces valid ReviewOutput JSON on stdout when run with PR_TITLE and GIT_DIFF_FILE
-- [ ] 1.3 npm start runs the updated demo without TypeScript or runtime errors
+- [x] 1.2 cli.ts produces valid ReviewOutput JSON on stdout when run with PR_TITLE and GIT_DIFF_FILE — 47e630e
+- [x] 1.3 npm start runs the updated demo without TypeScript or runtime errors — 47e630e
 
 ### Phase 2: GitHub Actions Infrastructure
 
 #### Automated
 
-- [ ] 2.1 Workflow YAML is syntactically valid — job appears in Actions tab without parse errors
-- [ ] 2.2 Composite action has no undefined inputs.* references
+- [x] 2.1 Workflow YAML is syntactically valid — job appears in Actions tab without parse errors
+- [x] 2.2 Composite action has no undefined inputs.* references
 
 #### Manual
 

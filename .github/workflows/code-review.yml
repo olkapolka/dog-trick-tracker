@@ -1,0 +1,53 @@
+name: Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+  pull_request_target:
+    types: [labeled]
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+concurrency:
+  group: code-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  code-review:
+    if: |
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'pull_request_target' &&
+       github.event.label.name == 'ai-cr:review')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: ./.github/actions/code-review
+        with:
+          pr_number: ${{ github.event.pull_request.number }}
+          pr_title: ${{ github.event.pull_request.title }}
+          pr_description: ${{ github.event.pull_request.body }}
+          base_sha: ${{ github.event.pull_request.base.sha }}
+          head_sha: ${{ github.event.pull_request.head.sha }}
+          openrouter_api_key: ${{ secrets.OPENROUTER_API_KEY }}
+          github_token: ${{ github.token }}
+
+  fork-pr-notice:
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post fork PR skip comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --repo "$GITHUB_REPOSITORY" \
+            --body "AI code review is not available for pull requests from forks. A maintainer can add the \`ai-cr:review\` label after reviewing the code to trigger the review."
