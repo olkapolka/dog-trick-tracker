@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node --env-file=.env --import tsx src/index.ts",
+    "ci": "node --import tsx src/cli.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
