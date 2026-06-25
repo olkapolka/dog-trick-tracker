@@ -337,6 +337,6 @@ This is a one-time manual step not automated by this change.
 - [x] 2.4 PR comment is posted with formatted markdown table
 - [x] 2.5 ai-cr:passed or ai-cr:failed label is applied
 - [x] 2.6 code-review job check shows green regardless of passed value (advisory-only)
-- [ ] 2.7 Adding ai-cr:review label retriggers the job; label is removed after completion
-- [ ] 2.8 Fork PR only triggers fork-pr-notice job and posts skip comment once
+- [x] 2.7 Adding ai-cr:review label retriggers the job; label is removed after completion
+- [x] 2.8 Fork PR only triggers fork-pr-notice job and posts skip comment once
 - [x] 2.9 OPENROUTER_API_KEY does not appear in any step log
