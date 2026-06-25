@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs';
-import { reviewCode } from './agent.js';
+import { readFileSync } from "fs";
+import { reviewCode } from "./agent.js";
 
 // Env vars consumed:
 //   PR_TITLE        — required; passed from github.event.pull_request.title
@@ -11,20 +11,20 @@ import { reviewCode } from './agent.js';
 const { PR_TITLE, PR_DESCRIPTION, GIT_DIFF_FILE } = process.env;
 
 if (!PR_TITLE) {
-  process.stderr.write('Error: PR_TITLE environment variable is required\n');
+  process.stderr.write("Error: PR_TITLE environment variable is required\n");
   process.exit(1);
 }
 
 if (!GIT_DIFF_FILE) {
-  process.stderr.write('Error: GIT_DIFF_FILE environment variable is required\n');
+  process.stderr.write("Error: GIT_DIFF_FILE environment variable is required\n");
   process.exit(1);
 }
 
 let gitDiff: string;
 try {
-  gitDiff = readFileSync(GIT_DIFF_FILE, 'utf-8');
+  gitDiff = readFileSync(GIT_DIFF_FILE, "utf-8");
 } catch (err) {
-  process.stderr.write(`Error: could not read GIT_DIFF_FILE at ${GIT_DIFF_FILE}: ${err}\n`);
+  process.stderr.write(`Error: could not read GIT_DIFF_FILE at ${GIT_DIFF_FILE}: ${String(err)}\n`);
   process.exit(1);
 }
 
@@ -34,9 +34,9 @@ reviewCode({
   gitDiff,
 })
   .then((result) => {
-    process.stdout.write(JSON.stringify(result) + '\n');
+    process.stdout.write(JSON.stringify(result) + "\n");
   })
-  .catch((err) => {
-    process.stderr.write(`Error: review failed: ${err}\n`);
+  .catch((err: unknown) => {
+    process.stderr.write(`Error: review failed: ${String(err)}\n`);
     process.exit(1);
   });

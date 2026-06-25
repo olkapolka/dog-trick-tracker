@@ -1,4 +1,4 @@
-import type { ReviewInput } from './schemas.js';
+import type { ReviewInput } from "./schemas.js";
 
 export const REVIEW_SYSTEM_INSTRUCTIONS = `You are an expert software engineer conducting pull request code reviews.
 
@@ -38,5 +38,5 @@ export function buildReviewPrompt(input: ReviewInput): string {
     lines.push(`\nPR Description:\n${input.prDescription}`);
   }
   lines.push(`\nGit Diff:\n${input.gitDiff}`);
-  return lines.join('\n');
+  return lines.join("\n");
 }

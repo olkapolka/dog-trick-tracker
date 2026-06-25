@@ -1,0 +1,150 @@
+name: AI Code Review
+description: Runs AI code review on a PR and posts a formatted comment with scores
+
+inputs:
+  pr_number:
+    description: PR number for gh CLI calls
+    required: true
+  pr_title:
+    description: PR title passed as PR_TITLE env var to cli.ts
+    required: true
+  pr_description:
+    description: PR description passed as PR_DESCRIPTION env var to cli.ts
+    required: false
+    default: ''
+  base_sha:
+    description: Base SHA checked out as working tree; diff base
+    required: true
+  head_sha:
+    description: Head SHA fetched for diff computation; never checked out as code
+    required: true
+  openrouter_api_key:
+    description: OpenRouter API key
+    required: true
+    no-log: true
+  github_token:
+    description: GitHub token used for gh CLI via GH_TOKEN
+    required: true
+    no-log: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.base_sha }}
+        fetch-depth: 0
+
+    - name: Fetch head commit
+      shell: bash
+      run: git fetch origin ${{ inputs.head_sha }}
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: npm
+        cache-dependency-path: packages/code-reviewer/package-lock.json
+
+    - name: Create labels idempotently
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        gh label create "ai-cr:review" --color "0075ca" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
+        gh label create "ai-cr:passed" --color "0e8a16" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
+        gh label create "ai-cr:failed" --color "d93f0b" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: packages/code-reviewer
+      run: npm ci
+
+    - name: Compute diff with soft cap
+      id: diff
+      shell: bash
+      run: |
+        git diff ${{ inputs.base_sha }}...${{ inputs.head_sha }} > /tmp/pr-diff.txt
+        LINE_COUNT=$(wc -l < /tmp/pr-diff.txt)
+        if [ "$LINE_COUNT" -gt 3000 ]; then
+          head -n 3000 /tmp/pr-diff.txt > /tmp/pr-diff-capped.txt
+          mv /tmp/pr-diff-capped.txt /tmp/pr-diff.txt
+          echo "truncated=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "truncated=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Run AI code reviewer
+      shell: bash
+      working-directory: packages/code-reviewer
+      env:
+        PR_TITLE: ${{ inputs.pr_title }}
+        PR_DESCRIPTION: ${{ inputs.pr_description }}
+        GIT_DIFF_FILE: /tmp/pr-diff.txt
+        OPENROUTER_API_KEY: ${{ inputs.openrouter_api_key }}
+      run: node --import tsx src/cli.ts > /tmp/review-output.json
+
+    - name: Post PR comment
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        PASSED=$(jq -r '.passed' /tmp/review-output.json)
+        if [ "$PASSED" = "true" ]; then
+          HEADER="## AI Code Review — ✅ PASSED"
+        else
+          HEADER="## AI Code Review — ❌ FAILED"
+        fi
+
+        IC_SCORE=$(jq -r '.implementationCorrectness.score' /tmp/review-output.json)
+        IC_RAT=$(jq -r '.implementationCorrectness.rationale' /tmp/review-output.json)
+        ID_SCORE=$(jq -r '.idiomaticity.score' /tmp/review-output.json)
+        ID_RAT=$(jq -r '.idiomaticity.rationale' /tmp/review-output.json)
+        CX_SCORE=$(jq -r '.complexity.score' /tmp/review-output.json)
+        CX_RAT=$(jq -r '.complexity.rationale' /tmp/review-output.json)
+        TR_SCORE=$(jq -r '.testRiskCoverage.score' /tmp/review-output.json)
+        TR_RAT=$(jq -r '.testRiskCoverage.rationale' /tmp/review-output.json)
+        DC_SCORE=$(jq -r '.documentation.score' /tmp/review-output.json)
+        DC_RAT=$(jq -r '.documentation.rationale' /tmp/review-output.json)
+        SS_SCORE=$(jq -r '.securitySafety.score' /tmp/review-output.json)
+        SS_RAT=$(jq -r '.securitySafety.rationale' /tmp/review-output.json)
+        SUMMARY=$(jq -r '.overallSummary' /tmp/review-output.json)
+
+        TRUNCATION_NOTE=""
+        if [ "${{ steps.diff.outputs.truncated }}" = "true" ]; then
+          TRUNCATION_NOTE=$'\n> ⚠️ Diff was truncated at 3 000 lines — review may be incomplete.'
+        fi
+
+        BODY="${HEADER}
+
+| Criterion | Score | Rationale |
+|-----------|-------|-----------|
+| Implementation Correctness | ${IC_SCORE}/10 | ${IC_RAT} |
+| Idiomaticity | ${ID_SCORE}/10 | ${ID_RAT} |
+| Complexity | ${CX_SCORE}/10 | ${CX_RAT} |
+| Test / Risk Coverage | ${TR_SCORE}/10 | ${TR_RAT} |
+| Documentation | ${DC_SCORE}/10 | ${DC_RAT} |
+| Security & Safety | ${SS_SCORE}/10 | ${SS_RAT} |
+
+**Overall**: ${SUMMARY}${TRUNCATION_NOTE}"
+
+        gh pr comment ${{ inputs.pr_number }} --body "$BODY"
+
+    - name: Apply result label
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: |
+        gh pr edit ${{ inputs.pr_number }} --remove-label "ai-cr:passed" 2>/dev/null || true
+        gh pr edit ${{ inputs.pr_number }} --remove-label "ai-cr:failed" 2>/dev/null || true
+        PASSED=$(jq -r '.passed' /tmp/review-output.json)
+        if [ "$PASSED" = "true" ]; then
+          gh pr edit ${{ inputs.pr_number }} --add-label "ai-cr:passed"
+        else
+          gh pr edit ${{ inputs.pr_number }} --add-label "ai-cr:failed"
+        fi
+
+    - name: Remove ai-cr:review trigger label
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+      run: gh pr edit ${{ inputs.pr_number }} --remove-label "ai-cr:review" 2>/dev/null || true
