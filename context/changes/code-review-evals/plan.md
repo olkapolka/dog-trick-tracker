@@ -316,7 +316,7 @@ No source changes. This phase is verification only.
 
 #### Automated
 
-- [x] 2.1 `wc -l react-migration.diff` prints between 80 and 120
+- [x] 2.1 `wc -l react-migration.diff` prints between 80 and 120 — 98be049
 
 #### Manual
 
@@ -327,12 +327,12 @@ No source changes. This phase is verification only.
 
 #### Automated
 
-- [ ] 3.1 `npx promptfoo eval --dry-run` exits 0
-- [ ] 3.2 `npm run typecheck` passes
+- [x] 3.1 `npx promptfoo eval --dry-run` exits 0
+- [x] 3.2 `npm run typecheck` passes
 
 #### Manual
 
-- [ ] 3.3 Config shows all three providers, chat-format prompt, transform expression, and three assertions with explicit `provider` on `llm-rubric`
+- [x] 3.3 Config shows all three providers, chat-format prompt, transform expression, and three assertions with explicit `provider` on `llm-rubric`
 
 ### Phase 4: Run and Verify
 
