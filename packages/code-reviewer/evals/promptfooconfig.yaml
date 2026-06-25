@@ -17,7 +17,7 @@ defaultTest:
   vars:
     systemPrompt: "file://fixtures/system-prompt.txt"
   options:
-    transform: "output.replace(/^```json\\s*/m, '').replace(/\\s*```\\s*$/m, '').trim()"
+    transform: "output.replace(/^```json\\s*/m, '').replace(/\\s*```\\s*$/m, '').replace(/^[\\s\\S]*?(?=\\{)/, '').trim()"
 
 tests:
   - description: "React 16→19 migration with three breaking API flaws"
@@ -28,16 +28,16 @@ tests:
       - type: javascript
         description: "Output must be valid ReviewOutput JSON with all required keys"
         value: |
-          (() => {
+          return (function() {
             try {
-              const r = JSON.parse(output);
-              const criteria = ['implementationCorrectness','idiomaticity','complexity',
-                                'testRiskCoverage','documentation','securitySafety'];
-              return criteria.every(k => k in r && typeof r[k].score === 'number')
+              var r = JSON.parse(output);
+              var criteria = ['implementationCorrectness','idiomaticity','complexity',
+                              'testRiskCoverage','documentation','securitySafety'];
+              return criteria.every(function(k) { return k in r && typeof r[k].score === 'number'; })
                 && typeof r.passed === 'boolean'
                 && typeof r.overallSummary === 'string';
-            } catch { return false; }
-          })()
+            } catch(e) { return false; }
+          }())
       - type: javascript
         description: "Review must fail — all three flaws are critical breaking changes"
         value: "JSON.parse(output).passed === false"

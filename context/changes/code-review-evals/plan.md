@@ -327,22 +327,22 @@ No source changes. This phase is verification only.
 
 #### Automated
 
-- [x] 3.1 `npx promptfoo eval --dry-run` exits 0
-- [x] 3.2 `npm run typecheck` passes
+- [x] 3.1 `npx promptfoo eval --dry-run` exits 0 — b6ad579
+- [x] 3.2 `npm run typecheck` passes — b6ad579
 
 #### Manual
 
-- [x] 3.3 Config shows all three providers, chat-format prompt, transform expression, and three assertions with explicit `provider` on `llm-rubric`
+- [x] 3.3 Config shows all three providers, chat-format prompt, transform expression, and three assertions with explicit `provider` on `llm-rubric` — b6ad579
 
 ### Phase 4: Run and Verify
 
 #### Automated
 
-- [ ] 4.1 `npm run eval` exits without crash
-- [ ] 4.2 Results table shows 3 providers × 1 test case = 3 rows
+- [x] 4.1 `npm run eval` exits without crash
+- [x] 4.2 Results table shows 3 providers × 1 test case = 3 rows
 
 #### Manual
 
-- [ ] 4.3 All three providers return valid ReviewOutput JSON
-- [ ] 4.4 `passed === false` on all three providers
-- [ ] 4.5 `llm-rubric` column shows meaningful judgments per provider
+- [x] 4.3 All three providers return valid ReviewOutput JSON
+- [x] 4.4 `passed === false` on all three providers
+- [x] 4.5 `llm-rubric` column shows meaningful judgments per provider
