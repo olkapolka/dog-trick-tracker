@@ -83,4 +83,17 @@ export default tseslint.config(
       "@typescript-eslint/no-redundant-type-constituents": "off", // Auto-generated file
     },
   },
+  {
+    // packages/code-reviewer has its own node_modules not installed by the root npm ci,
+    // so TypeScript's project service cannot resolve third-party types there.
+    // Disable rules that require cross-package type resolution.
+    files: ["packages/code-reviewer/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+    },
+  },
 );

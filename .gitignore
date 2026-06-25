@@ -49,6 +49,7 @@ starter-registry.yaml
 
 .github/*
 !.github/workflows/
+!.github/actions/
 .claude/*
 .agents/*
 CLAUDE.md
