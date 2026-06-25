@@ -107,16 +107,17 @@ runs:
 
         BODY="${HEADER}
 
-| Criterion | Score | Rationale |
-|-----------|-------|-----------|
-| Implementation Correctness | ${IC_SCORE}/10 | ${IC_RAT} |
-| Idiomaticity | ${ID_SCORE}/10 | ${ID_RAT} |
-| Complexity | ${CX_SCORE}/10 | ${CX_RAT} |
-| Test / Risk Coverage | ${TR_SCORE}/10 | ${TR_RAT} |
-| Documentation | ${DC_SCORE}/10 | ${DC_RAT} |
-| Security & Safety | ${SS_SCORE}/10 | ${SS_RAT} |
+        | Criterion | Score | Rationale |
+        |-----------|-------|-----------|
+        | Implementation Correctness | ${IC_SCORE}/10 | ${IC_RAT} |
+        | Idiomaticity | ${ID_SCORE}/10 | ${ID_RAT} |
+        | Complexity | ${CX_SCORE}/10 | ${CX_RAT} |
+        | Test / Risk Coverage | ${TR_SCORE}/10 | ${TR_RAT} |
+        | Documentation | ${DC_SCORE}/10 | ${DC_RAT} |
+        | Security & Safety | ${SS_SCORE}/10 | ${SS_RAT} |
 
-**Overall**: ${SUMMARY}${TRUNCATION_NOTE}"
+        **Overall**: ${SUMMARY}${TRUNCATION_NOTE}"
+
 
         gh pr comment ${{ inputs.pr_number }} --body "$BODY"
 
