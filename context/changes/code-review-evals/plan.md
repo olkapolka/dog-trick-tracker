@@ -338,11 +338,11 @@ No source changes. This phase is verification only.
 
 #### Automated
 
-- [x] 4.1 `npm run eval` exits without crash
-- [x] 4.2 Results table shows 3 providers × 1 test case = 3 rows
+- [x] 4.1 `npm run eval` exits without crash — d51edb4
+- [x] 4.2 Results table shows 3 providers × 1 test case = 3 rows — d51edb4
 
 #### Manual
 
-- [x] 4.3 All three providers return valid ReviewOutput JSON
-- [x] 4.4 `passed === false` on all three providers
-- [x] 4.5 `llm-rubric` column shows meaningful judgments per provider
+- [x] 4.3 All three providers return valid ReviewOutput JSON — d51edb4
+- [x] 4.4 `passed === false` on all three providers — d51edb4
+- [x] 4.5 `llm-rubric` column shows meaningful judgments per provider — d51edb4
