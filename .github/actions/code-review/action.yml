@@ -45,15 +45,6 @@ runs:
         cache: npm
         cache-dependency-path: packages/code-reviewer/package-lock.json
 
-    - name: Create labels idempotently
-      shell: bash
-      env:
-        GH_TOKEN: ${{ inputs.github_token }}
-      run: |
-        gh label create "ai-cr:review" --color "0075ca" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
-        gh label create "ai-cr:passed" --color "0e8a16" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
-        gh label create "ai-cr:failed" --color "d93f0b" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
-
     - name: Install dependencies
       shell: bash
       working-directory: packages/code-reviewer

@@ -328,8 +328,8 @@ This is a one-time manual step not automated by this change.
 
 #### Automated
 
-- [x] 2.1 Workflow YAML is syntactically valid — job appears in Actions tab without parse errors
-- [x] 2.2 Composite action has no undefined inputs.* references
+- [x] 2.1 Workflow YAML is syntactically valid — job appears in Actions tab without parse errors — b36c63f
+- [x] 2.2 Composite action has no undefined inputs.* references — b36c63f
 
 #### Manual
 
