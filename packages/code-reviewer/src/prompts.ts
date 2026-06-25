@@ -30,7 +30,20 @@ Criteria and scoring anchors:
    - 1: introduces an exploitable flaw, leaks secrets, or trusts untrusted input unsafely.
    - 10: input is validated, secrets are handled correctly, and no new attack surface is opened.
 
-IMPORTANT: Return ONLY raw JSON — no markdown code fences, no backticks, no prose. The response must be parseable by JSON.parse() directly.`;
+Return your response as a single JSON object matching this exact structure — no markdown fences, no backticks, no prose outside the JSON:
+
+{
+  "implementationCorrectness": { "score": <integer 1-10>, "rationale": "<string>" },
+  "idiomaticity":              { "score": <integer 1-10>, "rationale": "<string>" },
+  "complexity":                { "score": <integer 1-10>, "rationale": "<string>" },
+  "testRiskCoverage":          { "score": <integer 1-10>, "rationale": "<string>" },
+  "documentation":             { "score": <integer 1-10>, "rationale": "<string>" },
+  "securitySafety":            { "score": <integer 1-10>, "rationale": "<string>" },
+  "overallSummary": "<one to two sentence summary>",
+  "passed": <true | false>
+}
+
+The response must be parseable by JSON.parse() directly.`;
 
 export function buildReviewPrompt(input: ReviewInput): string {
   const lines: string[] = [`PR Title: ${input.prTitle}`];

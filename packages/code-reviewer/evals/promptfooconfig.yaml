@@ -20,10 +20,10 @@ defaultTest:
     transform: "output.replace(/^```json\\s*/m, '').replace(/\\s*```\\s*$/m, '').replace(/^[\\s\\S]*?(?=\\{)/, '').trim()"
 
 tests:
-  - description: "React 16→19 migration with three breaking API flaws"
+  - description: "Difficulty filter PR with missing validation, IDOR, and a server-side cache bug"
     vars:
-      prTitle: "Migrate UserCard component from React 16 to React 19"
-      gitDiff: "file://fixtures/react-migration.diff"
+      prTitle: "Add difficulty filter to progress score endpoint"
+      gitDiff: "file://fixtures/difficulty-filter.diff"
     assert:
       - type: javascript
         description: "Output must be valid ReviewOutput JSON with all required keys"
@@ -39,13 +39,13 @@ tests:
             } catch(e) { return false; }
           }())
       - type: javascript
-        description: "Review must fail — all three flaws are critical breaking changes"
+        description: "Review must fail — all three flaws are significant"
         value: "JSON.parse(output).passed === false"
       - type: llm-rubric
         provider: openrouter:anthropic/claude-sonnet-4.5
         value: |
-          The code review output must identify all three of the following React 19 migration issues:
-          1. ReactDOM.render() is still used in the entry point instead of createRoot() — this API was removed in React 19
-          2. A string ref literal (ref="someString" as a JSX string attribute) appears in the component — string refs were removed in React 19
-          3. A .map() render call produces list elements without a key prop — omitting key causes incorrect React reconciliation
+          The code review output must identify the following issues in the "Add difficulty filter to progress score endpoint" PR:
+          1. The `difficulty` query parameter is passed directly to Supabase without validation against the allowed values ("beginner", "intermediate", "advanced") — an arbitrary string can be injected as a filter
+          2. A module-level `const scoreCache = new Map<string, number>()` is used inside the API handler module — this Map is shared across all requests in the same Node.js process, so one user's cached score is visible to any other request
+          3. `const userId = url.searchParams.get("userId") ?? user.id` lets any authenticated user pass an arbitrary userId in the query string and read another user's score — this is an IDOR vulnerability
           Grade: PASS if the review text clearly identifies at least two of the three issues above.
