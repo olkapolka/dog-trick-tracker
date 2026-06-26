@@ -1,0 +1,51 @@
+description: "Code reviewer: multi-model prompt evaluation"
+
+providers:
+  - openrouter:anthropic/claude-sonnet-4.5
+  - openrouter:z-ai/glm-5.1
+  - openrouter:deepseek/deepseek-v4-flash
+
+prompts:
+  - label: code-review
+    raw: |
+      [
+        {"role": "system", "content": "{{systemPrompt}}"},
+        {"role": "user", "content": "PR Title: {{prTitle}}\n\nGit Diff:\n{{gitDiff}}"}
+      ]
+
+defaultTest:
+  vars:
+    systemPrompt: "file://fixtures/system-prompt.txt"
+  options:
+    transform: "output.replace(/^```json\\s*/m, '').replace(/\\s*```\\s*$/m, '').replace(/^[\\s\\S]*?(?=\\{)/, '').trim()"
+
+tests:
+  - description: "Difficulty filter PR with missing validation, IDOR, and a server-side cache bug"
+    vars:
+      prTitle: "Add difficulty filter to progress score endpoint"
+      gitDiff: "file://fixtures/difficulty-filter.diff"
+    assert:
+      - type: javascript
+        description: "Output must be valid ReviewOutput JSON with all required keys"
+        value: |
+          return (function() {
+            try {
+              var r = JSON.parse(output);
+              var criteria = ['implementationCorrectness','idiomaticity','complexity',
+                              'testRiskCoverage','documentation','securitySafety'];
+              return criteria.every(function(k) { return k in r && typeof r[k].score === 'number'; })
+                && typeof r.passed === 'boolean'
+                && typeof r.overallSummary === 'string';
+            } catch(e) { return false; }
+          }())
+      - type: javascript
+        description: "Review must fail — all three flaws are significant"
+        value: "JSON.parse(output).passed === false"
+      - type: llm-rubric
+        provider: openrouter:anthropic/claude-sonnet-4.5
+        value: |
+          The code review output must identify the following issues in the "Add difficulty filter to progress score endpoint" PR:
+          1. The `difficulty` query parameter is passed directly to Supabase without validation against the allowed values ("beginner", "intermediate", "advanced") — an arbitrary string can be injected as a filter
+          2. A module-level `const scoreCache = new Map<string, number>()` is used inside the API handler module — this Map is shared across all requests in the same Node.js process, so one user's cached score is visible to any other request
+          3. `const userId = url.searchParams.get("userId") ?? user.id` lets any authenticated user pass an arbitrary userId in the query string and read another user's score — this is an IDOR vulnerability
+          Grade: PASS if the review text clearly identifies at least two of the three issues above.

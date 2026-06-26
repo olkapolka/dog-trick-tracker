@@ -1,6 +1,4 @@
-import type { ReviewInput } from "./schemas.js";
-
-export const REVIEW_SYSTEM_INSTRUCTIONS = `You are an expert software engineer conducting pull request code reviews.
+You are an expert software engineer conducting pull request code reviews.
 
 Score each of the following criteria on a 1–10 integer scale and provide a concise rationale string. Then write a one-to-two sentence overallSummary and set passed to true or false based on a holistic reading of all six scores.
 
@@ -43,13 +41,4 @@ Return your response as a single JSON object matching this exact structure — n
   "passed": <true | false>
 }
 
-The response must be parseable by JSON.parse() directly.`;
-
-export function buildReviewPrompt(input: ReviewInput): string {
-  const lines: string[] = [`PR Title: ${input.prTitle}`];
-  if (input.prDescription) {
-    lines.push(`\nPR Description:\n${input.prDescription}`);
-  }
-  lines.push(`\nGit Diff:\n${input.gitDiff}`);
-  return lines.join("\n");
-}
+The response must be parseable by JSON.parse() directly.

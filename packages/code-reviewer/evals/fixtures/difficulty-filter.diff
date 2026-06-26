@@ -1,0 +1,84 @@
+diff --git a/src/lib/calculate-score.ts b/src/lib/calculate-score.ts
+index a1b2c3d..e4f5g6h 100644
+--- a/src/lib/calculate-score.ts
++++ b/src/lib/calculate-score.ts
+@@ -4,6 +4,7 @@
+ interface UserTrickWithWeight {
+   tricks: {
+     difficulty_weight: number;
++    difficulty: string;
+   } | null;
+ }
+
+@@ -20,13 +21,20 @@ export type ProgressScoreResult =
+ export async function calculateProgressScoreResult(
+   supabase: SupabaseClient<Database>,
+   userId: string,
++  difficulty?: string,
+ ): Promise<ProgressScoreResult> {
+-  const { data, error } = await supabase
++  let query = supabase
+     .from("user_tricks")
+-    .select("tricks(difficulty_weight)")
++    .select("tricks(difficulty_weight, difficulty)")
+     .eq("user_id", userId)
+     .eq("status", "finished");
+
++  if (difficulty) {
++    query = query.eq("tricks.difficulty", difficulty);
++  }
++
++  const { data, error } = await query;
++
+   if (error) {
+     return {
+       ok: false,
+@@ -46,7 +54,11 @@ export async function calculateProgressScoreResult(
+   };
+ }
+
+-export async function calculateProgressScore(supabase: SupabaseClient<Database>, userId: string): Promise<number> {
+-  const result = await calculateProgressScoreResult(supabase, userId);
++export async function calculateProgressScore(
++  supabase: SupabaseClient<Database>,
++  userId: string,
++  difficulty?: string,
++): Promise<number> {
++  const result = await calculateProgressScoreResult(supabase, userId, difficulty);
+   return result.ok ? result.score : 0;
+ }
+diff --git a/src/pages/api/tricks/score.ts b/src/pages/api/tricks/score.ts
+index 9c8d7e2..f3a4b1c 100644
+--- a/src/pages/api/tricks/score.ts
++++ b/src/pages/api/tricks/score.ts
+@@ -1,6 +1,8 @@
+ import type { APIRoute } from "astro";
+ import { createClient } from "@/lib/supabase";
+ import { calculateProgressScore } from "@/lib/calculate-score";
+
++const scoreCache = new Map<string, number>();
++
+ export const GET: APIRoute = async (context) => {
+   const { user } = context.locals;
+
+@@ -21,7 +23,18 @@ export const GET: APIRoute = async (context) => {
+     });
+   }
+
+-  const score = await calculateProgressScore(supabase, user.id);
++  const url = new URL(context.request.url);
++  const difficulty = url.searchParams.get("difficulty") ?? undefined;
++  const userId = url.searchParams.get("userId") ?? user.id;
++
++  if (scoreCache.has(userId)) {
++    return new Response(JSON.stringify({ score: scoreCache.get(userId), cached: true }), {
++      status: 200,
++      headers: { "Content-Type": "application/json" },
++    });
++  }
++
++  const score = await calculateProgressScore(supabase, userId, difficulty);
++  scoreCache.set(userId, score);
+
+   return new Response(JSON.stringify({ score }), {
+     status: 200,
