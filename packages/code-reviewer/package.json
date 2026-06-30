@@ -6,7 +6,8 @@
     "start": "node --env-file=.env --import tsx src/index.ts",
     "ci": "node --import tsx src/cli.ts",
     "typecheck": "tsc --noEmit",
-    "eval": "promptfoo eval --config evals/promptfooconfig.yaml"
+    "eval": "promptfoo eval --config evals/promptfooconfig.yaml",
+    "eval:view": "promptfoo view"
   },
   "dependencies": {
     "@openrouter/ai-sdk-provider": "2.9.1",
